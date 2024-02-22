@@ -21,11 +21,17 @@
 
 ## Features
 
-- TODO
+This package features 2 new management commands
+
+- `mamage.py devserver` - this is a simple rename of `runserver`
+- `manage.py prodserver` - this will start your wsgi/asgi server
+
+Includes in this package are configurations for gunicorn, waitress and uvicorn (wgsi & asgi)
 
 ## Requirements
 
-- TODO
+- django-click
+- your wsgi/asgi server of choice
 
 ## Installation
 
@@ -33,6 +39,28 @@ You can install _django-prodserver_ via [pip] from [PyPI]:
 
 ```console
 $ pip install django_prodserver
+```
+
+Add the following settings:
+
+```py
+
+INSTALLED_APPS += ["django_prodserver"]
+
+PROD_SERVERS = {
+    'web': {
+        "BACKEND": "django_prodserver.backends.gunicorn.GunicornServer",
+        "ARGS": [
+            "--bind=0.0.0.0:8111"
+            # other gunicorn commmand line args go here
+        ]
+    }
+}
+```
+
+Then you will be able to use the management command like so:
+```console
+$ python manage.py prodserver web
 ```
 
 ## Usage
