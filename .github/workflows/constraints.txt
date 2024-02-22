@@ -5,4 +5,4 @@ nox-poetry==1.0.3
 poetry==1.6.1
 pytest==7.4.2
 pytest-cov==4.1.0
-pytest-django==4.5.2
+pytest-django==4.8.0
