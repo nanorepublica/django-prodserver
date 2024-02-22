@@ -1,6 +1,6 @@
 # django-prodserver
 
-[![PyPI](https://img.shields.io/pypi/v/ kiecutter.project_name }}.svg)][pypi status]
+[![PyPI](https://img.shields.io/pypi/v/django-prodserver.svg)][pypi status]
 [![Status](https://img.shields.io/pypi/status/django-prodserver.svg)][pypi status]
 [![Python Version](https://img.shields.io/pypi/pyversions/django-prodserver)][pypi status]
 [![License](https://img.shields.io/pypi/l/django-prodserver)][license]
@@ -23,7 +23,7 @@
 
 This package features 2 new management commands
 
-- `mamage.py devserver` - this is a simple rename of `runserver`
+- `manage.py devserver` - this is a simple rename of `runserver`
 - `manage.py prodserver` - this will start your wsgi/asgi server
 
 Includes in this package are configurations for gunicorn, waitress and uvicorn (wgsi & asgi)
