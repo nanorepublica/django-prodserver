@@ -1,0 +1,50 @@
+name: Tests
+on: [push, pull_request]
+
+jobs:
+  tests:
+    env:
+      FORCE_COLOR: "1"
+      PRE_COMMIT_COLOR: "always"
+
+    strategy:
+      fail-fast: false
+
+    name: "Integration testing"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: "Set up environment"
+        run: |
+          docker compose build --build-arg MULTIPLE_PYTHON=True
+          docker compose up -d
+
+      - name: "Wait for docker to finish building"
+        run: sleep 10
+
+      - name: "Run tests"
+        run: docker compose exec django_test nox -r --force-color
+
+      - name: Upload documentation
+        uses: actions/upload-artifact@v3
+        with:
+          name: docs
+          path: docs/_build
+
+      - name: Combine coverage data and display human readable report
+        run: |
+          docker compose exec django_test nox --session "coverage(django='4.2')"
+
+      - name: Create coverage report and copy to artifacts
+        run: |
+          docker compose exec django_test nox --session "coverage(django='4.2')" -- xml
+          docker compose exec django_test cat coverage.xml > coverage.xml
+
+      - name: Upload coverage report
+        uses: codecov/codecov-action@v3.1.4
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+
+      - name: "Shut down environment"
+        run: docker compose down

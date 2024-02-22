@@ -1,0 +1,17 @@
+{
+  "_template": "gh:OmenApps/cookiecutter-django-package",
+  "author": "Andrew Miller",
+  "copyright_year": "2024",
+  "development_status": "Development Status :: 1 - Planning",
+  "docker_compose_python_version": "3.11",
+  "email": "info@akmiller.co.uk",
+  "github_owner": "nanorepublica",
+  "github_user": "nanorepublica",
+  "license": "MIT",
+  "package_description": "A mangement command to provide a manage.py interface to production wsgi/asgi servers",
+  "package_name": "django_prodserver",
+  "project_name": "django-prodserver",
+  "use_playwright": "n",
+  "use_postgres": "n",
+  "version": "2024.02.1"
+}

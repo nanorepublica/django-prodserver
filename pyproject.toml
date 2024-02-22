@@ -1,0 +1,97 @@
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry]
+name = "django-prodserver"
+version = "2024.02.1"
+description = "A mangement command to provide a manage.py interface to production wsgi/asgi servers"
+authors = ["Andrew Miller <info@akmiller.co.uk>"]
+license = "MIT"
+readme = "README.md"
+homepage = "https://github.com/nanorepublica/django-prodserver"
+repository = "https://github.com/nanorepublica/django-prodserver"
+documentation = "https://django-prodserver.readthedocs.io"
+packages = [{ include = "django_prodserver", from = "src" }]
+classifiers = [
+    "Environment :: Web Environment",
+    "Framework :: Django",
+    "Framework :: Django :: 3.2",
+    "Framework :: Django :: 4.0",
+    "Framework :: Django :: 4.1",
+    "Framework :: Django :: 4.2",
+    "Development Status :: 1 - Planning",
+]
+
+[tool.poetry.urls]
+Changelog = "https://github.com/nanorepublica/django-prodserver/releases"
+
+[tool.poetry.dependencies]
+python = ">=3.9,<4.0"
+django = ">=3.2"
+click = ">=8.0.1"
+django-click = "^2.3.0"
+gunicorn = "^21.2.0"
+uvicorn = "^0.27.1"
+waitress = "^3.0.0"
+
+[tool.poetry.dev-dependencies]
+Pygments = ">=2.10.0"
+bandit = ">=1.7.4"
+black = ">=21.10b0"
+coverage = { extras = ["toml"], version = ">=6.2" }
+darglint = ">=1.8.1"
+flake8 = ">=4.0.1"
+flake8-bugbear = ">=21.9.2"
+flake8-docstrings = ">=1.6.0"
+flake8-rst-docstrings = ">=0.2.5"
+furo = ">=2023.9.10"
+isort = ">=5.10.1"
+nox = ">=2023.4.22"
+nox-poetry = ">=1.0.3"
+pep8-naming = ">=0.12.1"
+pre-commit = ">=3.5.0"
+pre-commit-hooks = ">=4.1.0"
+pytest = ">=7.4.2"
+pytest-cov = ">=4.1.0"
+pytest-django = ">=4.5.2"
+pyupgrade = ">=2.29.1"
+safety = ">=1.10.3"
+sphinx = ">=7.2.6"
+sphinx-autobuild = ">=2021.3.14"
+sphinx-click = ">=5.0.1"
+xdoctest = { extras = ["colors"], version = ">=0.15.10" }
+myst-parser = { version = ">=0.16.1" }
+[tool.black]
+line-length = 120
+target-version = ["py38", "py39", "py310", "py311"]
+force-exclude = '''
+(
+  .nox
+)
+'''
+
+[tool.coverage.paths]
+source = ["src", "*/site-packages"]
+tests = ["tests", "*/tests"]
+
+[tool.coverage.run]
+branch = true
+source = ["src", "tests"]
+
+[tool.coverage.report]
+show_missing = true
+fail_under = 50
+omit = [".nox/*", "tests/*", "**/migrations/*", "**/__init__.py"]
+
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "tests.settings"
+python_files = ["*test_*.py", "*_test.py", "tests/*.py"]
+log_cli = true
+log_cli_level = "INFO"
+
+[tool.isort]
+profile = "black"
+force_single_line = true
+lines_after_imports = 2
+extend_skip = [".nox"]

@@ -1,0 +1,16 @@
+version: "3"
+
+services:
+  django_test:
+    build:
+      context: .
+      dockerfile: ./compose/django/Dockerfile
+    image: django_prodserver_django
+    container_name: django_test
+
+    env_file:
+      - ./compose/django/.django
+    ports:
+      - "8111:8111"
+      - "8080:8080"
+    command: /start
