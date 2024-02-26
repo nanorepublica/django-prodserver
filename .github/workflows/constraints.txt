@@ -2,7 +2,7 @@ pip==23.3.1
 pipx==1.2.1
 nox==2023.4.22
 nox-poetry==1.0.3
-poetry==1.6.1
+poetry==1.8.0
 pytest==7.4.2
 pytest-cov==4.1.0
 pytest-django==4.5.2
