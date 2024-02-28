@@ -1,7 +1,6 @@
 """Test cases for the django-prodserver package."""
 
 import pytest
-from click.testing import CliRunner
 from django.apps import apps
 from django.conf import settings
 

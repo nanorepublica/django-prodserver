@@ -29,8 +29,6 @@ Changelog = "https://github.com/nanorepublica/django-prodserver/releases"
 [tool.poetry.dependencies]
 python = ">=3.9,<4.0"
 django = ">=3.2"
-click = ">=8.0.1"
-django-click = "^2.3.0"
 gunicorn = "^21.2.0"
 uvicorn = "^0.27.1"
 waitress = "^3.0.0"

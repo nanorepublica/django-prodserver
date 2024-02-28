@@ -30,7 +30,6 @@ Includes in this package are configurations for gunicorn, waitress and uvicorn (
 
 ## Requirements
 
-- django-click
 - your wsgi/asgi server of choice
 
 ## Installation
