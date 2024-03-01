@@ -4,7 +4,7 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
 name = "django-prodserver"
-version = "2024.03.1"
+version = "2024.03.2"
 description = "A mangement command to provide a manage.py interface to production wsgi/asgi servers"
 authors = ["Andrew Miller <info@akmiller.co.uk>"]
 license = "MIT"
