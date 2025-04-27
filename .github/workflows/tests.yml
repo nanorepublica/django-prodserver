@@ -27,7 +27,7 @@ jobs:
         run: docker compose exec django_test nox -r --force-color
 
       - name: Upload documentation
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: docs
           path: docs/_build
