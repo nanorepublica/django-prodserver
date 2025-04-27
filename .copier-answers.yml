@@ -1,0 +1,23 @@
+# Changes here will be overwritten by Copier
+_commit: bba8395
+_src_path: gh:browniebroke/pypackage-template
+copyright_year: '2025'
+django_app_shorthand: prodserver
+documentation: true
+email: info@akmiller.co.uk
+full_name: Andy Miller
+github_username: nanorepublica
+has_cli: false
+initial_commit: false
+is_django_package: true
+open_source_license: MIT
+open_with_editor: false
+package_name: django_prodserver
+project_name: Django prodserver
+project_short_description: A management command to start production servers/workers
+    with a consistent interface
+project_slug: django-prodserver
+run_uv_sync: false
+setup_github: false
+setup_pre_commit: false
+
