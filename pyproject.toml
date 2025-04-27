@@ -42,6 +42,18 @@ urls.repository = "https://github.com/nanorepublica/django-prodserver"
 gunicorn = [
     "gunicorn>=23.0.0",
 ]
+django-tasks = [
+    "django-tasks>=0.7.0",
+]
+celery = [
+    "celery>=5.5.2",
+]
+uvicorn = [
+    "uvicorn>=0.34.2",
+]
+waitress = [
+    "waitress>=3.0.2",
+]
 
 [dependency-groups]
 dev = [
