@@ -14,7 +14,6 @@ class DjangoApplication(WSGIApplication):
         """Initialised the Gunicorn Server."""
         # strip mgmt command name from args and insert WSGI module
         args = (wsgi_app_name(),)
-        print(opts, args)
         super().init(parser, opts, args)
 
 
