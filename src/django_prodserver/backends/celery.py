@@ -4,9 +4,7 @@ from .base import BaseServerBackend
 
 
 class CeleryWorker(BaseServerBackend):
-    """
-    Backend to start a celery worker
-    """
+    """Backend to start a celery worker."""
 
     def __init__(self, **server_config):
         celery_app_str = server_config.get("APP")
@@ -14,7 +12,5 @@ class CeleryWorker(BaseServerBackend):
         super().__init__(**server_config)
 
     def start_server(self, *args):
+        """Start Celery Worker."""
         self.app.Worker(*args).start()
-
-    def prep_server_args(self):
-        return self.args

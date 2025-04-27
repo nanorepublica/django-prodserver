@@ -7,10 +7,13 @@ log = logging.getLogger(__name__)
 
 
 class WarmupFailure(Exception):
+    """Exception to capture WarmupFailure."""
+
     pass
 
 
-def wsgi_healthcheck(app, url, ok_status=200):
+def wsgi_healthcheck(app, url, ok_status=200) -> None:
+    """Simple healthcheck function."""
     try:
         host = settings.ALLOWED_HOSTS[0]
         if host.startswith("."):
@@ -27,9 +30,11 @@ def wsgi_healthcheck(app, url, ok_status=200):
         )
 
 
-def wsgi_app_name():
+def wsgi_app_name() -> str:
+    """Get the WSGI name from settings."""
     return ":".join(settings.WSGI_APPLICATION.rsplit(".", 1))
 
 
-def asgi_app_name():
+def asgi_app_name() -> str:
+    """Get the ASGI name from settings."""
     return ":".join(settings.ASGI_APPLICATION.rsplit(".", 1))

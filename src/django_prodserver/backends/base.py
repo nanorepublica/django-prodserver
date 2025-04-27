@@ -1,15 +1,33 @@
 class BaseServerBackend:
+    """
+    Base class to configure an individual process backend.
+
+    You are required to override "start_server" in the subclass
+    """
+
     def __init__(self, **server_args):
         self.args = self._format_server_args_from_dict(server_args.get("ARGS"))
 
     def start_server(self, *args):
+        """
+        Function is called to start the process directly.
+
+        This must be implemented in the subclass
+        """
         raise NotImplementedError
 
     def prep_server_args(self):
+        """
+        Here we customisation of the arguments passed to the server process.
+
+        Typically this is where fixed arguments are inserted into the args
+        """
         return self.args
 
     def _format_server_args_from_dict(self, args):
         """
+        Formatting server process arguments coming from settings.
+
         This function transforms the dictionary settings configuration
         from:
             {

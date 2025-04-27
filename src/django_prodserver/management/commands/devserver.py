@@ -2,4 +2,6 @@ from django.core.management.commands.runserver import Command as RunServerComman
 
 
 class Command(RunServerCommand):
+    """Class to override the name of 'runserver'."""
+
     pass
