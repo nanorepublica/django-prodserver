@@ -1,8 +1,9 @@
 import sys
+
 from gunicorn.app.wsgiapp import WSGIApplication
 
-from .base import BaseServerBackend
 from ..utils import wsgi_app_name
+from .base import BaseServerBackend
 
 
 class DjangoApplication(WSGIApplication):

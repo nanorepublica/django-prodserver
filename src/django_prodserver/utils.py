@@ -23,14 +23,13 @@ def wsgi_healthcheck(app, url, ok_status=200):
     warmup = app.get_response(RequestFactory().get(url, **headers))
     if warmup.status_code != ok_status:
         raise WarmupFailure(
-            "WSGI warmup using endpoint {} responded with a {}.".format(
-                url, warmup.status_code
-            )
+            f"WSGI warmup using endpoint {url} responded with a {warmup.status_code}."
         )
 
 
 def wsgi_app_name():
     return ":".join(settings.WSGI_APPLICATION.rsplit(".", 1))
+
 
 def asgi_app_name():
     return ":".join(settings.ASGI_APPLICATION.rsplit(".", 1))

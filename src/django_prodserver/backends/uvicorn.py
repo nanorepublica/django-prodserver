@@ -1,7 +1,7 @@
 import uvicorn.main
 
+from ..utils import asgi_app_name, wsgi_app_name
 from .base import BaseServerBackend
-from ..utils import wsgi_app_name, asgi_app_name
 
 
 class UvicornServer(BaseServerBackend):

@@ -1,4 +1,5 @@
 import sys
+
 from django.conf import settings
 from django.core.management import BaseCommand, CommandError, handle_default_options
 from django.core.management.base import SystemCheckError
@@ -58,9 +59,7 @@ class Command(BaseCommand):
         except KeyError:
             available_servers = "\n ".join(settings.PRODUCTION_PROCESSES.keys())
             raise CommandError(
-                "Server named '{}' not found in the PRODUCTION_PROCESSES setting\nAvailable names are:\n {}".format(
-                    server_name, available_servers
-                )
+                f"Server named '{server_name}' not found in the PRODUCTION_PROCESSES setting\nAvailable names are:\n {available_servers}"
             )
 
         self.stdout.write(self.style.NOTICE("Starting server named %s" % server_name))
@@ -68,7 +67,7 @@ class Command(BaseCommand):
         try:
             server_backend = server_config["BACKEND"]
         except KeyError:
-            raise CommandError("Backend not configured for server named {}".format(server_name))
+            raise CommandError(f"Backend not configured for server named {server_name}")
 
         backend_class = import_string(server_backend)
 
@@ -77,4 +76,8 @@ class Command(BaseCommand):
 
     def list_process_names(self):
         available_servers = "\n ".join(settings.PRODUCTION_PROCESSES.keys())
-        self.stdout.write(self.style.SUCCESS("Available production process names are:\n %s" % available_servers))
+        self.stdout.write(
+            self.style.SUCCESS(
+                "Available production process names are:\n %s" % available_servers
+            )
+        )

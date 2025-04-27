@@ -1,7 +1,7 @@
 import waitress.runner
 
-from .base import BaseServerBackend
 from ..utils import wsgi_app_name
+from .base import BaseServerBackend
 
 
 class WaitressServer(BaseServerBackend):
