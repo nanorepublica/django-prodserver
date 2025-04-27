@@ -1,14 +1,22 @@
+from collections.abc import Mapping
+
+
 class BaseServerBackend:
     """
     Base class to configure an individual process backend.
 
     You are required to override "start_server" in the subclass
+
+    {
+        "BACKEND": "django_prodserver.backends.gunicorn.GunicornServer",
+        "ARGS": {"bind": "0.0.0.0:8111"}
+    }
     """
 
-    def __init__(self, **server_args):
-        self.args = self._format_server_args_from_dict(server_args.get("ARGS"))
+    def __init__(self, **server_args: Mapping[str, str]) -> None:
+        self.args = self._format_server_args_from_dict(server_args.get("ARGS", {}))
 
-    def start_server(self, *args):
+    def start_server(self, *args: str) -> None:
         """
         Function is called to start the process directly.
 
@@ -16,7 +24,7 @@ class BaseServerBackend:
         """
         raise NotImplementedError
 
-    def prep_server_args(self):
+    def prep_server_args(self) -> list[str]:
         """
         Here we customisation of the arguments passed to the server process.
 
@@ -24,7 +32,7 @@ class BaseServerBackend:
         """
         return self.args
 
-    def _format_server_args_from_dict(self, args):
+    def _format_server_args_from_dict(self, args: Mapping[str, str]) -> list[str]:
         """
         Formatting server process arguments coming from settings.
 

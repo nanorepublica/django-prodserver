@@ -1,6 +1,7 @@
 import logging
 
 from django.conf import settings
+from django.core.handlers.wsgi import WSGIHandler
 from django.test import RequestFactory
 
 log = logging.getLogger(__name__)
@@ -12,7 +13,7 @@ class WarmupFailure(Exception):
     pass
 
 
-def wsgi_healthcheck(app, url, ok_status=200) -> None:
+def wsgi_healthcheck(app: WSGIHandler, url: str, ok_status: int = 200) -> None:
     """Simple healthcheck function."""
     try:
         host = settings.ALLOWED_HOSTS[0]

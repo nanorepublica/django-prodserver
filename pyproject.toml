@@ -38,6 +38,11 @@ urls.Changelog = "https://github.com/nanorepublica/django-prodserver/blob/main/C
 urls.documentation = "https://django-prodserver.readthedocs.io"
 urls.repository = "https://github.com/nanorepublica/django-prodserver"
 
+[project.optional-dependencies]
+gunicorn = [
+    "gunicorn>=23.0.0",
+]
+
 [dependency-groups]
 dev = [
   "pytest>=8,<9",

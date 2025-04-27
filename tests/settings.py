@@ -51,3 +51,37 @@ TEMPLATES = [
         },
     },
 ]
+
+PRODUCTION_PROCESSES = {
+    "web-g": {
+        "BACKEND": "django_prodserver.backends.gunicorn.GunicornServer",
+        "ARGS": {"bind": "0.0.0.0:8111"},
+    },
+    "web-w": {
+        "BACKEND": "django_prodserver.backends.waitress.WaitressServer",
+        "ARGS": {},
+    },
+    "web-u": {
+        "BACKEND": "django_prodserver.backends.uvicorn.UvicornServer",
+        "ARGS": {},
+    },
+    "web-uw": {
+        "BACKEND": "django_prodserver.backends.uvicorn.UvicornWSGIServer",
+        "ARGS": {},
+    },
+    "worker-celery": {
+        "BACKEND": "django_prodserver.backends.celery.CeleryWorker",
+        "APP": "example_project.celery.app",
+        "ARGS": {},
+    },
+    "worker": {
+        "BACKEND": "django_prodserver.backends.django_tasks.DjangoTasksWorker",
+        "ARGS": {},
+    },
+}
+
+
+TASKS = {"default": {"BACKEND": "django_tasks.backends.database.DatabaseBackend"}}
+
+WSGI_APPLICATION = "tests.wsgi.application"
+ASGI_APPLICATION = "tests.asgi.application"

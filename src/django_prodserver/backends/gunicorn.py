@@ -1,4 +1,5 @@
 import sys
+from argparse import ArgumentParser, Namespace
 
 from gunicorn.app.wsgiapp import WSGIApplication
 
@@ -9,10 +10,12 @@ from .base import BaseServerBackend
 class DjangoApplication(WSGIApplication):
     """Dynamic Gunicorn WSGI Application."""
 
-    def __init__(self, parser, opts, args):
+    def init(self, parser: ArgumentParser, opts: Namespace, *args: object) -> None:
+        """Initialised the Gunicorn Server."""
         # strip mgmt command name from args and insert WSGI module
-        args = [wsgi_app_name()]
-        super().__init__(parser, opts, args)
+        args = (wsgi_app_name(),)
+        print(opts, args)
+        super().init(parser, opts, args)
 
 
 class GunicornServer(BaseServerBackend):
@@ -23,7 +26,7 @@ class GunicornServer(BaseServerBackend):
     to gunicorn.
     """
 
-    def start_server(self, *args):
+    def start_server(self, *args: str) -> None:
         """Add args back into sys.argv and run the server."""
         sys.argv.extend(args)
         DjangoApplication("%(prog)s [OPTIONS]", *args).run()

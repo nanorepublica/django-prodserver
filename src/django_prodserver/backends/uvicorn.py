@@ -12,13 +12,13 @@ class UvicornServer(BaseServerBackend):
     to uvicorn.
     """
 
-    def prep_server_args(self):
+    def prep_server_args(self) -> list[str]:
         """Prepare the server args."""
         args = [asgi_app_name()]
         args.extend(self.args)
         return args
 
-    def start_server(self, *args):
+    def start_server(self, *args: str) -> None:
         """Start the server."""
         uvicorn.main.main(args)
 
@@ -31,12 +31,12 @@ class UvicornWSGIServer(BaseServerBackend):
     to uvicorn.
     """
 
-    def prep_server_args(self):
+    def prep_server_args(self) -> list[str]:
         """Prepare the server args."""
         args = [wsgi_app_name(), "--interface=wsgi"]
         args.extend(self.args)
         return args
 
-    def start_server(self, *args):
+    def start_server(self, *args: str) -> None:
         """Start the server."""
         uvicorn.main.main(args)

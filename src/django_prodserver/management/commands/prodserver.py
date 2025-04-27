@@ -1,4 +1,6 @@
 import sys
+from argparse import ArgumentParser
+from collections.abc import Mapping
 
 from django.conf import settings
 from django.core.management import BaseCommand, CommandError, handle_default_options
@@ -9,7 +11,7 @@ from django.utils.module_loading import import_string
 class Command(BaseCommand):
     """The main prodserver command."""
 
-    def add_arguments(self, parser) -> None:
+    def add_arguments(self, parser: ArgumentParser) -> None:
         """Add arguments."""
         choices = settings.PRODUCTION_PROCESSES.keys()
         parser.add_argument(
@@ -21,7 +23,7 @@ class Command(BaseCommand):
         )
         parser.add_argument("--list", action="store_true")
 
-    def run_from_argv(self, argv) -> None:
+    def run_from_argv(self, argv: list[str]) -> None:
         """
         Slight modification of the BaseCommand function.
 
@@ -57,7 +59,9 @@ class Command(BaseCommand):
                 self.stderr.write(f"{e.__class__.__name__}: {e}")
             sys.exit(e.returncode)
 
-    def start_server(self, server_name, *args, **kwargs) -> None:
+    def start_server(
+        self, server_name: str, *args: list[str], **kwargs: Mapping[str, str]
+    ) -> None:
         """Start the correct process based on the provided name."""
         # this try/except could be removed, keeping for now as it's a nicer
         try:
