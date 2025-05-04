@@ -13,6 +13,12 @@ python manage.py prodserver web
 python manage.py prodserver worker
 ```
 
+More generically this this is of the form:
+
+```sh
+python manage.py prodserver <process_name>
+```
+
 # Creating a new backend.
 
 Creating a backend is fairly simple. Subclass the `BaseServerBackend` class, then implement

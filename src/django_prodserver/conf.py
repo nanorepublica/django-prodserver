@@ -1,7 +1,7 @@
 """
 These are the available settings.
 
-All attributes prefixed ``PRODSERVER_*`` can be overridden from your Django
+All attributes prefixed ``PRODUCTION_*`` can be overridden from your Django
 project's settings module by defining a setting with the same name.
 """
 
@@ -14,14 +14,14 @@ from django.conf import settings as django_settings
 
 # All attributes accessed with this prefix are possible to overwrite
 # through django.conf.settings.
-SETTINGS_PREFIX = "PRODSERVER_"
+SETTINGS_PREFIX = "PRODUCTION_"
 
 
 @dataclass(frozen=True)
 class AppSettings:
     """Access this instance as `.conf.app_settings`."""
 
-    PRODSERVER_ENABLED: bool = True
+    PRODUCTION_PROCESSES: dict = {}
     """Whether the app is enabled (dummy setting to demo usage)."""
 
     def __getattribute__(self, __name: str) -> Any:

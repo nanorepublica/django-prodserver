@@ -2,10 +2,11 @@ import sys
 from argparse import ArgumentParser
 from collections.abc import Mapping
 
-from django.conf import settings
 from django.core.management import BaseCommand, CommandError, handle_default_options
 from django.core.management.base import SystemCheckError
 from django.utils.module_loading import import_string
+
+from ...conf import app_settings
 
 
 class Command(BaseCommand):
@@ -13,7 +14,7 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser: ArgumentParser) -> None:
         """Add arguments."""
-        choices = settings.PRODUCTION_PROCESSES.keys()
+        choices = app_settings.PRODUCTION_PROCESSES.keys()
         parser.add_argument(
             "server_name",
             type=str,
@@ -65,9 +66,9 @@ class Command(BaseCommand):
         """Start the correct process based on the provided name."""
         # this try/except could be removed, keeping for now as it's a nicer
         try:
-            server_config = settings.PRODUCTION_PROCESSES[server_name]
+            server_config = app_settings.PRODUCTION_PROCESSES[server_name]
         except KeyError:
-            available_servers = "\n ".join(settings.PRODUCTION_PROCESSES.keys())
+            available_servers = "\n ".join(app_settings.PRODUCTION_PROCESSES.keys())
             raise CommandError(
                 f"Server named '{server_name}' not found in the PRODUCTION_PROCESSES"
                 f" setting\nAvailable names are:\n {available_servers}"
@@ -89,7 +90,7 @@ class Command(BaseCommand):
 
     def list_process_names(self) -> None:
         """Simple function to return a list of the configured processes."""
-        available_servers = "\n ".join(settings.PRODUCTION_PROCESSES.keys())
+        available_servers = "\n ".join(app_settings.PRODUCTION_PROCESSES.keys())
         self.stdout.write(
             self.style.SUCCESS(
                 f"Available production process names are:\n {available_servers}"
