@@ -7,7 +7,7 @@ project's settings module by defining a setting with the same name.
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Any
 
 from django.conf import settings as django_settings
@@ -21,7 +21,7 @@ SETTINGS_PREFIX = "PRODUCTION_"
 class AppSettings:
     """Access this instance as `.conf.app_settings`."""
 
-    PRODUCTION_PROCESSES: dict = {}
+    PRODUCTION_PROCESSES: dict = field(default_factory=dict)
     """Whether the app is enabled (dummy setting to demo usage)."""
 
     def __getattribute__(self, __name: str) -> Any:
