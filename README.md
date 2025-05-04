@@ -55,6 +55,64 @@ INSTALLED_APPS = [
 ]
 ```
 
+## Configuration
+
+Add the `PRODUCTION_PROCESSES` setting to your `settings.py`. Below shows an example with a web process and worker process defined.
+
+The comments show other available backend processes that are available to use.
+
+```py
+PRODUCTION_PROCESSES = {
+    "web": {
+        "BACKEND": "django_prodserver.backends.gunicorn.GunicornServer",
+        "ARGS": {"bind": "0.0.0.0:8111"},
+    },
+    # "web": {
+    #     "BACKEND": "django_prodserver.backends.waitress.WaitressServer",
+    #     "ARGS": {},
+    # },
+    # "web": {
+    #     "BACKEND": "django_prodserver.backends.uvicorn.UvicornServer",
+    #     "ARGS": {},
+    # },
+    # "web": {
+    #     "BACKEND": "django_prodserver.backends.uvicorn.UvicornWSGIServer",
+    #     "ARGS": {},
+    # },
+    "worker": {
+        "BACKEND": "django_prodserver.backends.celery.CeleryWorker",
+        "APP": "tests.celery.app",
+        "ARGS": {},
+    },
+    # "worker": {
+    #     "BACKEND": "django_prodserver.backends.django_tasks.DjangoTasksWorker",
+    #     "ARGS": {},
+    # },
+}
+```
+
+## Usage
+
+Once the `PRODUCTION_PROCESSES` setting has been configured you can then start the processes as follows:
+
+```sh
+python manage.py prodserver web
+```
+
+```sh
+python manage.py prodserver worker
+```
+
+## Creating a new backend.
+
+Creating a backend is fairly simple. Subclass the `BaseServerBackend` class, then implement
+the `start_server` method which should call the underlying process in the best possible way for a production
+setting. You can also optionally override `prep_server_args` method to aid with this to provide any default arguments
+or formatting to the `start_server` command.
+
+See `django_prodserver.backends` for examples of existing backends for inspiration. Pull Request's are welcome for
+additional backends.
+
 ## Contributors ✨
 
 Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/docs/en/emoji-key)):
