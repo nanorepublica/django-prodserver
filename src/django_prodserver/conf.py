@@ -7,6 +7,7 @@ project's settings module by defining a setting with the same name.
 
 from __future__ import annotations
 
+from collections.abc import Mapping
 from dataclasses import dataclass, field
 from typing import Any
 
@@ -21,7 +22,7 @@ SETTINGS_PREFIX = "PRODUCTION_"
 class AppSettings:
     """Access this instance as `.conf.app_settings`."""
 
-    PRODUCTION_PROCESSES: dict = field(default_factory=dict)
+    PRODUCTION_PROCESSES: Mapping[str, Mapping[str, str]] = field(default_factory=dict)
     """Whether the app is enabled (dummy setting to demo usage)."""
 
     def __getattribute__(self, __name: str) -> Any:
