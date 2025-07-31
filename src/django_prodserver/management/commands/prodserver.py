@@ -15,12 +15,19 @@ class Command(BaseCommand):
     def add_arguments(self, parser: ArgumentParser) -> None:
         """Add arguments."""
         choices = app_settings.PRODUCTION_PROCESSES.keys()
+        try:
+            default = next(iter(choices))
+        except StopIteration:
+            raise CommandError(
+                "No servers configured in the PRODUCTION_PROCESSES setting.\n"
+                "Configure your servers before running this command."
+            ) from None
         parser.add_argument(
             "server_name",
             type=str,
             choices=choices,
             nargs="?",
-            default=next(iter(choices)),
+            default=default,
         )
         parser.add_argument("--list", action="store_true")
 

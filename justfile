@@ -29,3 +29,6 @@ new_backend extra:
     #     def start_server(self, *args: str) -> None:\
     #         """Start an {{ extra }} process."""\
     #         pass' > src/django_prodserver/backends/{{ extra }}.py
+
+tests *FLAGS:
+    python manage.py test {{FLAGS}}
