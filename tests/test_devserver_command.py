@@ -1,29 +1,26 @@
 import os
-import sys
+import re
+import shutil
 import socket
-import unittest
-import tempfile
 import subprocess
+import sys
+import tempfile
+import unittest
 from io import StringIO
 from unittest import mock
 
-import re
-import shutil
-
 from django import conf
 from django.conf import settings
-from django.core.management.base import SystemCheckError
-
 from django.core.checks import Error, Tags, register
 from django.core.checks.registry import registry
 from django.core.management import call_command
-from django.test import SimpleTestCase, TestCase, override_settings
-from django_prodserver.management.commands.devserver import Command as RunserverCommand
-
-from django.utils.version import PY313, get_docs_version
-
-from django.db.migrations.recorder import MigrationRecorder
+from django.core.management.base import SystemCheckError
 from django.db import ConnectionHandler
+from django.db.migrations.recorder import MigrationRecorder
+from django.test import SimpleTestCase
+from django.utils.version import get_docs_version
+
+from django_prodserver.management.commands.devserver import Command as RunserverCommand
 
 
 class AdminScriptTestCase(SimpleTestCase):
@@ -147,13 +144,13 @@ class AdminScriptTestCase(SimpleTestCase):
         return self.run_test(["./manage.py", *args], settings_file)
 
     def assertNoOutput(self, stream):
-        "Utility assertion: assert that the given stream is empty"
+        """Utility assertion: assert that the given stream is empty"""
         self.assertEqual(
             len(stream), 0, "Stream should be empty: actually contains '%s'" % stream
         )
 
     def assertOutput(self, stream, msg, regex=False):
-        "Utility assertion: assert that the given message exists in the output"
+        """Utility assertion: assert that the given message exists in the output"""
         if regex:
             self.assertIsNotNone(
                 re.search(msg, stream),
@@ -167,7 +164,7 @@ class AdminScriptTestCase(SimpleTestCase):
             )
 
     def assertNotInOutput(self, stream, msg):
-        "Utility assertion: assert that the given message doesn't exist in the output"
+        """Utility assertion: assert that the given message doesn't exist in the output"""
         self.assertNotIn(
             msg, stream, "'%s' matches actual output text '%s'" % (msg, stream)
         )
@@ -440,7 +437,7 @@ class ManageRunserverEmptyAllowedHosts(AdminScriptTestCase):
 
 class ManageRunserverHelpOutput(AdminScriptTestCase):
     def test_suppressed_options(self):
-        """runserver doesn't support --verbosity and --trackback options."""
+        """Runserver doesn't support --verbosity and --trackback options."""
         out, err = self.run_manage(["runserver", "--help"])
         self.assertNotInOutput(out, "--verbosity")
         self.assertNotInOutput(out, "--trackback")

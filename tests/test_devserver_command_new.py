@@ -1,9 +1,7 @@
-import pytest
 from unittest.mock import Mock, patch
-from django.core.management import call_command, CommandError
+
 from django.core.management.commands.runserver import Command as RunServerCommand
-from django.test import TestCase, override_settings
-from io import StringIO
+from django.test import TestCase
 
 from django_prodserver.management.commands.devserver import Command
 

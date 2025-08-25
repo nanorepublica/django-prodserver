@@ -1,5 +1,6 @@
+from unittest.mock import patch
+
 import pytest
-from unittest.mock import Mock, patch
 
 # Handle optional dependency
 waitress = pytest.importorskip("waitress")
@@ -53,7 +54,7 @@ class TestWaitressServer:
     def test_start_server(self, mock_waitress_run):
         """Test start_server method."""
         server = WaitressServer()
-        args = ["--host=0.0.0.0", "--port=8000"]
+        args = ("--host=0.0.0.0", "--port=8000")
 
         server.start_server(*args)
 
@@ -112,12 +113,12 @@ class TestWaitressServer:
 
         mock_wsgi_app_name.assert_called_once()
         mock_waitress_run.assert_called_once_with(
-            argv=[
+            argv=(
                 "waitress",
                 "--host=0.0.0.0",
                 "--port=8000",
                 "tests.wsgi:application",
-            ]
+            )
         )
 
     def test_waitress_always_first_arg(self):
@@ -152,7 +153,7 @@ class TestWaitressServer:
     def test_start_server_with_various_arg_types(self, mock_waitress_run):
         """Test start_server with various argument types."""
         server = WaitressServer()
-        args = ["--host=0.0.0.0", "--port=8000", "--threads=4"]
+        args = ("--host=0.0.0.0", "--port=8000", "--threads=4")
 
         server.start_server(*args)
 

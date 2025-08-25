@@ -107,9 +107,6 @@ lint.isort.known-first-party = [ "django_prodserver", "tests" ]
 addopts = """\
     -v
     -Wdefault
-    --cov=django_prodserver
-    --cov-report=term
-    --cov-report=xml
     --ds=tests.settings
     """
 pythonpath = [ "src" ]

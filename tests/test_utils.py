@@ -1,14 +1,12 @@
-import pytest
 from unittest.mock import Mock, patch
-from django.test import RequestFactory
-from django.http import HttpResponse
-from django.conf import settings
+
+import pytest
 
 from django_prodserver.utils import (
-    wsgi_app_name,
-    asgi_app_name,
-    wsgi_healthcheck,
     WarmupFailure,
+    asgi_app_name,
+    wsgi_app_name,
+    wsgi_healthcheck,
 )
 
 

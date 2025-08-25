@@ -1,5 +1,6 @@
-import pytest
 from unittest.mock import Mock, patch
+
+import pytest
 
 # Handle optional dependency
 celery = pytest.importorskip("celery")

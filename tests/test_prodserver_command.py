@@ -1,17 +1,16 @@
-import pytest
 from io import StringIO
-from unittest.mock import Mock, patch, MagicMock
+from unittest.mock import MagicMock, Mock, patch
+
+import pytest
 from django.core.management import CommandError, call_command
 from django.core.management.base import SystemCheckError
 from django.test import TestCase, override_settings
-from django.utils.module_loading import import_string
 
+from django_prodserver.management.commands.devserver import Command as DevServerCommand
 from django_prodserver.management.commands.prodserver import Command
-
 from django_prodserver.management.commands.prodserver import (
     Command as ProdServerCommand,
 )
-from django_prodserver.management.commands.devserver import Command as DevServerCommand
 
 
 class TestProdserverCommand(TestCase):
@@ -59,7 +58,6 @@ class TestProdserverCommand(TestCase):
     )
     def test_multiple_server_configurations(self):
         """Test handling of multiple server configurations."""
-
         self.command.run_from_argv(["manage.py", "prodserver", "--list"])
 
         output = self.command.stdout.getvalue()

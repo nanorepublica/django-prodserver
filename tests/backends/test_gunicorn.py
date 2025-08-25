@@ -1,6 +1,7 @@
-import pytest
-from unittest.mock import Mock, patch, MagicMock
 from argparse import ArgumentParser, Namespace
+from unittest.mock import Mock, patch
+
+import pytest
 
 # Handle optional dependency
 gunicorn = pytest.importorskip("gunicorn")
@@ -11,6 +12,7 @@ from django_prodserver.backends.gunicorn import DjangoApplication, GunicornServe
 class TestDjangoApplication:
     """Tests for DjangoApplication class."""
 
+    @patch("sys.argv", ["test_program"])
     def test_init(self):
         """Test DjangoApplication.init method."""
         app = DjangoApplication()
