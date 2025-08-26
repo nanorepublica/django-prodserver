@@ -64,7 +64,7 @@ jobs:
       - uses: astral-sh/setup-uv@v5
       - run: uv pip install --system tox tox-uv
         shell: bash
-      - run: tox -e py$(echo ${{ matrix.python-version }},${{ matrix.backend }},coverage | tr -d .)-django52
+      - run: tox -e py$(echo ${{ matrix.python-version }} | tr -d .)-django52,${{ matrix.backend }},coverage
         shell: bash
       - uses: codecov/codecov-action@v5
         with:
