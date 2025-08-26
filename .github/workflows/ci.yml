@@ -44,6 +44,16 @@ jobs:
                     - ubuntu-latest
                     - windows-latest
                     - macOS-latest
+                backend:
+                    - waitress
+                    - celery
+                    - uvicorn
+                include:
+                    - backend:
+                          - gunicorn
+                      os:
+                          - ubuntu-latest
+                          - macOS-latest
         runs-on: ${{ matrix.os }}
         steps:
             - uses: actions/checkout@v4
@@ -53,7 +63,7 @@ jobs:
             - uses: astral-sh/setup-uv@v5
             - run: uv pip install --system tox tox-uv
               shell: bash
-            - run: tox -e py$(echo ${{ matrix.python-version }},waitress,gunicorn,celery,uvicorn,coverage | tr -d .)-django52
+            - run: tox -e py$(echo ${{ matrix.python-version }},${{ matrix.backend }},coverage | tr -d .)-django52
               shell: bash
             - uses: codecov/codecov-action@v5
               with:
