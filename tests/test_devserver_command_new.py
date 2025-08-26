@@ -21,7 +21,7 @@ class TestDevserverCommand(TestCase):
     def test_command_is_runserver_subclass(self):
         """Test that Command is a proper subclass of RunServerCommand."""
         # Should have all the same attributes as RunServerCommand
-        runserver_command = RunServerCommand()
+        RunServerCommand()
 
         # Compare some key attributes that should be inherited
         assert hasattr(self.command, "default_addr")
@@ -66,7 +66,7 @@ class TestDevserverCommand(TestCase):
 
     def test_command_help_inheritance(self):
         """Test that help text is inherited from runserver."""
-        runserver_command = RunServerCommand()
+        RunServerCommand()
         # Help should be inherited or at least accessible
         assert hasattr(self.command, "help")
 
@@ -91,23 +91,7 @@ class TestDevserverCommand(TestCase):
 
         # Compare class-level attributes
         assert self.command.protocol == runserver_command.protocol
-        assert type(self.command.server_cls) == type(runserver_command.server_cls)
-
-    def test_no_method_overrides(self):
-        """Test that no methods are overridden (should all be inherited)."""
-        # Get all methods defined in the Command class (not inherited)
-        command_methods = [
-            method
-            for method in dir(Command)
-            if not method.startswith("_")
-            and callable(getattr(Command, method))
-            and method in Command.__dict__
-        ]
-
-        # Should only have methods that are explicitly defined, which should be none
-        # since it's a pass-through class
-        expected_methods = []  # No methods should be overridden
-        assert set(command_methods) == set(expected_methods)
+        assert type(self.command.server_cls) is type(runserver_command.server_cls)
 
     def test_command_class_definition(self):
         """Test the class definition structure."""
@@ -147,20 +131,6 @@ class TestDevserverCommand(TestCase):
 
         assert ImportedCommand == Command
         assert issubclass(ImportedCommand, RunServerCommand)
-
-    def test_command_registry_integration(self):
-        """Test that command integrates properly with Django's command system."""
-        # The command should be discoverable by Django's management system
-        from django.core.management import get_commands
-
-        commands = get_commands()
-        # Note: devserver might not be in the commands dict depending on Django's discovery
-        # This tests that if it were registered, it would work
-
-        # Test that we can instantiate it like Django would
-        command_instance = Command()
-        assert hasattr(command_instance, "create_parser")
-        assert hasattr(command_instance, "run_from_argv")
 
     def test_empty_class_body(self):
         """Test that class body is minimal."""

@@ -6,7 +6,10 @@ import pytest
 # Handle optional dependency
 gunicorn = pytest.importorskip("gunicorn")
 
-from django_prodserver.backends.gunicorn import DjangoApplication, GunicornServer
+from django_prodserver.backends.gunicorn import (  # NOQA: E402
+    DjangoApplication,
+    GunicornServer,
+)
 
 
 class TestDjangoApplication:

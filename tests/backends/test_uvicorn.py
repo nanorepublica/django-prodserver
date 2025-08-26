@@ -5,7 +5,10 @@ import pytest
 # Handle optional dependency
 uvicorn = pytest.importorskip("uvicorn")
 
-from django_prodserver.backends.uvicorn import UvicornServer, UvicornWSGIServer
+from django_prodserver.backends.uvicorn import (  # NOQA: E402
+    UvicornServer,
+    UvicornWSGIServer,
+)
 
 
 class TestUvicornServer:
@@ -18,8 +21,8 @@ class TestUvicornServer:
 
     def test_init_with_args(self):
         """Test UvicornServer initialization with args."""
-        server = UvicornServer(ARGS={"host": "0.0.0.0", "port": "8000"})
-        assert server.args == ["--host=0.0.0.0", "--port=8000"]
+        server = UvicornServer(ARGS={"host": "127.0.0.1", "port": "8000"})
+        assert server.args == ["--host=127.0.0.1", "--port=8000"]
 
     @patch(
         "django_prodserver.backends.uvicorn.asgi_app_name",
@@ -27,10 +30,10 @@ class TestUvicornServer:
     )
     def test_prep_server_args(self, mock_asgi_app_name):
         """Test prep_server_args method."""
-        server = UvicornServer(ARGS={"host": "0.0.0.0", "port": "8000"})
+        server = UvicornServer(ARGS={"host": "127.0.0.1", "port": "8000"})
         args = server.prep_server_args()
 
-        assert args == ["tests.asgi:application", "--host=0.0.0.0", "--port=8000"]
+        assert args == ["tests.asgi:application", "--host=127.0.0.1", "--port=8000"]
         mock_asgi_app_name.assert_called_once()
 
     @patch(
@@ -116,8 +119,8 @@ class TestUvicornWSGIServer:
 
     def test_init_with_args(self):
         """Test UvicornWSGIServer initialization with args."""
-        server = UvicornWSGIServer(ARGS={"host": "0.0.0.0", "port": "8000"})
-        assert server.args == ["--host=0.0.0.0", "--port=8000"]
+        server = UvicornWSGIServer(ARGS={"host": "127.0.0.1", "port": "8000"})
+        assert server.args == ["--host=127.0.0.1", "--port=8000"]
 
     @patch(
         "django_prodserver.backends.uvicorn.wsgi_app_name",
@@ -125,13 +128,13 @@ class TestUvicornWSGIServer:
     )
     def test_prep_server_args(self, mock_wsgi_app_name):
         """Test prep_server_args method."""
-        server = UvicornWSGIServer(ARGS={"host": "0.0.0.0", "port": "8000"})
+        server = UvicornWSGIServer(ARGS={"host": "127.0.0.1", "port": "8000"})
         args = server.prep_server_args()
 
         assert args == [
             "tests.wsgi:application",
             "--interface=wsgi",
-            "--host=0.0.0.0",
+            "--host=127.0.0.1",
             "--port=8000",
         ]
         mock_wsgi_app_name.assert_called_once()
@@ -152,7 +155,7 @@ class TestUvicornWSGIServer:
     def test_start_server(self, mock_uvicorn_main):
         """Test start_server method."""
         server = UvicornWSGIServer()
-        args = ["--host=0.0.0.0", "--port=8000"]
+        args = ["--host=127.0.0.1", "--port=8000"]
 
         server.start_server(*args)
 

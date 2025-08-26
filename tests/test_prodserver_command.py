@@ -69,7 +69,9 @@ class TestProdserverCommand(TestCase):
         """Test various error conditions in commands."""
         # Test with completely invalid configuration
         with override_settings(PRODUCTION_PROCESSES="invalid"):
-            with pytest.raises(Exception):  # Could be various exception types
+            # call_command("prodserver", "--list")
+
+            with pytest.raises(CommandError):  # Could be various exception types
                 call_command("prodserver", "--list")
 
     @override_settings(
@@ -375,7 +377,7 @@ class TestProdserverCommand(TestCase):
         args, kwargs = server_name_call
 
         assert args[0] == "server_name"
-        assert kwargs["type"] == str
+        assert kwargs["type"] is str
         assert kwargs["nargs"] == "?"
 
     @override_settings(

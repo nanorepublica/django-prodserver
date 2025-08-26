@@ -167,8 +167,8 @@ class TestDjangoTasksWorker:
         """Test that extra configuration keys are ignored properly."""
         worker = DjangoTasksWorker(
             ARGS={"queues": "default"},
-            EXTRA_CONFIG="ignored",
-            ANOTHER_KEY=123,
+            EXTRA_CONFIG={"key": "ignored"},
+            ANOTHER_KEY={"number": "123"},
         )
 
         # Should only process ARGS

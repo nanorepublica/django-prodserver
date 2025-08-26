@@ -5,7 +5,7 @@ import pytest
 # Handle optional dependency
 waitress = pytest.importorskip("waitress")
 
-from django_prodserver.backends.waitress import WaitressServer
+from django_prodserver.backends.waitress import WaitressServer  # NOQA: E402
 
 
 class TestWaitressServer:
@@ -18,8 +18,8 @@ class TestWaitressServer:
 
     def test_init_with_args(self):
         """Test WaitressServer initialization with args."""
-        server = WaitressServer(ARGS={"host": "0.0.0.0", "port": "8000"})
-        assert server.args == ["--host=0.0.0.0", "--port=8000"]
+        server = WaitressServer(ARGS={"host": "127.0.0.1", "port": "8000"})
+        assert server.args == ["--host=127.0.0.1", "--port=8000"]
 
     @patch(
         "django_prodserver.backends.waitress.wsgi_app_name",
@@ -27,12 +27,12 @@ class TestWaitressServer:
     )
     def test_prep_server_args(self, mock_wsgi_app_name):
         """Test prep_server_args method."""
-        server = WaitressServer(ARGS={"host": "0.0.0.0", "port": "8000"})
+        server = WaitressServer(ARGS={"host": "127.0.0.1", "port": "8000"})
         args = server.prep_server_args()
 
         assert args == [
             "waitress",
-            "--host=0.0.0.0",
+            "--host=127.0.0.1",
             "--port=8000",
             "tests.wsgi:application",
         ]
@@ -107,7 +107,7 @@ class TestWaitressServer:
     )
     def test_full_workflow(self, mock_wsgi_app_name, mock_waitress_run):
         """Test the complete workflow from initialization to server start."""
-        server = WaitressServer(ARGS={"host": "0.0.0.0", "port": "8000"})
+        server = WaitressServer(ARGS={"host": "127.0.0.1", "port": "8000"})
         prepared_args = server.prep_server_args()
         server.start_server(*prepared_args)
 
@@ -115,7 +115,7 @@ class TestWaitressServer:
         mock_waitress_run.assert_called_once_with(
             argv=(
                 "waitress",
-                "--host=0.0.0.0",
+                "--host=127.0.0.1",
                 "--port=8000",
                 "tests.wsgi:application",
             )
@@ -163,7 +163,7 @@ class TestWaitressServer:
         """Test that server args are properly formatted from dict."""
         server = WaitressServer(
             ARGS={
-                "host": "0.0.0.0",
+                "host": "127.0.0.1",
                 "port": "8000",
                 "threads": "4",
                 "url-scheme": "https",
@@ -171,7 +171,7 @@ class TestWaitressServer:
         )
 
         expected_args = [
-            "--host=0.0.0.0",
+            "--host=127.0.0.1",
             "--port=8000",
             "--threads=4",
             "--url-scheme=https",

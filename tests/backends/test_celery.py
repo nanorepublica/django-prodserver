@@ -5,7 +5,7 @@ import pytest
 # Handle optional dependency
 celery = pytest.importorskip("celery")
 
-from django_prodserver.backends.celery import CeleryWorker
+from django_prodserver.backends.celery import CeleryWorker  # NOQA: E402
 
 
 class TestCeleryWorker:
@@ -18,6 +18,7 @@ class TestCeleryWorker:
         mock_import_string.return_value = mock_app
 
         server_config = {
+            "BACKEND": "django_prodserver.backends.celery.CeleryWorker",
             "APP": "myproject.celery.app",
             "ARGS": {"loglevel": "info", "concurrency": "4"},
         }
@@ -50,7 +51,7 @@ class TestCeleryWorker:
 
         server_config = {"ARGS": {"loglevel": "info"}}
 
-        worker = CeleryWorker(**server_config)
+        CeleryWorker(**server_config)
 
         # When APP is None/missing, import_string will be called with None
         mock_import_string.assert_called_once_with(None)
@@ -249,7 +250,7 @@ class TestCeleryWorker:
             "APP": "myproject.celery.app",
             "ARGS": {"loglevel": "info"},
             "EXTRA_CONFIG": "ignored",
-            "ANOTHER_KEY": 123,
+            "ANOTHER_KEY": "123",
         }
 
         worker = CeleryWorker(**server_config)

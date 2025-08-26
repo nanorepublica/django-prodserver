@@ -1,4 +1,5 @@
-from collections.abc import Mapping
+from collections.abc import Collection, Mapping
+from typing import Any
 
 
 class BaseServerBackend:
@@ -13,7 +14,7 @@ class BaseServerBackend:
     }
     """
 
-    def __init__(self, **server_args: Mapping[str, str]) -> None:
+    def __init__(self, **server_args: Any) -> None:
         self.args = self._format_server_args_from_dict(server_args.get("ARGS", {}))
 
     def start_server(self, *args: str) -> None:
@@ -32,7 +33,9 @@ class BaseServerBackend:
         """
         return self.args
 
-    def _format_server_args_from_dict(self, args: Mapping[str, str]) -> list[str]:
+    def _format_server_args_from_dict(
+        self, args: str | Mapping[str, str | Collection[str]]
+    ) -> list[str]:
         """
         Formatting server process arguments coming from settings.
 
@@ -46,6 +49,8 @@ class BaseServerBackend:
                 "--bind=0.0.0.0:8111"
             ]
         """
+        if isinstance(args, str):
+            return [args]
         return [f"--{arg_name}={arg_value}" for arg_name, arg_value in args.items()]
 
     # def run_from_argv(self, argv):

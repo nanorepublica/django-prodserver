@@ -33,9 +33,9 @@ new_backend extra:
 tests *FLAGS:
     python manage.py test {{FLAGS}}
 
-envs := 'waitress,gunicorn,celery,uvicorn,coverage'
+envs := 'waitress,gunicorn,celery,uvicorn'
 tox extras=envs:
-    tox run -e py312-django52,{{extras}}
+    tox run -e py312-django52,{{extras}} && tox run -e coverage
 
 # activate:
 #     source .venv/bin/activate

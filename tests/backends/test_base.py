@@ -56,7 +56,11 @@ def test_format_server_args_from_empty_dict():
 
 
 def test_start_server_with_args():
-    """Test that start_server can accept arguments (even though it raises NotImplementedError)."""
+    """
+    Test that start_server can accept arguments.
+
+    (even though it raises NotImplementedError).
+    """
     backend = BaseServerBackend()
     with pytest.raises(NotImplementedError):
         backend.start_server("arg1", "arg2")
@@ -64,7 +68,7 @@ def test_start_server_with_args():
 
 def test_init_with_other_server_args():
     """Test initialization with other server configuration arguments."""
-    backend = BaseServerBackend(OTHER_CONFIG="value", ARGS={"port": "8000"})
+    backend = BaseServerBackend(OTHER_CONFIG={"key": "value"}, ARGS={"port": "8000"})
     assert backend.args == ["--port=8000"]
     # Other config arguments are not processed, only ARGS
 

@@ -14,7 +14,13 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser: ArgumentParser) -> None:
         """Add arguments."""
-        choices = app_settings.PRODUCTION_PROCESSES.keys()
+        try:
+            choices = app_settings.PRODUCTION_PROCESSES.keys()
+        except AttributeError:
+            raise CommandError(
+                "PRODUCTION_PROCESSES setting has been configured incorrectly.\n"
+                "Check the documentation to configure this setting correctly."
+            ) from None
         try:
             default = next(iter(choices))
         except StopIteration:
