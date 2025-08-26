@@ -53,6 +53,9 @@ jobs:
               - gunicorn
             os:
               - ubuntu-latest
+          - backend:
+              - gunicorn
+            os:
               - macOS-latest
     runs-on: ${{ matrix.os }}
     steps:
