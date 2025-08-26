@@ -62,7 +62,6 @@ jobs:
     release:
         needs:
             - test
-            - test-coverage
             - lint
             - commitlint
 
