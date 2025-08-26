@@ -53,25 +53,11 @@ jobs:
             - uses: astral-sh/setup-uv@v5
             - run: uv pip install --system tox tox-uv
               shell: bash
-            - run: tox -f py$(echo ${{ matrix.python-version }} | tr -d .)-django52
-              shell: bash
-
-    test-coverage:
-        runs-on: ubuntu-latest
-        steps:
-            - uses: actions/checkout@v4
-            - uses: actions/setup-python@v5
-              with:
-                  python-version: "3.12"
-            - uses: astral-sh/setup-uv@v5
-            - run: uv pip install --system tox tox-uv
-              shell: bash
-            - run: tox -f py312-django52,waitress,gunicorn,celery,uvicorn,coverage
+            - run: tox -e py$(echo ${{ matrix.python-version }},waitress,gunicorn,celery,uvicorn,coverage | tr -d .)-django52
               shell: bash
             - uses: codecov/codecov-action@v5
               with:
                   token: ${{ secrets.CODECOV_TOKEN }}
-                  files: ./coverage.xml
 
     release:
         needs:
