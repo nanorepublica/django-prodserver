@@ -462,3 +462,18 @@ class TestProdserverCommand(TestCase):
         """Test that command has appropriate help text."""
         # The command should have help text accessible
         assert hasattr(self.command, "help")
+
+    @override_settings(PRODUCTION_PROCESSES={})
+    def test_add_arguments_no_servers_configured(self):
+        """Test add_arguments raises CommandError when no servers are configured."""
+        parser = MagicMock()
+
+        with pytest.raises(CommandError) as exc_info:
+            self.command.add_arguments(parser)
+
+        assert "No servers configured in the PRODUCTION_PROCESSES setting" in str(
+            exc_info.value
+        )
+        assert "Configure your servers before running this command" in str(
+            exc_info.value
+        )

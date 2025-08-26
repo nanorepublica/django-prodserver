@@ -80,3 +80,16 @@ def test_multiple_server_args_ordering():
     assert "--workers=4" in backend.args
     assert "--bind=127.0.0.1:8000" in backend.args
     assert len(backend.args) == 2
+
+
+def test_format_server_args_from_string():
+    """Test _format_server_args_from_dict with string args."""
+    backend = BaseServerBackend()
+    result = backend._format_server_args_from_dict("--custom-arg")
+    assert result == ["--custom-arg"]
+
+
+def test_init_with_string_args():
+    """Test BaseServerBackend initialization with string ARGS."""
+    backend = BaseServerBackend(ARGS="--custom-config")
+    assert backend.args == ["--custom-config"]
