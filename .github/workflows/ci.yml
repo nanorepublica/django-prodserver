@@ -49,15 +49,11 @@ jobs:
           - celery
           - uvicorn
         include:
-          - backend:
-              - gunicorn
-            os:
-              - ubuntu-latest
+          - backend: gunicorn
+            os: ubuntu-latest
             python-version: "3.13"
-          - backend:
-              - gunicorn
-            os:
-              - macOS-latest
+          - backend: gunicorn
+            os: macOS-latest
             python-version: "3.13"
     runs-on: ${{ matrix.os }}
     steps:
