@@ -1,5 +1,11 @@
 # Changelog
 
+## v2.1.1 (2025-08-31)
+
+### Bug fixes
+
+- Incorrect argument handling in gunicorn backend" ([`02304ff`](https://github.com/nanorepublica/django-prodserver/commit/02304ffa29a70f76ce7a7bb987640c48c5224338))
+
 ## v2.1.0 (2025-08-31)
 
 ### Features
