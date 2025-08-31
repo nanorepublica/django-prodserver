@@ -1,5 +1,11 @@
 # Changelog
 
+## v2.1.0 (2025-08-31)
+
+### Features
+
+- Add django-q2 backend ([`5f4c58e`](https://github.com/nanorepublica/django-prodserver/commit/5f4c58e1645f8cd322e75d48f8ddae3ca4ba5058))
+
 ## v2.0.0 (2025-08-29)
 
 ### Features
