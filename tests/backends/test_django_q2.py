@@ -388,7 +388,7 @@ class TestDjangoQ2WorkerFunctionality:
         assert "--verbosity=3" in remaining_args
 
     def test_proper_exception_types(self):
-        """Test that the correct exception types are raised for various error conditions."""
+        """Test that the correct exception types are raised."""
         # Test missing INSTALLED_APPS -> ImproperlyConfigured
         self.mock_settings.INSTALLED_APPS = []
 
