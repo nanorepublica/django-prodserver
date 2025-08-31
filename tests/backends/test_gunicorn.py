@@ -28,7 +28,7 @@ class TestDjangoApplication:
                 "django_prodserver.backends.gunicorn.wsgi_app_name",
                 return_value="tests.wsgi:application",
             ):
-                app.init(parser, opts, "extra_arg1", "extra_arg2")
+                app.init(parser, opts, ["extra_arg1", "extra_arg2"])
 
                 # Check that parent init was called with correct args
                 mock_parent_init.assert_called_once_with(
@@ -68,7 +68,7 @@ class TestGunicornServer:
         assert "--workers=4" in sys.argv
 
         # Check that DjangoApplication was created and run was called
-        mock_django_app.assert_called_once_with("%(prog)s [OPTIONS]", *args)
+        mock_django_app.assert_called_once_with("%(prog)s [OPTIONS]")
         mock_app_instance.run.assert_called_once()
 
     @patch("sys.argv", ["manage.py", "prodserver"])
@@ -121,7 +121,7 @@ class TestGunicornServer:
         for arg in args:
             assert arg in sys.argv
 
-        mock_django_app.assert_called_once_with("%(prog)s [OPTIONS]", *args)
+        mock_django_app.assert_called_once_with("%(prog)s [OPTIONS]")
         mock_app_instance.run.assert_called_once()
 
     def test_server_args_formatting(self):

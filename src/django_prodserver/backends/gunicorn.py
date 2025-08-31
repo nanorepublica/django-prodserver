@@ -10,7 +10,7 @@ from .base import BaseServerBackend
 class DjangoApplication(WSGIApplication):
     """Dynamic Gunicorn WSGI Application."""
 
-    def init(self, parser: ArgumentParser, opts: Namespace, *args: object) -> None:
+    def init(self, parser: ArgumentParser, opts: Namespace, args: object) -> None:
         """Initialised the Gunicorn Server."""
         # strip mgmt command name from args and insert WSGI module
         args = (wsgi_app_name(),)
@@ -28,4 +28,4 @@ class GunicornServer(BaseServerBackend):
     def start_server(self, *args: str) -> None:
         """Add args back into sys.argv and run the server."""
         sys.argv.extend(args)
-        DjangoApplication("%(prog)s [OPTIONS]", *args).run()
+        DjangoApplication("%(prog)s [OPTIONS]").run()
