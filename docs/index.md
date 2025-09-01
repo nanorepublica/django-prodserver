@@ -1,5 +1,3 @@
-# Welcome to Django prodserver documentation!
-
 ```{include} ../README.md
 
 ```
