@@ -1,5 +1,9 @@
 # Welcome to Django prodserver documentation!
 
+```{include} ../README.md
+
+```
+
 ```{toctree}
 :caption: Installation & Usage
 :maxdepth: 2
@@ -22,8 +26,4 @@ contributing
 :maxdepth: 2
 
 django_prodserver
-```
-
-```{include} ../README.md
-
 ```
