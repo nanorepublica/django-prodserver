@@ -5,7 +5,7 @@ import pytest
 # Handle optional dependency
 celery = pytest.importorskip("celery")
 
-from django_prodserver.backends.celery import CeleryWorker  # NOQA: E402
+from django_prodserver.backends.celery import CeleryBeat, CeleryWorker  # NOQA: E402
 
 
 class TestCeleryWorker:
@@ -259,3 +259,60 @@ class TestCeleryWorker:
         assert worker.app == mock_app
         assert worker.args == ["--loglevel=info"]
         mock_import_string.assert_called_once_with("myproject.celery.app")
+
+
+class TestCeleryBeat:
+    """Test CeleryBeat backend."""
+
+    @patch("django_prodserver.backends.celery.import_string")
+    def test_init_with_app(self, mock_import_string):
+        """Test CeleryBeat initialization with APP config."""
+        mock_app = Mock()
+        mock_import_string.return_value = mock_app
+
+        server_config = {
+            "BACKEND": "django_prodserver.backends.celery.CeleryBeat",
+            "APP": "myproject.celery.app",
+            "ARGS": {"loglevel": "info"},
+        }
+
+        worker = CeleryBeat(**server_config)
+
+        assert worker.app == mock_app
+        assert worker.args == ["--loglevel=info"]
+        mock_import_string.assert_called_once_with("myproject.celery.app")
+
+    @patch("django_prodserver.backends.celery.import_string")
+    def test_start_server_no_args(self, mock_import_string):
+        """Test start_server method with no args."""
+        mock_app = Mock()
+        mock_beat_instance = Mock()
+        mock_app.Beat.return_value = mock_beat_instance
+        mock_import_string.return_value = mock_app
+
+        server_config = {"APP": "myproject.celery.app"}
+        beat = CeleryBeat(**server_config)
+
+        beat.start_server()
+
+        mock_app.Beat.assert_called_once_with()
+        mock_beat_instance.start.assert_called_once()
+
+    @patch("django_prodserver.backends.celery.import_string")
+    def test_start_server_with_mixed_args(self, mock_import_string):
+        """Test start_server with a mix of initialization and runtime args."""
+        mock_app = Mock()
+        mock_beat_instance = Mock()
+        mock_app.Beat.return_value = mock_beat_instance
+        mock_import_string.return_value = mock_app
+
+        # Initialize with some args
+        beat = CeleryBeat(APP="myproject.celery.app", ARGS={"loglevel": "info"})
+
+        # Start with additional args
+        runtime_args = ["--scheduler=some.Scheduler"]
+        beat.start_server(*runtime_args)
+
+        # Should call Beat with the runtime args passed to start_server
+        mock_app.Beat.assert_called_once_with(*runtime_args)
+        mock_beat_instance.start.assert_called_once()
