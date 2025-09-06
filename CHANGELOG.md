@@ -1,5 +1,16 @@
 # Changelog
 
+## v2.2.0 (2025-09-06)
+
+### Features
+
+- Add backend for celery beat process ([`a0b2a9d`](https://github.com/nanorepublica/django-prodserver/commit/a0b2a9ddd74be99a84c79df2534c90f61441c908))
+
+### Documentation
+
+- Remove duplicated h1 tag on home page ([`4442588`](https://github.com/nanorepublica/django-prodserver/commit/44425882fa71d0f9b8a027f5c6ec3b50ecada26a))
+- Move table of content after main readme ([`55816cc`](https://github.com/nanorepublica/django-prodserver/commit/55816cc99b47403d716db1a2889d57ef5d1a4169))
+
 ## v2.1.1 (2025-08-31)
 
 ### Bug fixes
