@@ -1,5 +1,12 @@
 # Changelog
 
+## v2.3.0 (2025-10-08)
+
+### Features
+
+- Add granian as a server backend ([`1cafd80`](https://github.com/nanorepublica/django-prodserver/commit/1cafd804b97f5a2d093e844260676e9f24946d87))
+- Add granian as a server backend ([`825d7b6`](https://github.com/nanorepublica/django-prodserver/commit/825d7b6c42c2931a9f12bf867e9a0bf33049b5c4))
+
 ## v2.2.0 (2025-09-06)
 
 ### Features

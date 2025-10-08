@@ -15,7 +15,7 @@ from sphinx.ext import apidoc
 project = "Django prodserver"
 copyright = "2025, Andy Miller"
 author = "Andy Miller"
-release = "2.2.0"
+release = "2.3.0"
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
