@@ -33,6 +33,7 @@ gunicorn = ["gunicorn>=23.0.0"]
 django-tasks = ["django-tasks>=0.7.0"]
 celery = ["celery>=5.5.2"]
 django-q2 = ["django-q2>=1.6.0", "django-picklefield"]
+granian = ["granian>=1.0.0"]
 uvicorn = ["uvicorn>=0.34.2"]
 waitress = ["waitress>=3.0.2"]
 
@@ -77,6 +78,7 @@ lint.per-file-ignores."tests/**/*" = [
     "D103",
     "D104",
     "S101",
+    "S104",
 ]
 lint.isort.known-first-party = ["django_prodserver", "tests"]
 

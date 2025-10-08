@@ -68,6 +68,14 @@ PRODUCTION_PROCESSES = {
         "ARGS": {"bind": "0.0.0.0:8111"},
     },
     # "web": {
+    #     "BACKEND": "django_prodserver.backends.granian.GranianASGIServer",
+    #     "ARGS": {"address": "0.0.0.0", "port": "8000", "workers": "4"},
+    # },
+    # "web": {
+    #     "BACKEND": "django_prodserver.backends.granian.GranianWSGIServer",
+    #     "ARGS": {"address": "0.0.0.0", "port": "8000", "workers": "4"},
+    # },
+    # "web": {
     #     "BACKEND": "django_prodserver.backends.waitress.WaitressServer",
     #     "ARGS": {},
     # },
