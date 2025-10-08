@@ -1,4 +1,9 @@
 [breaking]
+color = "f416d1"
+name = "marketing"
+description = "Issues related to spreading the use and adoption of the project"
+
+[breaking]
 color = "ffcc00"
 name = "breaking"
 description = "Breaking change."
