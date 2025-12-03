@@ -30,18 +30,18 @@ PRODUCTION_PROCESSES = {
 
 ## Common ARGS
 
-| Argument | Default | Description |
-|----------|---------|-------------|
-| `bind` | `127.0.0.1:8000` | Socket to bind (host:port or unix socket) |
-| `workers` | `1` | Worker processes (recommend: `2-4 x CPU`) |
-| `worker-class` | `sync` | Worker type (`sync`, `gevent`, `eventlet`) |
-| `timeout` | `30` | Request timeout (seconds) |
-| `max-requests` | `0` | Restart workers after N requests |
-| `max-requests-jitter` | `0` | Random jitter for max-requests |
-| `keepalive` | `2` | Keep-alive timeout |
-| `accesslog` | `None` | Access log path (`-` for stdout) |
-| `errorlog` | `stderr` | Error log path |
-| `loglevel` | `info` | Log level |
+| Argument              | Default          | Description                                |
+| --------------------- | ---------------- | ------------------------------------------ |
+| `bind`                | `127.0.0.1:8000` | Socket to bind (host:port or unix socket)  |
+| `workers`             | `1`              | Worker processes (recommend: `2-4 x CPU`)  |
+| `worker-class`        | `sync`           | Worker type (`sync`, `gevent`, `eventlet`) |
+| `timeout`             | `30`             | Request timeout (seconds)                  |
+| `max-requests`        | `0`              | Restart workers after N requests           |
+| `max-requests-jitter` | `0`              | Random jitter for max-requests             |
+| `keepalive`           | `2`              | Keep-alive timeout                         |
+| `accesslog`           | `None`           | Access log path (`-` for stdout)           |
+| `errorlog`            | `stderr`         | Error log path                             |
+| `loglevel`            | `info`           | Log level                                  |
 
 ## Examples
 

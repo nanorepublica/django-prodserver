@@ -1,7 +1,7 @@
 # Product Roadmap
 
-*Last updated: 2025-11-12*
-*Source: [GitHub Project Board](https://github.com/users/nanorepublica/projects/1)*
+_Last updated: 2025-11-12_
+_Source: [GitHub Project Board](https://github.com/users/nanorepublica/projects/1)_
 
 ## Current Backlog (From GitHub Issues)
 

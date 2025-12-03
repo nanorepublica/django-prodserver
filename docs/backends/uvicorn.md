@@ -19,6 +19,7 @@ pip install uvicorn[standard]
 ## Backends
 
 (backend-uvicorn-asgi)=
+
 ### ASGI Mode
 
 For async Django with WebSocket support:
@@ -37,6 +38,7 @@ PRODUCTION_PROCESSES = {
 ```
 
 (backend-uvicorn-wsgi)=
+
 ### WSGI Mode
 
 For traditional Django with Uvicorn performance:
@@ -56,18 +58,18 @@ PRODUCTION_PROCESSES = {
 
 ## Common ARGS
 
-| Argument | Default | Description |
-|----------|---------|-------------|
-| `host` | `127.0.0.1` | Host to bind |
-| `port` | `8000` | Port to bind |
-| `workers` | `1` | Worker processes |
-| `loop` | `auto` | Event loop (`auto`, `uvloop`) |
-| `log-level` | `info` | Log level |
-| `no-access-log` | `False` | Disable access logging |
-| `proxy-headers` | `False` | Trust proxy headers |
-| `timeout-keep-alive` | `5` | Keep-alive timeout |
-| `limit-concurrency` | `None` | Max concurrent connections |
-| `limit-max-requests` | `None` | Restart after N requests |
+| Argument             | Default     | Description                   |
+| -------------------- | ----------- | ----------------------------- |
+| `host`               | `127.0.0.1` | Host to bind                  |
+| `port`               | `8000`      | Port to bind                  |
+| `workers`            | `1`         | Worker processes              |
+| `loop`               | `auto`      | Event loop (`auto`, `uvloop`) |
+| `log-level`          | `info`      | Log level                     |
+| `no-access-log`      | `False`     | Disable access logging        |
+| `proxy-headers`      | `False`     | Trust proxy headers           |
+| `timeout-keep-alive` | `5`         | Keep-alive timeout            |
+| `limit-concurrency`  | `None`      | Max concurrent connections    |
+| `limit-max-requests` | `None`      | Restart after N requests      |
 
 ## Examples
 
@@ -106,11 +108,11 @@ PRODUCTION_PROCESSES = {
 
 ## ASGI vs WSGI
 
-| Feature | ASGI | WSGI |
-|---------|------|------|
-| Async views | Yes | No |
-| WebSockets | Yes | No |
-| Traditional Django | Yes | Yes |
+| Feature            | ASGI | WSGI |
+| ------------------ | ---- | ---- |
+| Async views        | Yes  | No   |
+| WebSockets         | Yes  | No   |
+| Traditional Django | Yes  | Yes  |
 
 ## Troubleshooting
 

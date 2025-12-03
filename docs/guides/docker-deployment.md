@@ -7,6 +7,7 @@ Learn how to deploy django-prodserver applications using Docker and Docker Compo
 ## Overview
 
 This guide covers:
+
 - Creating Dockerfiles for django-prodserver applications
 - Multi-stage builds for optimized images
 - Docker Compose for multi-container deployments
@@ -127,6 +128,7 @@ CMD ["python", "manage.py", "prodserver", "web"]
 ```
 
 **Benefits:**
+
 - Smaller image size (no build tools in final image)
 - Better security (minimal attack surface)
 - Faster deployments (smaller images)
@@ -137,7 +139,7 @@ CMD ["python", "manage.py", "prodserver", "web"]
 
 ```yaml
 # docker-compose.yml
-version: '3.8'
+version: "3.8"
 
 services:
   db:
@@ -173,6 +175,7 @@ volumes:
 ```
 
 Start services:
+
 ```bash
 docker-compose up -d
 ```
@@ -181,7 +184,7 @@ docker-compose up -d
 
 ```yaml
 # docker-compose.yml
-version: '3.8'
+version: "3.8"
 
 services:
   db:
@@ -325,7 +328,7 @@ SECRET_KEY=your-secret-key-here
 
 ```yaml
 # docker-compose.yml
-version: '3.8'
+version: "3.8"
 
 services:
   web:
@@ -479,10 +482,10 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '2'
+          cpus: "2"
           memory: 2G
         reservations:
-          cpus: '1'
+          cpus: "1"
           memory: 1G
 ```
 
@@ -491,6 +494,7 @@ services:
 ### Container Won't Start
 
 **Check logs:**
+
 ```bash
 docker-compose logs web
 docker logs container_name
@@ -499,6 +503,7 @@ docker logs container_name
 ### Database Connection Issues
 
 **Ensure database is ready:**
+
 ```yaml
 depends_on:
   db:
@@ -508,6 +513,7 @@ depends_on:
 ### Permission Denied Errors
 
 **Fix ownership:**
+
 ```dockerfile
 RUN chown -R appuser:appuser /app
 USER appuser
@@ -516,6 +522,7 @@ USER appuser
 ### Static Files Not Found
 
 **Ensure collectstatic runs:**
+
 ```dockerfile
 RUN python manage.py collectstatic --noinput
 ```
@@ -560,6 +567,7 @@ app = "myapp"
 ### Deploy to AWS ECS
 
 Use Docker Compose integration:
+
 ```bash
 docker compose up
 docker context create ecs myapp-context
@@ -570,6 +578,7 @@ docker compose up
 ## Complete Example
 
 See the [example directory](https://github.com/nanorepublica/django-prodserver/tree/main/examples/docker) for a complete working example with:
+
 - Multi-stage Dockerfile
 - Docker Compose with all services
 - Environment configuration

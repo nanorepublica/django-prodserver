@@ -47,22 +47,22 @@ PRODUCTION_PROCESSES = {
 
 ## Q_CLUSTER Settings
 
-| Setting | Default | Description |
-|---------|---------|-------------|
-| `name` | Required | Cluster name |
-| `workers` | CPU count | Worker processes |
-| `timeout` | `None` | Task timeout (seconds) |
-| `retry` | `None` | Retry timeout |
-| `recycle` | `500` | Tasks before worker restart |
-| `queue_limit` | Workers × 2 | Max queued tasks |
-| `save_limit` | `250` | Successful tasks to keep |
-| `orm` | `default` | Database alias |
+| Setting       | Default     | Description                 |
+| ------------- | ----------- | --------------------------- |
+| `name`        | Required    | Cluster name                |
+| `workers`     | CPU count   | Worker processes            |
+| `timeout`     | `None`      | Task timeout (seconds)      |
+| `retry`       | `None`      | Retry timeout               |
+| `recycle`     | `500`       | Tasks before worker restart |
+| `queue_limit` | Workers × 2 | Max queued tasks            |
+| `save_limit`  | `250`       | Successful tasks to keep    |
+| `orm`         | `default`   | Database alias              |
 
 ## ARGS
 
-| Argument | Default | Description |
-|----------|---------|-------------|
-| `verbosity` | `1` | Log verbosity (0-3) |
+| Argument    | Default | Description         |
+| ----------- | ------- | ------------------- |
+| `verbosity` | `1`     | Log verbosity (0-3) |
 
 ## Example
 
@@ -119,6 +119,7 @@ schedule('myapp.tasks.daily', schedule_type='C', cron='0 8 * * *')
 ## Admin Interface
 
 Access at `/admin/django_q/` to:
+
 - View task results
 - Monitor workers
 - Manage schedules
@@ -129,6 +130,7 @@ Access at `/admin/django_q/` to:
 **Tasks not processing:** Check worker running, migrations applied
 
 **Database locks:** Reduce workers or switch to Redis:
+
 ```python
 Q_CLUSTER = {'redis': {'host': 'localhost', 'port': 6379}}
 ```

@@ -5,6 +5,7 @@ You are creating a tasks breakdown from a given spec and requirements for a new 
 ## PHASE 1: Get and read the spec.md and/or requirements document(s)
 
 You will need ONE OR BOTH of these files to inform your tasks breakdown:
+
 - `agent-os/specs/[this-spec]/spec.md`
 - `agent-os/specs/[this-spec]/planning/requirements.md`
 
@@ -21,6 +22,7 @@ Please direct me to where I can find those.  If you haven't created them yet, yo
 Once you have `spec.md` AND/OR `requirements.md`, use the **tasks-list-creator** subagent to break down the spec and requirements into an actionable tasks list with strategic grouping and ordering.
 
 Provide the tasks-list-creator:
+
 - `agent-os/specs/[this-spec]/spec.md` (if present)
 - `agent-os/specs/[this-spec]/planning/requirements.md` (if present)
 - `agent-os/specs/[this-spec]/planning/visuals/` and its' contents (if present)

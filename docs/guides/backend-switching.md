@@ -11,6 +11,7 @@ django-prodserver makes it easy to switch backends by simply changing configurat
 ## Why Switch Backends?
 
 Common reasons to switch:
+
 - **Performance**: Need better throughput or lower latency
 - **Features**: Require async support, WebSockets, or specific capabilities
 - **Simplicity**: Move to simpler solution for easier maintenance
@@ -42,6 +43,7 @@ Common reasons to switch:
 **When**: You want to use async views, WebSockets, or ASGI features
 
 **Before (Gunicorn - WSGI):**
+
 ```python
 PRODUCTION_PROCESSES = {
     "web": {
@@ -56,6 +58,7 @@ PRODUCTION_PROCESSES = {
 ```
 
 **After (Uvicorn - ASGI):**
+
 ```python
 PRODUCTION_PROCESSES = {
     "web": {
@@ -73,11 +76,13 @@ PRODUCTION_PROCESSES = {
 **Migration Steps:**
 
 1. **Install Uvicorn:**
+
    ```bash
    pip install uvicorn[standard]
    ```
 
 2. **Verify ASGI configuration:**
+
    ```python
    # Ensure asgi.py exists and is correct
    # myproject/asgi.py
@@ -91,6 +96,7 @@ PRODUCTION_PROCESSES = {
 3. **Update configuration** (as shown above)
 
 4. **Test in staging:**
+
    ```bash
    python manage.py prodserver web --settings=myproject.settings.staging
    ```
@@ -98,6 +104,7 @@ PRODUCTION_PROCESSES = {
 5. **Deploy to production**
 
 **Considerations:**
+
 - ARGS mapping differs (bind → host/port)
 - Fewer workers needed with async (1-2 per CPU)
 - Monitor performance and adjust
@@ -107,6 +114,7 @@ PRODUCTION_PROCESSES = {
 **When**: You want Rust-powered performance while keeping WSGI
 
 **Before (Gunicorn):**
+
 ```python
 PRODUCTION_PROCESSES = {
     "web": {
@@ -120,6 +128,7 @@ PRODUCTION_PROCESSES = {
 ```
 
 **After (Granian WSGI):**
+
 ```python
 PRODUCTION_PROCESSES = {
     "web": {
@@ -137,6 +146,7 @@ PRODUCTION_PROCESSES = {
 **Migration Steps:**
 
 1. **Install Granian:**
+
    ```bash
    pip install granian
    ```
@@ -152,6 +162,7 @@ PRODUCTION_PROCESSES = {
 **When**: Migrating from Windows to Linux servers
 
 **Before (Waitress - Windows):**
+
 ```python
 PRODUCTION_PROCESSES = {
     "web": {
@@ -166,6 +177,7 @@ PRODUCTION_PROCESSES = {
 ```
 
 **After (Gunicorn - Linux):**
+
 ```python
 PRODUCTION_PROCESSES = {
     "web": {
@@ -183,6 +195,7 @@ PRODUCTION_PROCESSES = {
 1. **Prepare Linux environment**
 
 2. **Install Gunicorn:**
+
    ```bash
    pip install gunicorn
    ```
@@ -200,6 +213,7 @@ PRODUCTION_PROCESSES = {
 **When**: Reducing complexity, removing Redis/RabbitMQ dependency
 
 **Before (Celery):**
+
 ```python
 # settings.py
 CELERY_BROKER_URL = 'redis://localhost:6379/0'
@@ -221,6 +235,7 @@ PRODUCTION_PROCESSES = {
 ```
 
 **After (Django Tasks - Django 5.1+):**
+
 ```python
 # settings.py
 INSTALLED_APPS = [
@@ -241,6 +256,7 @@ PRODUCTION_PROCESSES = {
 **Migration Steps:**
 
 1. **Ensure Django 5.1+:**
+
    ```bash
    pip install "django>=5.1"
    ```
@@ -248,11 +264,13 @@ PRODUCTION_PROCESSES = {
 2. **Add to INSTALLED_APPS**
 
 3. **Run migrations:**
+
    ```bash
    python manage.py migrate
    ```
 
 4. **Convert tasks:**
+
    ```python
    # Before (Celery)
    from celery import shared_task
@@ -270,6 +288,7 @@ PRODUCTION_PROCESSES = {
    ```
 
 5. **Update task calls** (unchanged):
+
    ```python
    send_email.delay('user@example.com')
    ```
@@ -279,6 +298,7 @@ PRODUCTION_PROCESSES = {
 7. **Remove Celery and broker**
 
 **Limitations:**
+
 - No chains, groups, or chords
 - Database-backed (less performant at scale)
 - Simpler feature set
@@ -288,6 +308,7 @@ PRODUCTION_PROCESSES = {
 **When**: Need distributed processing, complex workflows, or high volume
 
 **Before (Django Tasks):**
+
 ```python
 PRODUCTION_PROCESSES = {
     "worker": {
@@ -300,6 +321,7 @@ PRODUCTION_PROCESSES = {
 ```
 
 **After (Celery):**
+
 ```python
 # Requires broker setup
 CELERY_BROKER_URL = 'redis://localhost:6379/0'
@@ -325,6 +347,7 @@ PRODUCTION_PROCESSES = {
 1. **Set up broker** (Redis or RabbitMQ)
 
 2. **Install Celery:**
+
    ```bash
    pip install celery[redis]
    ```
@@ -344,6 +367,7 @@ PRODUCTION_PROCESSES = {
 **When**: Want more features than Django Tasks but simpler than Celery
 
 **Before (Celery):**
+
 ```python
 PRODUCTION_PROCESSES = {
     "worker": {
@@ -355,6 +379,7 @@ PRODUCTION_PROCESSES = {
 ```
 
 **After (Django-Q2):**
+
 ```python
 # settings.py
 INSTALLED_APPS = [
@@ -379,6 +404,7 @@ PRODUCTION_PROCESSES = {
 **Migration Steps:**
 
 1. **Install Django-Q2:**
+
    ```bash
    pip install django-q2
    ```
@@ -388,6 +414,7 @@ PRODUCTION_PROCESSES = {
 3. **Run migrations**
 
 4. **Convert tasks:**
+
    ```python
    # Before (Celery)
    from celery import shared_task
@@ -495,6 +522,7 @@ else:
 **Problem**: Configuration not being applied
 
 **Solution**: Check ARGS mapping for new backend
+
 - Different backends use different argument names
 - Consult backend-specific documentation
 
@@ -503,6 +531,7 @@ else:
 **Problem**: New backend is slower
 
 **Solution**: Tune configuration
+
 - Adjust worker/thread counts
 - Check resource limits
 - Monitor bottlenecks
@@ -512,6 +541,7 @@ else:
 **Problem**: Feature worked in old backend but not new one
 
 **Solution**: Check feature compatibility
+
 - Read limitations in backend documentation
 - Consider alternative approaches
 - May need to keep old backend for specific features

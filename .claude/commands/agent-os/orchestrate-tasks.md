@@ -37,7 +37,7 @@ task_groups:
 
 ### NEXT: Ask user to assign subagents to each task group
 
-Next we must determine which subagents should be assigned to which task groups.  Ask the user to provide this info using the following request to user and WAIT for user's response:
+Next we must determine which subagents should be assigned to which task groups. Ask the user to provide this info using the following request to user and WAIT for user's response:
 
 ```
 Please specify the name of each subagent to be assigned to each task group:
@@ -50,7 +50,7 @@ Please specify the name of each subagent to be assigned to each task group:
 Simply respond with the subagent names and corresponding task group number and I'll update orchestration.yml accordingly.
 ```
 
-Using the user's responses, update `orchestration.yml` to specify those subagent names.  `orchestration.yml` should end up looking like this:
+Using the user's responses, update `orchestration.yml` to specify those subagent names. `orchestration.yml` should end up looking like this:
 
 ```yaml
 task_groups:
@@ -75,12 +75,12 @@ task_groups:
     claude_code_subagent: backend-specialist
 ```
 
-
 ### NEXT: Delegate task groups implementations to assigned subagents
 
 Loop through each task group in `agent-os/specs/[this-spec]/tasks.md` and delegate its implementation to the assigned subagent specified in `orchestration.yml`.
 
 For each delegation, provide the subagent with:
+
 - The task group (including the parent task and all sub-tasks)
 - The spec file: `agent-os/specs/[this-spec]/spec.md`
 - Instruct subagent to:

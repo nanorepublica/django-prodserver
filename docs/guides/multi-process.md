@@ -7,6 +7,7 @@ Learn how to run and manage multiple process types (web servers, workers, schedu
 ## Overview
 
 Most production applications need multiple process types:
+
 - **Web servers**: Handle HTTP requests
 - **Workers**: Process background tasks
 - **Beat schedulers**: Run periodic tasks
@@ -21,6 +22,7 @@ This guide covers deploying and managing all these processes together.
 The standard init system for modern Linux distributions.
 
 **Advantages:**
+
 - Native to Linux
 - Auto-restart on failure
 - Dependency management
@@ -32,6 +34,7 @@ The standard init system for modern Linux distributions.
 Container orchestration for multiple services.
 
 **Advantages:**
+
 - Cross-platform
 - Isolated environments
 - Easy scaling
@@ -42,6 +45,7 @@ Container orchestration for multiple services.
 Python-based process manager.
 
 **Advantages:**
+
 - Python-native
 - Cross-platform
 - Web UI for monitoring
@@ -200,7 +204,7 @@ sudo systemctl stop myapp.target
 
 ```yaml
 # docker-compose.yml
-version: '3.8'
+version: "3.8"
 
 services:
   db:
@@ -274,7 +278,7 @@ services:
     networks:
       - backend
     deploy:
-      replicas: 2  # Run 2 worker instances
+      replicas: 2 # Run 2 worker instances
 
   beat:
     build: .
@@ -292,7 +296,7 @@ services:
     networks:
       - backend
     deploy:
-      replicas: 1  # Only 1 beat instance!
+      replicas: 1 # Only 1 beat instance!
 
   nginx:
     image: nginx:alpine
@@ -501,6 +505,7 @@ docker-compose logs -f --timestamps
 ### Horizontal Scaling
 
 **Web servers:**
+
 ```yaml
 # Docker Compose
 web:
@@ -509,6 +514,7 @@ web:
 ```
 
 **Workers:**
+
 ```yaml
 worker:
   deploy:

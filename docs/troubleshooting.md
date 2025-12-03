@@ -7,6 +7,7 @@
 ### ImportError: No module named 'gunicorn'
 
 Install the backend:
+
 ```bash
 pip install django-prodserver[gunicorn]  # or uvicorn, celery, etc.
 ```
@@ -14,6 +15,7 @@ pip install django-prodserver[gunicorn]  # or uvicorn, celery, etc.
 ### PRODUCTION_PROCESSES not found
 
 Add to `settings.py`:
+
 ```python
 PRODUCTION_PROCESSES = {
     "web": {
@@ -26,6 +28,7 @@ PRODUCTION_PROCESSES = {
 ### Process name not found
 
 Ensure the process name matches your config:
+
 ```bash
 # If configured as "web":
 python manage.py prodserver web
@@ -49,6 +52,7 @@ kill <PID>
 ### Permission denied on port 80/443
 
 Use a higher port with a reverse proxy, or:
+
 ```bash
 # Linux only
 sudo setcap 'cap_net_bind_service=+ep' /path/to/python
@@ -61,6 +65,7 @@ sudo setcap 'cap_net_bind_service=+ep' /path/to/python
 ### Gunicorn: Worker timeout
 
 Increase timeout:
+
 ```python
 "ARGS": {"timeout": "120"}
 ```
@@ -68,6 +73,7 @@ Increase timeout:
 ### Uvicorn: ASGI app not found
 
 Ensure `asgi.py` exists:
+
 ```python
 # myproject/asgi.py
 from django.core.asgi import get_asgi_application
@@ -102,6 +108,7 @@ __all__ = ('celery_app',)
 ### High memory usage
 
 Reduce workers and enable recycling:
+
 ```python
 # Gunicorn
 "ARGS": {"workers": "2", "max-requests": "1000"}
@@ -139,6 +146,7 @@ And reduce worker count.
 ### Container exits immediately
 
 Check logs:
+
 ```bash
 docker logs container_name
 ```
@@ -148,6 +156,7 @@ Use health checks and wait for dependencies.
 ### Can't connect to database
 
 Use service name as host:
+
 ```python
 DATABASES = {'default': {'HOST': 'db'}}  # Not 'localhost'
 ```
