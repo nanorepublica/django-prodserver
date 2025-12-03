@@ -6,88 +6,45 @@ django-prodserver supports multiple production-ready server backends for WSGI/AS
 
 ## Available Backends
 
-### WSGI Servers
+### Web Servers
 
-WSGI servers are used for traditional synchronous Django applications.
-
-- **{ref}`backend-gunicorn`** - Industry-standard WSGI server, mature and battle-tested
-- **{ref}`backend-waitress`** - Pure Python WSGI server with excellent Windows support
-- **{ref}`backend-granian-wsgi`** - Modern Rust-based high-performance WSGI server
-
-### ASGI Servers
-
-ASGI servers are used for asynchronous Django applications with WebSocket and async support.
-
-- **{ref}`backend-uvicorn-asgi`** - Popular ASGI server built on uvloop
-- **{ref}`backend-uvicorn-wsgi`** - Uvicorn running in WSGI compatibility mode
-- **{ref}`backend-granian-asgi`** - Modern Rust-based high-performance ASGI server
+| Backend | Type | Best For |
+|---------|------|----------|
+| {ref}`Gunicorn <backend-gunicorn>` | WSGI | Traditional Django, Linux production |
+| {ref}`Waitress <backend-waitress>` | WSGI | Windows, pure Python |
+| {ref}`Granian WSGI <backend-granian-wsgi>` | WSGI | High performance (Rust) |
+| {ref}`Uvicorn ASGI <backend-uvicorn-asgi>` | ASGI | Async Django, WebSockets |
+| {ref}`Uvicorn WSGI <backend-uvicorn-wsgi>` | WSGI | Traditional with Uvicorn perf |
+| {ref}`Granian ASGI <backend-granian-asgi>` | ASGI | High-perf async (Rust) |
 
 ### Background Workers
 
-Background workers handle asynchronous tasks and scheduled jobs.
+| Backend | Best For |
+|---------|----------|
+| {ref}`Celery Worker <backend-celery-worker>` | Distributed tasks, complex workflows |
+| {ref}`Celery Beat <backend-celery-beat>` | Scheduled/periodic tasks |
+| {ref}`Django Tasks <backend-django-tasks>` | Simple tasks, no dependencies |
+| {ref}`Django-Q2 <backend-django-q2>` | ORM-backed, admin interface |
 
-- **{ref}`backend-celery-worker`** - Industry-standard distributed task queue
-- **{ref}`backend-celery-beat`** - Celery scheduler for periodic tasks
-- **{ref}`backend-django-tasks`** - Django's built-in lightweight task system
-- **{ref}`backend-django-q2`** - Django ORM-backed task queue
+## Quick Comparison
 
-## Backend Comparison
+| Backend | Async | Windows | External Deps |
+|---------|-------|---------|---------------|
+| Gunicorn | No | Limited | None |
+| Waitress | No | Yes | None |
+| Granian | Both | Yes | None |
+| Uvicorn | Yes | Yes | None |
+| Celery | Yes | Yes | Redis/RabbitMQ |
+| Django Tasks | Yes | Yes | None |
+| Django-Q2 | Yes | Yes | None |
 
-| Backend | Type | Async Support | Windows Support | External Dependencies |
-|---------|------|---------------|-----------------|----------------------|
-| Gunicorn | WSGI | No | Limited | None |
-| Waitress | WSGI | No | Excellent | None |
-| Granian (WSGI) | WSGI | No | Yes | None |
-| Uvicorn (ASGI) | ASGI | Yes | Yes | None |
-| Uvicorn (WSGI) | WSGI | No | Yes | None |
-| Granian (ASGI) | ASGI | Yes | Yes | None |
-| Celery | Worker | Yes | Yes | Message Broker (Redis/RabbitMQ) |
-| Django Tasks | Worker | Yes | Yes | None |
-| Django-Q2 | Worker | Yes | Yes | None |
+## ARGS Translation
 
-## How ARGS Translation Works
-
-All backends use the `ARGS` dictionary in `PRODUCTION_PROCESSES` to pass configuration to the underlying server. The framework automatically converts dictionary keys to command-line arguments:
+All backends convert the `ARGS` dict to CLI arguments:
 
 ```python
-# In settings.py
-PRODUCTION_PROCESSES = {
-    "web": {
-        "BACKEND": "django_prodserver.backends.gunicorn.GunicornServer",
-        "ARGS": {
-            "bind": "0.0.0.0:8000",
-            "workers": "4",
-            "timeout": "30"
-        }
-    }
-}
+"ARGS": {"bind": "0.0.0.0:8000", "workers": "4"}
+# becomes: --bind=0.0.0.0:8000 --workers=4
 ```
 
-This translates to CLI arguments:
-```bash
-gunicorn --bind=0.0.0.0:8000 --workers=4 --timeout=30
-```
-
-Each backend page provides specific examples and ARGS reference tables.
-
-## Choosing the Right Backend
-
-**For traditional Django apps:**
-- Use **Gunicorn** for production-ready WSGI serving on Linux
-- Use **Waitress** if you need Windows compatibility
-- Use **Granian WSGI** for maximum performance
-
-**For async Django apps:**
-- Use **Uvicorn ASGI** for WebSocket and async view support
-- Use **Granian ASGI** for high-performance async applications
-
-**For background tasks:**
-- Use **Celery** for complex distributed task processing
-- Use **Django Tasks** for simple in-process task queues
-- Use **Django-Q2** for ORM-backed task queues
-
-## Next Steps
-
-- See {ref}`installation` for setup instructions
-- Read {ref}`guide-quickstart` for a beginner-friendly tutorial
-- Explore individual backend pages for detailed configuration options
+See individual backend pages for specific ARGS options.
