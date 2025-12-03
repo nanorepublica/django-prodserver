@@ -92,6 +92,7 @@ PRODUCTION_PROCESSES = {
 ### Process Supervision
 
 **systemd:**
+
 ```ini
 # /etc/systemd/system/myapp-web.service
 [Unit]
@@ -110,6 +111,7 @@ WantedBy=multi-user.target
 ```
 
 **Docker Compose:**
+
 ```yaml
 services:
   web:
@@ -126,10 +128,10 @@ See {ref}`guide-multi-process` for complete examples.
 
 ## Development vs Production
 
-| Command | Use Case |
-|---------|----------|
-| `python manage.py devserver` | Local development (auto-reload, debug) |
-| `python manage.py prodserver web` | Production (multi-worker, optimized) |
+| Command                           | Use Case                               |
+| --------------------------------- | -------------------------------------- |
+| `python manage.py devserver`      | Local development (auto-reload, debug) |
+| `python manage.py prodserver web` | Production (multi-worker, optimized)   |
 
 ### Environment-Specific Settings
 

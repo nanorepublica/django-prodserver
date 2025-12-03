@@ -56,14 +56,14 @@ class DjangoQ2Worker(BaseServerBackend):
                 "django-q2 is required to use DjangoQ2Worker backend. "
                 "Install it with: pip install django-q2"
             ) from e
-        
+
         # Verify django_q is in INSTALLED_APPS
         from django.conf import settings
         if 'django_q' not in settings.INSTALLED_APPS:
             raise ImproperlyConfigured(
                 "Add 'django_q' to INSTALLED_APPS to use DjangoQ2Worker backend"
             )
-        
+
         super().__init__(**server_config)
 
     def start_server(self, *args):
@@ -73,7 +73,7 @@ class DjangoQ2Worker(BaseServerBackend):
     def prep_server_args(self):
         """Prepare arguments for qcluster command."""
         args = super().prep_server_args()
-        
+
         # Add any default arguments for qcluster if needed
         # Most configuration should be in Q_CLUSTER settings
         return args
@@ -123,7 +123,7 @@ PRODUCTION_PROCESSES = {
         "ARGS": {"bind": "0.0.0.0:8000"},
     },
     "worker-high": {
-        "BACKEND": "django_prodserver.backends.django_q2.DjangoQ2Worker", 
+        "BACKEND": "django_prodserver.backends.django_q2.DjangoQ2Worker",
         "ARGS": {"cluster-name": "high-priority"},
     },
     "worker-low": {
@@ -152,7 +152,7 @@ waitress = ["waitress>=3.0.2"]
 The backend implements comprehensive error handling:
 
 1. **Missing django-q2**: Clear message with installation instructions
-2. **Missing INSTALLED_APPS**: Guidance on adding 'django_q' 
+2. **Missing INSTALLED_APPS**: Guidance on adding 'django_q'
 3. **Configuration errors**: Forward Django-Q2's built-in validation
 4. **Runtime errors**: Preserve Django-Q2's error reporting
 
@@ -161,7 +161,7 @@ The backend implements comprehensive error handling:
 The backend supports all `qcluster` command arguments:
 
 - `--cluster-name`: Specify cluster name
-- `--verbosity`: Control logging verbosity  
+- `--verbosity`: Control logging verbosity
 - `--settings`: Override Django settings module
 - Any other arguments passed through transparently
 
@@ -170,6 +170,7 @@ The backend supports all `qcluster` command arguments:
 ### Phase 1: Core Backend Implementation
 
 **Tasks:**
+
 1. Create `DjangoQ2Worker` backend class
 2. Implement graceful import handling and error messages
 3. Add django-q2 optional dependency to pyproject.toml
@@ -177,6 +178,7 @@ The backend supports all `qcluster` command arguments:
 5. Test integration with `qcluster` command
 
 **Acceptance Criteria:**
+
 - Backend can be imported without django-q2 installed (with clear error on use)
 - Backend successfully starts qcluster when properly configured
 - All configuration errors provide actionable error messages
@@ -187,6 +189,7 @@ The backend supports all `qcluster` command arguments:
 ### Phase 2: Documentation and Examples
 
 **Tasks:**
+
 1. Update README.md with django-q2 configuration examples
 2. Add django-q2 section to existing documentation
 3. Document common configuration patterns
@@ -194,6 +197,7 @@ The backend supports all `qcluster` command arguments:
 5. Add integration tests with different broker configurations
 
 **Acceptance Criteria:**
+
 - README includes django-q2 examples alongside other backends
 - Documentation covers installation, basic and advanced configuration
 - Troubleshooting guide addresses common setup issues
@@ -204,6 +208,7 @@ The backend supports all `qcluster` command arguments:
 ### Phase 3: Testing and Validation
 
 **Tasks:**
+
 1. Create comprehensive test suite for django-q2 backend
 2. Test with different Django-Q2 broker configurations
 3. Validate error handling and edge cases
@@ -211,6 +216,7 @@ The backend supports all `qcluster` command arguments:
 5. Compatibility testing with different Django versions
 
 **Acceptance Criteria:**
+
 - Test coverage >90% for new backend code
 - Tests pass with Redis, ORM, and mock brokers
 - Error conditions properly tested and documented
@@ -234,10 +240,10 @@ class TestDjangoQ2Worker:
         """Test graceful handling when django-q2 not installed."""
         with patch('django_prodserver.backends.django_q2.import_string') as mock_import:
             mock_import.side_effect = ImportError("No module named 'django_q'")
-            
+
             with pytest.raises(ImproperlyConfigured) as exc_info:
                 DjangoQ2Worker()
-            
+
             assert "django-q2 is required" in str(exc_info.value)
             assert "pip install django-q2" in str(exc_info.value)
 
@@ -245,10 +251,10 @@ class TestDjangoQ2Worker:
         """Test error when django_q not in INSTALLED_APPS."""
         with patch('django_prodserver.backends.django_q2.settings') as mock_settings:
             mock_settings.INSTALLED_APPS = []
-            
+
             with pytest.raises(ImproperlyConfigured) as exc_info:
                 DjangoQ2Worker()
-            
+
             assert "Add 'django_q' to INSTALLED_APPS" in str(exc_info.value)
 
     @patch('django_prodserver.backends.django_q2.management.call_command')
@@ -256,7 +262,7 @@ class TestDjangoQ2Worker:
         """Test qcluster command is called correctly."""
         worker = DjangoQ2Worker()
         worker.start_server("--verbosity", "2")
-        
+
         mock_call_command.assert_called_once_with("qcluster", "--verbosity", "2")
 ```
 
@@ -269,7 +275,7 @@ class TestDjangoQ2Integration:
     def test_worker_starts_with_orm_broker(self):
         """Test worker starts successfully with ORM broker."""
         # Test with Q_CLUSTER configured for ORM broker
-        
+
     def test_worker_with_custom_args(self):
         """Test worker accepts custom arguments."""
         # Test ARGS configuration passes through correctly
@@ -349,7 +355,8 @@ Users already using Django-Q2 can easily migrate:
 
 **Impact:** High - Backend could break with django-q2 updates
 **Probability:** Low - Django-Q2 has stable API
-**Mitigation:** 
+**Mitigation:**
+
 - Pin to known-good django-q2 versions in optional dependencies
 - Comprehensive test suite to catch API changes
 - Monitor django-q2 releases for breaking changes
@@ -359,15 +366,17 @@ Users already using Django-Q2 can easily migrate:
 **Impact:** Medium - Conflicts between django-q and django-q2
 **Probability:** Low - Django-Q2 replaced django-q completely
 **Mitigation:**
+
 - Clear documentation about using django-q2 vs django-q
 - Explicit error messages if both packages detected
 - Test with both packages in CI if needed
 
-### Risk 3: Configuration Complexity  
+### Risk 3: Configuration Complexity
 
 **Impact:** Medium - Users struggle with Q_CLUSTER setup
 **Probability:** Medium - Django-Q2 has many configuration options
 **Mitigation:**
+
 - Comprehensive documentation with examples
 - Clear error messages for common misconfigurations
 - Troubleshooting guide for setup issues
@@ -378,6 +387,7 @@ Users already using Django-Q2 can easily migrate:
 **Impact:** Low - Import overhead even when unused
 **Probability:** Low - Lazy import handling prevents this
 **Mitigation:**
+
 - Lazy imports only when backend is instantiated
 - Performance tests to verify no overhead
 - Benchmark against existing backends
@@ -385,18 +395,21 @@ Users already using Django-Q2 can easily migrate:
 ## Success Metrics
 
 ### Functionality Metrics
+
 - Backend successfully starts django-q2 workers
 - All qcluster command arguments supported
 - Error handling provides actionable guidance
 - Integration tests pass with multiple broker types
 
-### Code Quality Metrics  
+### Code Quality Metrics
+
 - Test coverage >90% for new code
 - No performance regression in existing functionality
 - Documentation completeness score >95%
 - Zero critical security vulnerabilities
 
 ### User Experience Metrics
+
 - Installation success rate >95%
 - Configuration error resolution time <5 minutes
 - User satisfaction with documentation quality

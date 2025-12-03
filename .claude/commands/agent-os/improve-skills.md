@@ -10,7 +10,7 @@ LOOP through each `SKILL.md` file and FOR EACH use the following process to revi
 
 ### Step 1: Confirm which skills to improve
 
-First, ask the user to confirm whether they want ALL of their Claude Code skills to be improved, only select Skills.  Assume the answer will be "all" but ask the user to confirm by displaying the following message, then WAIT for the user's response before proceeding to Step 2:
+First, ask the user to confirm whether they want ALL of their Claude Code skills to be improved, only select Skills. Assume the answer will be "all" but ask the user to confirm by displaying the following message, then WAIT for the user's response before proceeding to Step 2:
 
 ```
 Before I proceed with improving your Claude Code Skills, can you confirm that you want me to revise and improve ALL Skills in your .claude/skills/ folder?
@@ -45,13 +45,14 @@ At the top of the content of skill.md, below the frontmatter, insert an H2 headi
 The use case examples can repeat the same one(s) listed in the description and/or expand on them.
 
 Example:
+
 ```markdown
 ## When to use this skill:
 
 - [Descriptive example A]
 - [Descriptive example B]
 - [Descriptive example C]
-...
+  ...
 ```
 
 ### Step 5: Advise the user on improving their skills further

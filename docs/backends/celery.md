@@ -46,6 +46,7 @@ CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
 ```
 
 (backend-celery-worker)=
+
 ## Worker
 
 ```python
@@ -63,18 +64,19 @@ PRODUCTION_PROCESSES = {
 
 ### Worker ARGS
 
-| Argument | Default | Description |
-|----------|---------|-------------|
-| `concurrency` | CPU count | Worker processes/threads |
-| `loglevel` | `info` | Log level |
-| `pool` | `prefork` | Pool type (`prefork`, `gevent`, `solo`) |
-| `queues` | All | Comma-separated queue names |
-| `max-tasks-per-child` | `None` | Restart after N tasks |
-| `max-memory-per-child` | `None` | Restart after N KB |
-| `time-limit` | `None` | Hard task timeout |
-| `soft-time-limit` | `None` | Soft task timeout |
+| Argument               | Default   | Description                             |
+| ---------------------- | --------- | --------------------------------------- |
+| `concurrency`          | CPU count | Worker processes/threads                |
+| `loglevel`             | `info`    | Log level                               |
+| `pool`                 | `prefork` | Pool type (`prefork`, `gevent`, `solo`) |
+| `queues`               | All       | Comma-separated queue names             |
+| `max-tasks-per-child`  | `None`    | Restart after N tasks                   |
+| `max-memory-per-child` | `None`    | Restart after N KB                      |
+| `time-limit`           | `None`    | Hard task timeout                       |
+| `soft-time-limit`      | `None`    | Soft task timeout                       |
 
 (backend-celery-beat)=
+
 ## Beat (Scheduler)
 
 ```python
@@ -91,9 +93,9 @@ PRODUCTION_PROCESSES = {
 
 ### Beat ARGS
 
-| Argument | Default | Description |
-|----------|---------|-------------|
-| `loglevel` | `info` | Log level |
+| Argument    | Default | Description     |
+| ----------- | ------- | --------------- |
+| `loglevel`  | `info`  | Log level       |
 | `scheduler` | Default | Scheduler class |
 
 ## Examples

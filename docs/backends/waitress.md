@@ -30,16 +30,16 @@ PRODUCTION_PROCESSES = {
 
 ## Common ARGS
 
-| Argument | Default | Description |
-|----------|---------|-------------|
-| `host` | `0.0.0.0` | Host to bind |
-| `port` | `8080` | Port to bind |
-| `threads` | `4` | Thread count |
-| `channel-timeout` | `120` | Channel timeout (seconds) |
-| `connection-limit` | `100` | Max simultaneous connections |
-| `backlog` | `1024` | Socket backlog |
-| `unix-socket` | `None` | Unix socket path (Linux/macOS) |
-| `expose-tracebacks` | `False` | Show tracebacks (dev only) |
+| Argument            | Default   | Description                    |
+| ------------------- | --------- | ------------------------------ |
+| `host`              | `0.0.0.0` | Host to bind                   |
+| `port`              | `8080`    | Port to bind                   |
+| `threads`           | `4`       | Thread count                   |
+| `channel-timeout`   | `120`     | Channel timeout (seconds)      |
+| `connection-limit`  | `100`     | Max simultaneous connections   |
+| `backlog`           | `1024`    | Socket backlog                 |
+| `unix-socket`       | `None`    | Unix socket path (Linux/macOS) |
+| `expose-tracebacks` | `False`   | Show tracebacks (dev only)     |
 
 ## Examples
 
@@ -77,7 +77,7 @@ PRODUCTION_PROCESSES = {
 ## Thread Count
 
 - **Low traffic:** 2-4 threads
-- **Medium traffic:** 4-8 threads  
+- **Medium traffic:** 4-8 threads
 - **High traffic:** 8-16 threads
 
 ## Troubleshooting

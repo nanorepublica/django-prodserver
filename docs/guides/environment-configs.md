@@ -7,6 +7,7 @@ Learn how to manage different configurations across development, staging, and pr
 ## Overview
 
 Different environments require different configurations:
+
 - **Development**: Debug enabled, fewer workers, verbose logging
 - **Staging**: Production-like settings for testing
 - **Production**: Optimized for performance and security

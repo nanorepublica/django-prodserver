@@ -1,6 +1,7 @@
 # Task Breakdown: Comprehensive User Documentation
 
 ## Overview
+
 Total Tasks: 7 task groups with 45 sub-tasks
 
 This implementation creates beginner-friendly documentation for django-prodserver, covering all 8 supported backends, practical deployment guides, and troubleshooting resources. The documentation will be built using the existing Sphinx + Furo + MyST infrastructure.
@@ -10,6 +11,7 @@ This implementation creates beginner-friendly documentation for django-prodserve
 ### Infrastructure & Setup
 
 #### Task Group 1: Documentation Structure Setup
+
 **Dependencies:** None
 
 - [x] 1.0 Set up documentation structure
@@ -35,6 +37,7 @@ This implementation creates beginner-friendly documentation for django-prodserve
     - Verify index files exist
 
 **Acceptance Criteria:**
+
 - `docs/backends/` and `docs/guides/` directories exist
 - Both directories have index.md files with structure outlined
 - `docs/index.md` TOC includes new sections
@@ -45,6 +48,7 @@ This implementation creates beginner-friendly documentation for django-prodserve
 ### Core Documentation Updates
 
 #### Task Group 2: Update Existing Documentation Files
+
 **Dependencies:** Task Group 1
 
 - [x] 2.0 Update and expand core documentation
@@ -62,7 +66,7 @@ This implementation creates beginner-friendly documentation for django-prodserve
     - Add "Multiple Processes" section showing web + worker configurations
     - Add "Development vs Production" section explaining prodserver vs devserver
     - Add examples for running multiple process types simultaneously
-    - Include code examples with syntax highlighting (```python, ```bash)
+    - Include code examples with syntax highlighting (`python, `bash)
     - Add cross-references to relevant guides and backend pages
     - Add MyST section labels: `(usage-patterns)=`, `(multiple-processes)=`
   - [x] 2.3 Enhance `docs/configuration.rst` with comprehensive reference
@@ -81,6 +85,7 @@ This implementation creates beginner-friendly documentation for django-prodserve
     - Confirm links to backend reference pages are present (will be created in next groups)
 
 **Acceptance Criteria:**
+
 - `docs/installation.md` includes beginner-friendly quickstart tutorial
 - `docs/usage.md` provides practical examples and patterns
 - `docs/configuration.rst` has comprehensive PRODUCTION_PROCESSES reference
@@ -92,6 +97,7 @@ This implementation creates beginner-friendly documentation for django-prodserve
 ### Backend Reference - Priority Backends
 
 #### Task Group 3: Document Popular Backends (Gunicorn, Celery, Uvicorn)
+
 **Dependencies:** Task Groups 1-2
 
 - [x] 3.0 Create backend reference pages for most popular backends
@@ -151,6 +157,7 @@ This implementation creates beginner-friendly documentation for django-prodserve
     - Check that cross-references work
 
 **Acceptance Criteria:**
+
 - Gunicorn, Celery, and Uvicorn backend pages are complete
 - Each page follows the standard structure (overview, when to use, configuration, etc.)
 - ARGS translation examples are clear and accurate
@@ -162,6 +169,7 @@ This implementation creates beginner-friendly documentation for django-prodserve
 ### Backend Reference - Additional Backends
 
 #### Task Group 4: Document Remaining Backends
+
 **Dependencies:** Task Group 3
 
 - [x] 4.0 Create backend reference pages for remaining backends
@@ -225,6 +233,7 @@ This implementation creates beginner-friendly documentation for django-prodserve
     - Verify backend index page has complete listings
 
 **Acceptance Criteria:**
+
 - All 8 backend pages are complete (Gunicorn, Granian, Uvicorn, Waitress, Celery, Django Tasks, Django-Q2)
 - Each page follows consistent structure and format
 - Backend index page provides good overview and comparison
@@ -236,6 +245,7 @@ This implementation creates beginner-friendly documentation for django-prodserve
 ### Practical Guides
 
 #### Task Group 5: Create Tutorials and Deployment Guides
+
 **Dependencies:** Task Groups 1-4
 
 - [x] 5.0 Create practical guides for common deployment scenarios
@@ -304,6 +314,7 @@ This implementation creates beginner-friendly documentation for django-prodserve
     - Verify code examples are properly formatted
 
 **Acceptance Criteria:**
+
 - All 5 practical guides are complete
 - Docker guide includes working Dockerfile examples
 - Multi-process guide shows realistic deployment patterns
@@ -316,6 +327,7 @@ This implementation creates beginner-friendly documentation for django-prodserve
 ### Troubleshooting
 
 #### Task Group 6: Create Troubleshooting Guide
+
 **Dependencies:** Task Groups 1-5
 
 - [x] 6.0 Create comprehensive troubleshooting documentation
@@ -366,6 +378,7 @@ This implementation creates beginner-friendly documentation for django-prodserve
     - Verify admonitions display properly
 
 **Acceptance Criteria:**
+
 - Troubleshooting guide covers at least 10 common issues
 - Each issue has clear symptoms, diagnosis, and solution
 - Solutions include code examples where applicable
@@ -377,6 +390,7 @@ This implementation creates beginner-friendly documentation for django-prodserve
 ### Integration, Testing & Polish
 
 #### Task Group 7: Cross-Linking, Validation, and Final Polish
+
 **Dependencies:** Task Groups 1-6
 
 - [x] 7.0 Integrate, validate, and polish all documentation
@@ -424,6 +438,7 @@ This implementation creates beginner-friendly documentation for django-prodserve
     - Confirm all success criteria from spec are met
 
 **Acceptance Criteria:**
+
 - All documentation pages have appropriate cross-references
 - Sphinx builds with zero warnings or errors
 - All external links to backend documentation are valid
@@ -441,32 +456,38 @@ This implementation creates beginner-friendly documentation for django-prodserve
 Recommended implementation sequence:
 
 1. **Infrastructure & Setup** (Task Group 1)
+
    - Create directory structure
    - Set up index files and TOC
    - Prepare for content creation
 
 2. **Core Documentation Updates** (Task Group 2)
+
    - Update installation.md with quickstart
    - Expand usage.md with patterns
    - Enhance configuration.rst with reference
    - These are the foundation for all other content
 
 3. **Backend Reference - Priority** (Task Group 3)
+
    - Document Gunicorn, Celery, Uvicorn first
    - These are the most commonly used backends
    - Establishes pattern for remaining backends
 
 4. **Backend Reference - Additional** (Task Group 4)
+
    - Document Granian, Waitress, Django Tasks, Django-Q2
    - Complete the backend reference section
    - Follows established pattern
 
 5. **Practical Guides** (Task Group 5)
+
    - Create quickstart, Docker, environment, multi-process, backend-switching guides
    - Builds on backend reference content
    - Provides practical value for users
 
 6. **Troubleshooting** (Task Group 6)
+
    - Create troubleshooting guide
    - References backends and guides created earlier
    - Helps users solve common problems
@@ -483,6 +504,7 @@ Recommended implementation sequence:
 ## Success Metrics
 
 **Documentation Completeness:**
+
 - 8 backend reference pages created (Gunicorn, Granian, Uvicorn, Waitress, Celery Worker, Celery Beat, Django Tasks, Django-Q2)
 - 5+ practical guides created (quickstart, Docker, environment configs, multi-process, backend switching)
 - 1 comprehensive troubleshooting guide covering 10+ common issues
@@ -490,6 +512,7 @@ Recommended implementation sequence:
 - 1 updated TOC (index.md)
 
 **Technical Quality:**
+
 - Sphinx builds with zero warnings or errors
 - All MyST cross-references resolve correctly
 - All external links are valid
@@ -497,6 +520,7 @@ Recommended implementation sequence:
 - Documentation follows existing style conventions
 
 **User Experience:**
+
 - Quickstart tutorial accessible within 2 clicks from homepage
 - Quickstart completable in under 10 minutes
 - All code examples are copy-paste ready (no placeholders)
@@ -504,6 +528,7 @@ Recommended implementation sequence:
 - Progressive disclosure: beginners start simple, advanced users can dive deep
 
 **Testing Validation:**
+
 - Run `make html` successfully without warnings
 - Verify all pages render in browser
 - Test cross-reference links work

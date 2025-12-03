@@ -1,11 +1,13 @@
 # Product Mission
 
 ## Pitch
+
 Django prodserver is a production server management tool that helps Django developers and DevOps engineers start and manage production servers and background workers with a unified, consistent interface, regardless of the underlying server technology being used.
 
 ## Users
 
 ### Primary Customers
+
 - **Django Developers**: Individual developers and development teams building Django applications that need simple, reliable production server management
 - **DevOps Engineers**: Operations teams managing Django deployments across multiple projects and environments
 - **System Administrators**: Infrastructure teams responsible for standardizing server management across their Django application portfolio
@@ -13,6 +15,7 @@ Django prodserver is a production server management tool that helps Django devel
 ### User Personas
 
 **Solo Django Developer** (25-40)
+
 - **Role:** Full-stack developer working on side projects or small commercial applications
 - **Context:** Building Django applications that need to be deployed to production, often managing multiple projects simultaneously
 - **Pain Points:**
@@ -26,6 +29,7 @@ Django prodserver is a production server management tool that helps Django devel
   - Minimal configuration required to get production-ready setup
 
 **DevOps Engineer** (28-45)
+
 - **Role:** Platform engineer managing Django deployments in containerized environments
 - **Context:** Responsible for maintaining deployment pipelines and infrastructure for multiple Django applications across development, staging, and production environments
 - **Pain Points:**
@@ -40,6 +44,7 @@ Django prodserver is a production server management tool that helps Django devel
   - Easy integration with container orchestration platforms
 
 **Enterprise System Administrator** (35-55)
+
 - **Role:** Infrastructure architect managing large-scale Django deployments
 - **Context:** Corporate environment with strict standards, compliance requirements, and multiple Django applications serving different business units
 - **Pain Points:**

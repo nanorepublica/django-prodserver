@@ -7,6 +7,7 @@ Get django-prodserver up and running in 10 minutes or less! This tutorial walks 
 ## What You'll Accomplish
 
 By the end of this guide, you'll have:
+
 - django-prodserver installed in your Django project
 - A production-ready web server (Gunicorn) configured
 - Your Django application running in production mode
@@ -28,9 +29,11 @@ pip install django-prodserver
 
 ::::{tip}
 For production use, you'll also need a server backend. We'll use Gunicorn for this quickstart:
+
 ```bash
 pip install gunicorn
 ```
+
 ::::
 
 ## Step 2: Add to INSTALLED_APPS
@@ -79,6 +82,7 @@ PRODUCTION_PROCESSES = {
 ```
 
 **What this configuration does:**
+
 - Creates a process named "web"
 - Uses Gunicorn as the server backend
 - Binds to all interfaces (0.0.0.0) on port 8000
@@ -214,6 +218,7 @@ Explore other server backends:
 **Q: How is this different from `python manage.py runserver`?**
 
 A: Django's `runserver` is for development only. django-prodserver uses production-ready servers like Gunicorn that are:
+
 - Much faster (multiple workers)
 - More stable (automatic worker restarts)
 - More secure (designed for production)
@@ -226,6 +231,7 @@ A: Yes, but `runserver` is better for development because it auto-reloads when c
 **Q: Do I need to configure nginx or Apache?**
 
 A: Not necessarily! Gunicorn can serve your application directly. However, for production, it's recommended to use a reverse proxy (nginx/Apache) for:
+
 - SSL/TLS termination
 - Static file serving
 - Load balancing
@@ -234,14 +240,17 @@ A: Not necessarily! Gunicorn can serve your application directly. However, for p
 **Q: How many workers should I use?**
 
 A: A good starting point is `(2 × CPU_cores) + 1`. For example, on a 2-core machine:
+
 ```python
 "workers": "5"  # (2 × 2) + 1
 ```
+
 Monitor your application and adjust based on resource usage.
 
 **Q: What if I get errors?**
 
 A: Check the {ref}`troubleshooting` guide for common issues. Common problems:
+
 - Backend not installed: `pip install gunicorn`
 - Port in use: Change the port number
 - Settings not found: Ensure `PRODUCTION_PROCESSES` is in your settings
@@ -288,6 +297,7 @@ PRODUCTION_PROCESSES = {
 ## Troubleshooting
 
 **Server won't start:**
+
 ```bash
 # Check if gunicorn is installed
 pip install gunicorn
@@ -303,11 +313,13 @@ netstat -ano | findstr :8000
 ```
 
 **ImportError: No module named 'gunicorn':**
+
 ```bash
 pip install gunicorn
 ```
 
 **Port already in use:**
+
 ```python
 # Change port in settings.py
 "ARGS": {
@@ -320,6 +332,7 @@ For more help, see {ref}`troubleshooting`.
 ## Summary
 
 You've learned how to:
+
 1. Install django-prodserver and a backend (Gunicorn)
 2. Add django-prodserver to your Django project
 3. Configure a production server

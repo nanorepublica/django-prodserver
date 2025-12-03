@@ -1,9 +1,11 @@
 # Specification: Comprehensive User Documentation
 
 ## Goal
+
 Create beginner-friendly, comprehensive documentation for django-prodserver that guides users from installation through production deployment, with complete backend references and practical examples for all supported servers and workers.
 
 ## User Stories
+
 - As a Django developer new to production deployments, I want a quickstart tutorial so that I can get my application running in production quickly
 - As a developer comparing server backends, I want clear documentation for each backend with examples so that I can choose the right one for my needs
 - As a DevOps engineer, I want to understand how ARGS translate to CLI arguments so that I can fine-tune server configurations
@@ -15,6 +17,7 @@ Create beginner-friendly, comprehensive documentation for django-prodserver that
 ## Core Requirements
 
 **Documentation Structure:**
+
 - Update existing `docs/installation.md` with enhanced setup instructions and quickstart tutorial
 - Expand `docs/usage.md` with practical examples, tutorials, and common patterns
 - Extend `docs/configuration.rst` with comprehensive PRODUCTION_PROCESSES reference
@@ -23,6 +26,7 @@ Create beginner-friendly, comprehensive documentation for django-prodserver that
 - Create `docs/troubleshooting.md` for common issues and solutions
 
 **Content for Beginners:**
+
 - Quickstart tutorial as the primary entry point in installation.md
 - Progressive disclosure pattern: basic concepts first, advanced features later
 - Clear explanations assuming limited production deployment experience
@@ -30,6 +34,7 @@ Create beginner-friendly, comprehensive documentation for django-prodserver that
 - Visual structure using admonitions (notes, warnings, tips) for emphasis
 
 **Backend Reference Documentation:**
+
 - Individual page for each supported backend in `docs/backends/` directory
 - WSGI Servers: Gunicorn, Waitress
 - ASGI Servers: Uvicorn (ASGI + WSGI modes), Granian (ASGI + WSGI modes)
@@ -43,6 +48,7 @@ Create beginner-friendly, comprehensive documentation for django-prodserver that
   - Common gotchas and troubleshooting tips
 
 **Examples and Tutorials:**
+
 - Quickstart tutorial (installation through running first server)
 - Environment-specific configuration guide (dev, staging, production settings)
 - Docker deployment guide with Dockerfile examples
@@ -51,6 +57,7 @@ Create beginner-friendly, comprehensive documentation for django-prodserver that
 - Common troubleshooting scenarios with solutions
 
 **Technical Implementation:**
+
 - Write all new content in Markdown (.md) format
 - Use MyST syntax for cross-references between documentation sections
 - Add code examples with appropriate syntax highlighting
@@ -59,11 +66,13 @@ Create beginner-friendly, comprehensive documentation for django-prodserver that
 - Maintain consistency with existing documentation style
 
 ## Visual Design
+
 No visual mockups were provided. Documentation will follow the existing Furo theme design already configured in the project.
 
 ## Reusable Components
 
 ### Existing Documentation Infrastructure
+
 - Sphinx documentation build system (configured in `docs/conf.py`)
 - Furo theme already installed and configured
 - MyST Parser for Markdown support
@@ -72,6 +81,7 @@ No visual mockups were provided. Documentation will follow the existing Furo the
 - Configuration reference in `docs/configuration.rst`
 
 ### Existing Code to Reference
+
 - Backend implementations in `/home/user/django-prodserver/src/django_prodserver/backends/`:
   - `base.py`: BaseServerBackend class showing extensibility pattern
   - `gunicorn.py`: GunicornServer implementation
@@ -87,6 +97,7 @@ No visual mockups were provided. Documentation will follow the existing Furo the
 - Configuration in README.md showing PRODUCTION_PROCESSES structure
 
 ### Documentation Patterns to Follow
+
 - README.md structure for configuration examples
 - Existing installation.md format for setup instructions
 - Cross-reference pattern using MyST: `{ref}section-name`
@@ -95,15 +106,18 @@ No visual mockups were provided. Documentation will follow the existing Furo the
 ## Technical Approach
 
 ### File Structure
+
 Create new files and update existing ones:
 
 **Update Existing Files:**
+
 - `docs/installation.md`: Add quickstart tutorial section at top, expand setup instructions
 - `docs/usage.md`: Add practical examples, common patterns, and tutorial references
 - `docs/configuration.rst`: Expand with detailed PRODUCTION_PROCESSES reference
 - `docs/index.md`: Update table of contents to include new sections
 
 **New Backend Reference Files (create `docs/backends/` directory):**
+
 - `docs/backends/index.md`: Overview of all backends
 - `docs/backends/gunicorn.md`: Gunicorn server documentation
 - `docs/backends/granian.md`: Granian ASGI and WSGI server documentation
@@ -114,6 +128,7 @@ Create new files and update existing ones:
 - `docs/backends/django-q2.md`: Django-Q2 worker documentation
 
 **New Tutorial/Guide Files (create `docs/guides/` directory):**
+
 - `docs/guides/quickstart.md`: Step-by-step quickstart (may duplicate content from installation.md for discoverability)
 - `docs/guides/docker-deployment.md`: Docker and container deployment guide
 - `docs/guides/environment-configs.md`: Environment-specific configuration patterns
@@ -121,11 +136,13 @@ Create new files and update existing ones:
 - `docs/guides/backend-switching.md`: How to switch between backends
 
 **New Troubleshooting File:**
+
 - `docs/troubleshooting.md`: Common issues, error messages, and solutions
 
 ### Content Organization Pattern
 
 Each backend reference file should follow this structure:
+
 1. **Overview**: 1-2 sentence description
 2. **When to Use**: Use cases and scenarios
 3. **Installation**: How to install the backend (link to official docs)
@@ -137,20 +154,26 @@ Each backend reference file should follow this structure:
 9. **Official Documentation**: Links to backend's official docs
 
 ### MyST Cross-References
+
 Use MyST reference syntax to create navigable documentation:
+
 - Section labels: `(label-name)=` before headings
 - Cross-references: `{ref}label-name` to link to sections
 - External links: Standard Markdown `[text](url)` syntax
 
 ### Code Examples
+
 All code examples should:
-- Use appropriate language tags for syntax highlighting (```python, ```bash, ```yaml)
+
+- Use appropriate language tags for syntax highlighting (`python, `bash, ```yaml)
 - Include comments explaining key configuration options
 - Show realistic, production-ready values
 - Include both minimal and advanced variations
 
 ### Admonitions
+
 Use MyST admonitions for emphasis:
+
 - `:::{note}` for helpful information
 - `:::{warning}` for important caveats
 - `:::{tip}` for best practices
@@ -159,6 +182,7 @@ Use MyST admonitions for emphasis:
 ### Documentation Sections to Create/Update
 
 **1. Enhanced Installation (update `docs/installation.md`):**
+
 - Add "Quickstart Tutorial" section at the top
 - Expand "Installing the Package" with troubleshooting notes
 - Add "Choosing Your Backend" section explaining backend options
@@ -166,6 +190,7 @@ Use MyST admonitions for emphasis:
 - Include link to backend reference and detailed configuration guide
 
 **2. Expanded Usage Guide (update `docs/usage.md`):**
+
 - Add "Common Usage Patterns" section with real-world examples
 - Add "Process Management" section explaining process names
 - Add "Multiple Processes" section showing web + worker configurations
@@ -173,6 +198,7 @@ Use MyST admonitions for emphasis:
 - Reference relevant tutorials and guides
 
 **3. Configuration Deep-Dive (update `docs/configuration.rst`):**
+
 - Add comprehensive PRODUCTION_PROCESSES structure documentation
 - Document BACKEND, ARGS, and APP configuration keys
 - Explain environment-specific configuration patterns
@@ -180,12 +206,14 @@ Use MyST admonitions for emphasis:
 - Document how to override settings per environment
 
 **4. Backend Reference (new `docs/backends/` directory):**
+
 - Index page listing all backends with brief descriptions
 - Individual pages for each backend with detailed configuration
 - Comparison table showing backend features (async support, platform compatibility, etc.)
 - Links between related backends (e.g., Granian ASGI vs WSGI)
 
 **5. Practical Guides (new `docs/guides/` directory):**
+
 - Quickstart: 5-minute tutorial getting a server running
 - Docker Deployment: Dockerfile examples, multi-stage builds, best practices
 - Environment Configs: Using Django settings for dev/staging/production
@@ -193,6 +221,7 @@ Use MyST admonitions for emphasis:
 - Backend Switching: Step-by-step guide to migrate between backends
 
 **6. Troubleshooting (new `docs/troubleshooting.md`):**
+
 - "Server won't start" issues and solutions
 - "ImportError" for missing backend dependencies
 - Configuration validation errors
@@ -204,6 +233,7 @@ Use MyST admonitions for emphasis:
 ## Out of Scope
 
 **Explicitly Excluded from this Documentation:**
+
 - Backend installation instructions (defer to official backend documentation)
 - General Django deployment topics unrelated to prodserver (database setup, static files, migrations)
 - Infrastructure-as-code templates (Kubernetes YAML, Docker Compose files, Terraform)
@@ -217,18 +247,21 @@ Use MyST admonitions for emphasis:
 ## Success Criteria
 
 **Documentation Completeness:**
+
 - Every supported backend has a dedicated reference page with examples
 - At least 5 practical guides covering common deployment scenarios
 - Quickstart tutorial allows a beginner to run a production server in under 10 minutes
 - Troubleshooting guide covers the top 10 most common issues
 
 **User Experience:**
+
 - New users can find quickstart tutorial within 2 clicks from docs homepage
 - Backend reference pages include working copy-paste examples
 - Cross-references between related documentation sections work correctly
 - Code examples use realistic configuration values (not placeholders)
 
 **Technical Quality:**
+
 - All Markdown files build successfully with Sphinx without warnings
 - MyST cross-references resolve correctly
 - Code blocks have appropriate syntax highlighting
@@ -236,6 +269,7 @@ Use MyST admonitions for emphasis:
 - Links to external backend documentation remain valid
 
 **Search and Navigation:**
+
 - Table of contents in `docs/index.md` includes all new sections
 - Backend reference has index page listing all backends
 - Guides directory has index page listing all tutorials
@@ -245,6 +279,7 @@ Use MyST admonitions for emphasis:
 ## Implementation Considerations
 
 **Content Writing Priority:**
+
 1. Update `docs/installation.md` with quickstart tutorial (highest priority for new users)
 2. Create backend reference pages for most popular backends (Gunicorn, Uvicorn, Celery)
 3. Create Docker deployment guide (common production deployment)
@@ -255,6 +290,7 @@ Use MyST admonitions for emphasis:
 8. Polish and cross-link all documentation
 
 **Backend Documentation Order:**
+
 1. Gunicorn (most common WSGI server)
 2. Celery Worker (most common task queue)
 3. Uvicorn (popular ASGI server)
@@ -265,17 +301,20 @@ Use MyST admonitions for emphasis:
 8. Django-Q2 (ORM-backed queue)
 
 **Alignment with Product Mission:**
+
 - Emphasize unified interface benefit throughout documentation
 - Show how easy it is to switch backends (align with "easy backend switching" feature)
 - Demonstrate Django-native integration
 - Highlight consistency across different backend types
 
 **Alignment with Product Roadmap:**
+
 - Structure allows easy addition of future backends (Celery Flower, development servers)
 - Configuration documentation supports upcoming features (sane defaults, CLI argument passing)
 - Extensibility documentation prepares for custom backend development
 
 **Documentation Build:**
+
 - All new Markdown files must be added to `docs/index.md` toctree
 - Run `make html` in docs directory to verify build succeeds
 - Check for Sphinx warnings about unresolved references
@@ -283,6 +322,7 @@ Use MyST admonitions for emphasis:
 - Verify code syntax highlighting displays correctly
 
 **Maintenance Considerations:**
+
 - Backend reference pages should link to specific versions of official docs where possible
 - Include "last updated" dates in rapidly-changing sections
 - Keep examples aligned with current best practices

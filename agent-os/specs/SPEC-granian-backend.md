@@ -18,10 +18,12 @@ Add Granian server as a new backend option for django-prodserver. Granian is a R
 
 **Package**: `granian>=1.0.0`
 
-**Python Requirements**: 
+**Python Requirements**:
+
 - Python >= 3.9 (already satisfied by project's >= 3.9 requirement)
 
 **Optional Dependencies**:
+
 - `granian[reload]` - for auto-reload functionality (development)
 - `granian[uvloop]` - for uvloop event loop support
 
@@ -55,11 +57,13 @@ tests/backends/
 **Location**: `src/django_prodserver/backends/granian.py`
 
 **Responsibilities**:
+
 - Import and configure Granian's ASGI interface
 - Prepare arguments for ASGI application serving
 - Start Granian server with ASGI interface
 
 **Key Methods**:
+
 - `__init__(**server_args)`: Initialize with server arguments
 - `prep_server_args() -> list[str]`: Format arguments for Granian CLI
 - `start_server(*args)`: Launch Granian with ASGI interface
@@ -72,6 +76,7 @@ Granian provides a CLI interface that should be invoked programmatically. The im
 **Location**: `src/django_prodserver/backends/granian.py`
 
 **Responsibilities**:
+
 - Import and configure Granian's WSGI interface
 - Prepare arguments for WSGI application serving
 - Start Granian server with WSGI interface
@@ -83,6 +88,7 @@ Granian provides a CLI interface that should be invoked programmatically. The im
 The backend must support common Granian CLI arguments through the `ARGS` configuration:
 
 **Core Arguments**:
+
 - `interface`: `asgi` or `wsgi` (auto-set by backend class)
 - `host`: Bind host address (e.g., "0.0.0.0")
 - `port`: Bind port number (e.g., 8000)
@@ -95,22 +101,25 @@ The backend must support common Granian CLI arguments through the `ARGS` configu
 - `reload`: Enable auto-reload (development only)
 
 **SSL Arguments**:
+
 - `ssl-keyfile`: Path to SSL key file
 - `ssl-certificate`: Path to SSL certificate file
 
 **Advanced Arguments**:
+
 - `url-path-prefix`: URL path prefix for mounted apps
 - `ws/no-ws`: WebSocket support toggle
 - `loop`: Event loop implementation (`auto`, `asyncio`, `uvloop`)
 
 **Argument Formatting**:
+
 - Use base class `_format_server_args_from_dict()` method
 - Granian expects arguments in format: `--arg=value` or `--arg value`
 - Boolean flags: `--ws` or `--no-ws`
 
 #### 3.4 Application Target
 
-- **ASGI**: Use `asgi_app_name()` utility function to get `settings.ASGI_APPLICATION` 
+- **ASGI**: Use `asgi_app_name()` utility function to get `settings.ASGI_APPLICATION`
 - **WSGI**: Use `wsgi_app_name()` utility function to get `settings.WSGI_APPLICATION`
 
 Format: `module:application` (e.g., `myproject.asgi:application`)
@@ -177,12 +186,14 @@ PRODUCTION_PROCESSES = {
 **Test Coverage**:
 
 1. **Initialization Tests**:
+
    - Test `GranianASGIServer` initialization without args
    - Test `GranianASGIServer` initialization with args
    - Test `GranianWSGIServer` initialization without args
    - Test `GranianWSGIServer` initialization with args
 
 2. **Argument Preparation Tests**:
+
    - Test `prep_server_args()` returns correct format for ASGI
    - Test `prep_server_args()` returns correct format for WSGI
    - Test argument formatting with various combinations
@@ -190,12 +201,14 @@ PRODUCTION_PROCESSES = {
    - Test interface flag is correctly set
 
 3. **Server Start Tests**:
+
    - Mock Granian server start for ASGI
    - Mock Granian server start for WSGI
    - Verify correct application target is passed
    - Verify all args are properly formatted
 
 4. **Inheritance Tests**:
+
    - Verify both classes inherit from `BaseServerBackend`
    - Test base class functionality works correctly
 
@@ -224,7 +237,7 @@ Add Granian examples to the configuration section:
     "ARGS": {"host": "0.0.0.0", "port": "8000", "workers": "4"},
 },
 
-# WSGI variant  
+# WSGI variant
 "web": {
     "BACKEND": "django_prodserver.backends.granian.GranianWSGIServer",
     "ARGS": {"host": "0.0.0.0", "port": "8000", "workers": "4"},
@@ -243,6 +256,7 @@ granian = ["granian>=1.0.0"]
 #### 6.3 docs/usage.md
 
 Add comprehensive Granian backend documentation:
+
 - Overview of Granian capabilities
 - When to use ASGI vs WSGI variant
 - Common configuration patterns
@@ -254,6 +268,7 @@ Add comprehensive Granian backend documentation:
 Granian can be invoked in two ways:
 
 **Option A: Programmatic API** (Recommended)
+
 ```python
 from granian import Granian
 
@@ -268,6 +283,7 @@ server.serve()
 ```
 
 **Option B: CLI Runner**
+
 ```python
 from granian.cli import main as granian_main
 
@@ -276,6 +292,7 @@ granian_main(["--interface", "asgi", "myapp.asgi:application"])
 ```
 
 **Recommendation**: Use **Option A** (Programmatic API) if available, as it provides:
+
 - Better Python integration
 - Easier argument handling
 - More explicit control
@@ -302,6 +319,7 @@ If Option A is not feasible, use **Option B** following the pattern established 
 Users can migrate from existing backends:
 
 **From Gunicorn (WSGI)**:
+
 ```python
 # Before
 "BACKEND": "django_prodserver.backends.gunicorn.GunicornServer",
@@ -313,12 +331,13 @@ Users can migrate from existing backends:
 ```
 
 **From Uvicorn (ASGI)**:
+
 ```python
 # Before
 "BACKEND": "django_prodserver.backends.uvicorn.UvicornServer",
 "ARGS": {"host": "0.0.0.0", "port": "8000"},
 
-# After  
+# After
 "BACKEND": "django_prodserver.backends.granian.GranianASGIServer",
 "ARGS": {"host": "0.0.0.0", "port": "8000", "workers": "4"},
 ```
@@ -326,12 +345,14 @@ Users can migrate from existing backends:
 ## Task Breakdown
 
 ### Phase 1: Core Implementation
+
 1. Create `src/django_prodserver/backends/granian.py`
 2. Implement `GranianASGIServer` class
 3. Implement `GranianWSGIServer` class
 4. Add proper imports and error handling
 
 ### Phase 2: Testing
+
 5. Create `tests/backends/test_granian.py`
 6. Implement initialization tests
 7. Implement argument preparation tests
@@ -340,15 +361,18 @@ Users can migrate from existing backends:
 10. Implement edge case tests
 
 ### Phase 3: Configuration
+
 11. Update `pyproject.toml` to add optional dependency
 12. Verify CI/linting configuration compatibility
 
 ### Phase 4: Documentation
+
 13. Update README.md with Granian examples
 14. Update docs/usage.md with detailed Granian documentation
 15. Update docs/installation.md if needed
 
 ### Phase 5: Quality Assurance
+
 16. Run full test suite
 17. Run linting and type checking
 18. Manual integration testing
@@ -391,19 +415,21 @@ Users can migrate from existing backends:
 ## Estimated Effort
 
 - **Implementation**: 2-3 hours
-- **Testing**: 2-3 hours  
+- **Testing**: 2-3 hours
 - **Documentation**: 1-2 hours
 - **Total**: 5-8 hours
 
 ## Risk Assessment
 
 **Low Risk**:
+
 - Follows established patterns
 - Granian is mature and stable (v1.0+)
 - Optional dependency (no impact on existing users)
 - Well-defined interface
 
 **Potential Issues**:
+
 - Granian API changes between versions (mitigate with version pinning)
 - Platform-specific issues (Rust compilation)
 - Argument format differences from expectations

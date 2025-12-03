@@ -45,12 +45,12 @@ PRODUCTION_PROCESSES = {
 
 ## ARGS
 
-| Argument | Default | Description |
-|----------|---------|-------------|
-| `processes` | `1` | Worker processes |
-| `threads` | `1` | Threads per process |
-| `queue` | `default` | Queue to process |
-| `verbosity` | `1` | Log verbosity (0-3) |
+| Argument    | Default   | Description         |
+| ----------- | --------- | ------------------- |
+| `processes` | `1`       | Worker processes    |
+| `threads`   | `1`       | Threads per process |
+| `queue`     | `default` | Queue to process    |
+| `verbosity` | `1`       | Log verbosity (0-3) |
 
 ## Example
 
@@ -86,11 +86,11 @@ send_email.enqueue('user@example.com', 'Hello!')
 
 ## Scaling
 
-| Volume | Config |
-|--------|--------|
-| Low (< 1K/day) | 1 process, 2 threads |
+| Volume             | Config                 |
+| ------------------ | ---------------------- |
+| Low (< 1K/day)     | 1 process, 2 threads   |
 | Medium (1-10K/day) | 2 processes, 2 threads |
-| High (> 10K/day) | Consider Celery |
+| High (> 10K/day)   | Consider Celery        |
 
 ## Troubleshooting
 

@@ -41,20 +41,20 @@ python manage.py prodserver web
 
 ### Web Servers
 
-| Backend | Best For |
-|---------|----------|
-| {ref}`Gunicorn <backend-gunicorn>` | Traditional sync Django apps, Linux production |
-| {ref}`Uvicorn <backend-uvicorn-asgi>` | Async Django, WebSockets |
-| {ref}`Waitress <backend-waitress>` | Windows, pure Python environments |
-| {ref}`Granian <backend-granian-asgi>` | Maximum performance (Rust-based), WSGI/ASGI |
+| Backend                               | Best For                                       |
+| ------------------------------------- | ---------------------------------------------- |
+| {ref}`Gunicorn <backend-gunicorn>`    | Traditional sync Django apps, Linux production |
+| {ref}`Uvicorn <backend-uvicorn-asgi>` | Async Django, WebSockets                       |
+| {ref}`Waitress <backend-waitress>`    | Windows, pure Python environments              |
+| {ref}`Granian <backend-granian-asgi>` | Maximum performance (Rust-based), WSGI/ASGI    |
 
 ### Background Workers
 
-| Backend | Best For |
-|---------|----------|
-| {ref}`Celery <backend-celery-worker>` | Distributed tasks, complex workflows, Redis/RabbitMQ |
-| {ref}`Django Tasks <backend-django-tasks>` | Simple tasks, no external dependencies |
-| {ref}`Django-Q2 <backend-django-q2>` | ORM-backed queues, scheduled tasks |
+| Backend                                    | Best For                                             |
+| ------------------------------------------ | ---------------------------------------------------- |
+| {ref}`Celery <backend-celery-worker>`      | Distributed tasks, complex workflows, Redis/RabbitMQ |
+| {ref}`Django Tasks <backend-django-tasks>` | Simple tasks, no external dependencies               |
+| {ref}`Django-Q2 <backend-django-q2>`       | ORM-backed queues, scheduled tasks                   |
 
 ---
 
