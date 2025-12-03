@@ -81,7 +81,7 @@ def send_email(email_address, message):
     send_mail('Subject', message, 'from@example.com', [email_address])
 
 # Enqueue
-send_email.delay('user@example.com', 'Hello!')
+send_email.enqueue('user@example.com', 'Hello!')
 ```
 
 ## Scaling
@@ -96,7 +96,7 @@ send_email.delay('user@example.com', 'Hello!')
 
 **Tasks not processing:** Check worker is running and migrations applied
 
-**Django < 5.1:** Upgrade Django or use {ref}`backend-django-q2`
+**Django < 6:** Upgrade Django or use {ref}`backend-django-q2`
 
 ## Links
 
