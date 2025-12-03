@@ -13,8 +13,7 @@ Subpackages
    :maxdepth: 4
 
    django_prodserver.backends
-   django_prodserver.management
-   django_prodserver.migrations
+   django_prodserver.management.commands
 
 Submodules
 ----------
