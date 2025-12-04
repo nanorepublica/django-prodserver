@@ -1,5 +1,21 @@
 # Changelog
 
+## v2.4.0 (2025-12-04)
+
+### Features
+
+- Release ([`f7803a4`](https://github.com/nanorepublica/django-prodserver/commit/f7803a475e0f44eb1427510471542ce95ffbee41))
+
+### Documentation
+
+- Make the docs more concise ([`45252c6`](https://github.com/nanorepublica/django-prodserver/commit/45252c6a78f7e272b05d9f45d1f592e558e9ce03))
+- Implement comprehensive user documentation ([`7d07706`](https://github.com/nanorepublica/django-prodserver/commit/7d077066e37f29066ec08ea94b071b61c1c466c5))
+- Create tasks breakdown for user documentation ([`e851d0f`](https://github.com/nanorepublica/django-prodserver/commit/e851d0f6388b2804dadb1912b3704746a58bb392))
+- Create comprehensive user documentation spec ([`24da4d7`](https://github.com/nanorepublica/django-prodserver/commit/24da4d7a4b9a1c8fc796473bc1c9bf1e45efd11f))
+- Add requirements for user documentation spec ([`1fb4333`](https://github.com/nanorepublica/django-prodserver/commit/1fb43330dcae6772ae6f1436ddd13d7c396bdcb3))
+- Initialize spec for comprehensive user documentation ([`ec6dd1a`](https://github.com/nanorepublica/django-prodserver/commit/ec6dd1a0c19de9687bfce01d003e84f990d40233))
+- Add product planning documentation ([`12706f1`](https://github.com/nanorepublica/django-prodserver/commit/12706f1d16bb4917c61d9188829be85aa88c68a9))
+
 ## v2.3.0 (2025-10-08)
 
 ### Features
