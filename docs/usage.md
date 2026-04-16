@@ -10,6 +10,32 @@ python manage.py prodserver <process_name>
 
 ## Common Patterns
 
+### Default Process
+
+Name a process `"default"` to make it run when no argument is given:
+
+```python
+PRODUCTION_PROCESSES = {
+    "default": {
+        "BACKEND": "django_prodserver.backends.gunicorn.GunicornServer",
+        "ARGS": {"bind": "0.0.0.0:8000", "workers": "4"},
+    },
+    "worker": {
+        "BACKEND": "django_prodserver.backends.celery.CeleryWorker",
+        "APP": "myproject.celery.app",
+        "ARGS": {"concurrency": "4"},
+    },
+}
+```
+
+```bash
+python manage.py prodserver          # starts "default"
+python manage.py prodserver default  # equivalent
+python manage.py prodserver worker   # starts worker
+```
+
+If no `"default"` key exists, a process name argument is required.
+
 ### Single Web Server
 
 ```python

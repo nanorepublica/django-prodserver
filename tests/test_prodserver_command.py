@@ -331,8 +331,8 @@ class TestProdserverCommand(TestCase):
             "worker": {"BACKEND": "django_prodserver.backends.celery.CeleryWorker"},
         }
     )
-    def test_default_server_selection(self):
-        """Test that first server is selected as default."""
+    def test_no_default_key_means_no_default(self):
+        """Test that without a 'default' key, default is None."""
         parser = MagicMock()
         self.command.add_arguments(parser)
 
@@ -340,10 +340,23 @@ class TestProdserverCommand(TestCase):
         server_name_call = calls[0]
         args, kwargs = server_name_call
 
-        # Should have a default value (first in choices)
-        assert "default" in kwargs
-        # The default should be one of the available choices
-        assert kwargs["default"] in kwargs["choices"]
+        assert kwargs["default"] is None
+
+    @override_settings(
+        PRODUCTION_PROCESSES={
+            "web": {"BACKEND": "django_prodserver.backends.gunicorn.GunicornServer"},
+            "worker": {"BACKEND": "django_prodserver.backends.celery.CeleryWorker"},
+        }
+    )
+    @patch("sys.exit")
+    def test_no_arg_without_default_key_errors(self, mock_exit):
+        """Test that running without an argument and no 'default' key raises an error."""
+        self.command.run_from_argv(["manage.py", "prodserver"])
+
+        error_output = self.command.stderr.getvalue()
+        assert "No process name provided" in error_output
+        assert "default" in error_output
+        mock_exit.assert_called_with(1)
 
     @override_settings(
         PRODUCTION_PROCESSES={
@@ -462,6 +475,49 @@ class TestProdserverCommand(TestCase):
         """Test that command has appropriate help text."""
         # The command should have help text accessible
         assert hasattr(self.command, "help")
+
+    @override_settings(
+        PRODUCTION_PROCESSES={
+            "web": {"BACKEND": "django_prodserver.backends.gunicorn.GunicornServer"},
+            "default": {
+                "BACKEND": "django_prodserver.backends.uvicorn.UvicornServer"
+            },
+            "worker": {"BACKEND": "django_prodserver.backends.celery.CeleryWorker"},
+        }
+    )
+    def test_default_key_used_as_default(self):
+        """Test that 'default' key is preferred as the default server."""
+        parser = MagicMock()
+        self.command.add_arguments(parser)
+
+        calls = parser.add_argument.call_args_list
+        server_name_call = calls[0]
+        args, kwargs = server_name_call
+        assert kwargs["default"] == "default"
+        assert "default" in kwargs["choices"]
+
+    @override_settings(
+        PRODUCTION_PROCESSES={
+            "default": {
+                "BACKEND": "django_prodserver.backends.gunicorn.GunicornServer"
+            },
+        }
+    )
+    @patch("django_prodserver.management.commands.prodserver.import_string")
+    def test_run_from_argv_no_arg_uses_default_key(self, mock_import_string):
+        """Test that running without an argument starts the 'default' process."""
+        mock_backend_class = Mock()
+        mock_backend_instance = Mock()
+        mock_backend_instance.prep_server_args.return_value = []
+        mock_backend_class.return_value = mock_backend_instance
+        mock_import_string.return_value = mock_backend_class
+
+        self.command.run_from_argv(["manage.py", "prodserver"])
+
+        mock_import_string.assert_called_once_with(
+            "django_prodserver.backends.gunicorn.GunicornServer"
+        )
+        mock_backend_instance.start_server.assert_called_once()
 
     @override_settings(PRODUCTION_PROCESSES={})
     def test_add_arguments_no_servers_configured(self):

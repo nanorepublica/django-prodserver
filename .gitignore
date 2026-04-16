@@ -140,3 +140,4 @@ dmypy.json
 cython_debug/
 # Generated file
 requirements-dev.txt
+.DS_Store

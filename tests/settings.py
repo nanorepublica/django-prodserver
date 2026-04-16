@@ -53,6 +53,10 @@ TEMPLATES = [
 ]
 
 PRODUCTION_PROCESSES = {
+    "default": {
+        "BACKEND": "django_prodserver.backends.gunicorn.GunicornServer",
+        "ARGS": {"bind": "0.0.0.0:8222", "workers": "2"},
+    },
     "web-g": {
         "BACKEND": "django_prodserver.backends.gunicorn.GunicornServer",
         "ARGS": {"bind": "0.0.0.0:8222", "workers": "2"},

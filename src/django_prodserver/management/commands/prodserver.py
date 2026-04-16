@@ -21,13 +21,12 @@ class Command(BaseCommand):
                 "PRODUCTION_PROCESSES setting has been configured incorrectly.\n"
                 "Check the documentation to configure this setting correctly."
             ) from None
-        try:
-            default = next(iter(choices))
-        except StopIteration:
+        if not choices:
             raise CommandError(
                 "No servers configured in the PRODUCTION_PROCESSES setting.\n"
                 "Configure your servers before running this command."
-            ) from None
+            )
+        default = "default" if "default" in choices else None
         parser.add_argument(
             "server_name",
             type=str,
@@ -77,6 +76,14 @@ class Command(BaseCommand):
         self, server_name: str, *args: list[str], **kwargs: Mapping[str, str]
     ) -> None:
         """Start the correct process based on the provided name."""
+        if server_name is None:
+            available_servers = "\n ".join(app_settings.PRODUCTION_PROCESSES.keys())
+            raise CommandError(
+                "No process name provided and no 'default' process configured.\n"
+                f"Available names are:\n {available_servers}\n\n"
+                "Hint: Add a 'default' key to PRODUCTION_PROCESSES to allow "
+                "running prodserver without arguments."
+            )
         # this try/except could be removed, keeping for now as it's a nicer
         try:
             server_config = app_settings.PRODUCTION_PROCESSES[server_name]
