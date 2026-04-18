@@ -42,16 +42,24 @@ class BaseServerBackend:
         This function transforms the dictionary settings configuration
         from:
             {
-                "bind": "0.0.0.0:8111"
+                "bind": "0.0.0.0:8111",
+                "preload": None,
             }
         to
             [
-                "--bind=0.0.0.0:8111"
+                "--bind=0.0.0.0:8111",
+                "--preload",
             ]
         """
         if isinstance(args, str):
             return [args]
-        return [f"--{arg_name}={arg_value}" for arg_name, arg_value in args.items()]
+
+        def format_arg(arg_name, arg_value):
+            if arg_value is None:
+                return f"--{arg_name}"
+            return f"--{arg_name}={arg_value}"
+
+        return [format_arg(arg_name, arg_value) for arg_name, arg_value in args.items()]
 
     # def run_from_argv(self, argv):
     # TODO: The below should be looked into and implemented

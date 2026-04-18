@@ -43,9 +43,9 @@ def test_prep_server_args_empty():
 def test_format_server_args_from_dict():
     """Test _format_server_args_from_dict method."""
     backend = BaseServerBackend()
-    args = {"bind": "0.0.0.0:8000", "workers": "4"}
+    args = {"bind": "0.0.0.0:8000", "workers": "4", "preload": None}
     result = backend._format_server_args_from_dict(args)
-    assert result == ["--bind=0.0.0.0:8000", "--workers=4"]
+    assert result == ["--bind=0.0.0.0:8000", "--workers=4", "--preload"]
 
 
 def test_format_server_args_from_empty_dict():
