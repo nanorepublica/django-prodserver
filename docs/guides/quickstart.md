@@ -76,6 +76,7 @@ PRODUCTION_PROCESSES = {
         "ARGS": {
             "bind": "0.0.0.0:8000",
             "workers": "2",
+            "preload": None,
         }
     }
 }
@@ -87,6 +88,7 @@ PRODUCTION_PROCESSES = {
 - Uses Gunicorn as the server backend
 - Binds to all interfaces (0.0.0.0) on port 8000
 - Runs with 2 worker processes for handling concurrent requests
+- Preloads your wsgi app
 
 ## Step 4: Run Your Production Server
 
