@@ -34,7 +34,7 @@ class BaseServerBackend:
         return self.args
 
     def _format_server_args_from_dict(
-        self, args: str | Mapping[str, str | Collection[str]]
+        self, args: str | Mapping[str, str | Collection[str] | None]
     ) -> list[str]:
         """
         Formatting server process arguments coming from settings.
@@ -54,7 +54,7 @@ class BaseServerBackend:
         if isinstance(args, str):
             return [args]
 
-        def format_arg(arg_name, arg_value):
+        def format_arg(arg_name: str, arg_value: str | Collection[str] | None) -> str:
             if arg_value is None:
                 return f"--{arg_name}"
             return f"--{arg_name}={arg_value}"
