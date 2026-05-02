@@ -82,6 +82,10 @@ PRODUCTION_PROCESSES = {
         "BACKEND": "django_prodserver.backends.django_runserver.DjangoRunserver",
         "ARGS": {"addrport": "127.0.0.1:8000"},
     },
+    "dev-asgi": {
+        "BACKEND": "django_prodserver.backends.daphne.DaphneRunserver",
+        "ARGS": {},
+    },
 }
 
 

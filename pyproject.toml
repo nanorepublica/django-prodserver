@@ -36,6 +36,7 @@ django-q2 = ["django-q2>=1.6.0", "django-picklefield"]
 granian = ["granian>=1.0.0"]
 uvicorn = ["uvicorn>=0.34.2"]
 waitress = ["waitress>=3.0.2"]
+daphne = ["daphne>=4.0"]
 
 [dependency-groups]
 dev = ["pytest>=8,<9", "pytest-cov>=6,<7", "pytest-django>=4.5,<5"]
