@@ -73,7 +73,7 @@ Group=www-data
 WorkingDirectory=/var/www/myapp
 Environment="PATH=/var/www/myapp/venv/bin"
 Environment="DJANGO_SETTINGS_MODULE=myproject.settings.prod"
-ExecStart=/var/www/myapp/venv/bin/python manage.py prodserver web
+ExecStart=/var/www/myapp/venv/bin/python manage.py server web
 Restart=always
 RestartSec=10
 StandardOutput=journal
@@ -104,7 +104,7 @@ Group=www-data
 WorkingDirectory=/var/www/myapp
 Environment="PATH=/var/www/myapp/venv/bin"
 Environment="DJANGO_SETTINGS_MODULE=myproject.settings.prod"
-ExecStart=/var/www/myapp/venv/bin/python manage.py prodserver worker
+ExecStart=/var/www/myapp/venv/bin/python manage.py server worker
 Restart=always
 RestartSec=10
 StandardOutput=journal
@@ -135,7 +135,7 @@ Group=www-data
 WorkingDirectory=/var/www/myapp
 Environment="PATH=/var/www/myapp/venv/bin"
 Environment="DJANGO_SETTINGS_MODULE=myproject.settings.prod"
-ExecStart=/var/www/myapp/venv/bin/python manage.py prodserver beat
+ExecStart=/var/www/myapp/venv/bin/python manage.py server beat
 Restart=always
 RestartSec=10
 StandardOutput=journal
@@ -237,7 +237,7 @@ services:
 
   web:
     build: .
-    command: python manage.py prodserver web
+    command: python manage.py server web
     volumes:
       - ./staticfiles:/app/staticfiles
     ports:
@@ -264,7 +264,7 @@ services:
 
   worker:
     build: .
-    command: python manage.py prodserver worker
+    command: python manage.py server worker
     environment:
       - DJANGO_SETTINGS_MODULE=myproject.settings.prod
       - DATABASE_URL=postgres://myapp:${DB_PASSWORD}@db:5432/myapp
@@ -282,7 +282,7 @@ services:
 
   beat:
     build: .
-    command: python manage.py prodserver beat
+    command: python manage.py server beat
     environment:
       - DJANGO_SETTINGS_MODULE=myproject.settings.prod
       - DATABASE_URL=postgres://myapp:${DB_PASSWORD}@db:5432/myapp
@@ -361,7 +361,7 @@ pip install supervisor
 # /etc/supervisor/conf.d/myapp.conf
 
 [program:myapp-web]
-command=/var/www/myapp/venv/bin/python manage.py prodserver web
+command=/var/www/myapp/venv/bin/python manage.py server web
 directory=/var/www/myapp
 user=www-data
 autostart=true
@@ -371,7 +371,7 @@ stdout_logfile=/var/log/myapp/web.log
 environment=DJANGO_SETTINGS_MODULE="myproject.settings.prod"
 
 [program:myapp-worker]
-command=/var/www/myapp/venv/bin/python manage.py prodserver worker
+command=/var/www/myapp/venv/bin/python manage.py server worker
 directory=/var/www/myapp
 user=www-data
 autostart=true
@@ -383,7 +383,7 @@ numprocs=2
 process_name=%(program_name)s_%(process_num)02d
 
 [program:myapp-beat]
-command=/var/www/myapp/venv/bin/python manage.py prodserver beat
+command=/var/www/myapp/venv/bin/python manage.py server beat
 directory=/var/www/myapp
 user=www-data
 autostart=true
@@ -554,7 +554,7 @@ sudo journalctl -u myapp-web -n 50
 ls -la /var/www/myapp
 
 # Test manually
-sudo -u www-data /var/www/myapp/venv/bin/python manage.py prodserver web
+sudo -u www-data /var/www/myapp/venv/bin/python manage.py server web
 ```
 
 ### Process Keeps Restarting

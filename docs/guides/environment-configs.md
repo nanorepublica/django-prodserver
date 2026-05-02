@@ -214,10 +214,10 @@ SECURE_HSTS_PRELOAD = True
 python manage.py runserver --settings=myproject.settings.dev
 
 # Staging
-python manage.py prodserver web --settings=myproject.settings.staging
+python manage.py server web --settings=myproject.settings.staging
 
 # Production
-python manage.py prodserver web --settings=myproject.settings.prod
+python manage.py server web --settings=myproject.settings.prod
 ```
 
 Or set the `DJANGO_SETTINGS_MODULE` environment variable:
@@ -225,7 +225,7 @@ Or set the `DJANGO_SETTINGS_MODULE` environment variable:
 ```bash
 # In your shell or systemd service file
 export DJANGO_SETTINGS_MODULE=myproject.settings.prod
-python manage.py prodserver web
+python manage.py server web
 ```
 
 ### Pattern 2: Single File with Environment Variables

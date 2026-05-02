@@ -17,8 +17,16 @@ django\_prodserver.management.commands.devserver module
    :show-inheritance:
    :undoc-members:
 
-django\_prodserver.management.commands.prodserver module
---------------------------------------------------------
+django\_prodserver.management.commands.server module
+----------------------------------------------------
+
+.. automodule:: django_prodserver.management.commands.server
+   :members:
+   :show-inheritance:
+   :undoc-members:
+
+django\_prodserver.management.commands.prodserver module (deprecated)
+---------------------------------------------------------------------
 
 .. automodule:: django_prodserver.management.commands.prodserver
    :members:
