@@ -1,19 +1,14 @@
 """Pure-Python ASGI dev server backend mirroring channels runserver via Daphne."""
 
 import sys
-from datetime import datetime
 from typing import Any
 
 from django.core.exceptions import ImproperlyConfigured
 
-from .base import BaseServerBackend
-
-DEFAULT_PORT = 8000
-DEFAULT_ADDR = "127.0.0.1"
-DEFAULT_ADDR_IPV6 = "::1"
+from ._runserver_base import BaseRunserverBackend
 
 
-class DaphneRunserver(BaseServerBackend):
+class DaphneRunserver(BaseRunserverBackend):
     """
     ASGI development server backend driving daphne.Server directly.
 
@@ -57,8 +52,10 @@ class DaphneRunserver(BaseServerBackend):
     DjangoRunserver but ignored — Daphne is single-reactor by design.
     """
 
+    server_kind = "ASGI development"
+
     def __init__(self, **server_args: Any) -> None:
-        """Validate dependencies and parse ARGS into typed Python attributes."""
+        """Validate dependencies and parse Daphne-specific ARGS keys."""
         super().__init__(**server_args)
 
         try:
@@ -77,16 +74,6 @@ class DaphneRunserver(BaseServerBackend):
             )
 
         args = server_args.get("ARGS") or {}
-
-        self.use_ipv6 = bool(args.get("ipv6", False))
-        self.use_reloader = not bool(args.get("noreload", False))
-        self.use_static = not bool(args.get("nostatic", False))
-        self.insecure = bool(args.get("insecure", False))
-
-        self.addr, self.port = self._parse_addrport(
-            args.get("addrport") or self._default_addrport()
-        )
-        self.protocol = "http"
 
         self.http_timeout = args.get("http_timeout")
         self.websocket_handshake_timeout = int(
@@ -112,22 +99,6 @@ class DaphneRunserver(BaseServerBackend):
 
         self.access_log_path = args.get("access_log")
 
-    def _default_addrport(self) -> str:
-        if self.use_ipv6:
-            return f"[{DEFAULT_ADDR_IPV6}]:{DEFAULT_PORT}"
-        return f"{DEFAULT_ADDR}:{DEFAULT_PORT}"
-
-    @staticmethod
-    def _parse_addrport(addrport: str | int) -> tuple[str, int]:
-        s = str(addrport)
-        if s.startswith("["):
-            addr, _, port = s.rpartition(":")
-            return addr.strip("[]"), int(port)
-        if ":" in s:
-            addr, port = s.rsplit(":", 1)
-            return (addr or DEFAULT_ADDR), int(port)
-        return DEFAULT_ADDR, int(s)
-
     def _build_endpoints(self) -> list[str]:
         """Build Twisted endpoint description strings using Daphne's helper."""
         from daphne.endpoints import build_endpoint_description_strings
@@ -148,11 +119,7 @@ class DaphneRunserver(BaseServerBackend):
         from django.utils.module_loading import import_string
 
         app = guarantee_single_callable(import_string(settings.ASGI_APPLICATION))
-        if not self.use_static:
-            return app
-        if "django.contrib.staticfiles" not in settings.INSTALLED_APPS:
-            return app
-        if not (settings.DEBUG or self.insecure):
+        if not self._should_wrap_static():
             return app
         from django.contrib.staticfiles.handlers import ASGIStaticFilesHandler
 
@@ -169,33 +136,11 @@ class DaphneRunserver(BaseServerBackend):
             return AccessLogGenerator(sys.stdout)
         return None
 
-    def _display_addr(self) -> str:
-        return f"[{self.addr}]" if self.use_ipv6 else self.addr
-
     def _inner_run(self) -> None:
         """1:1 mirror of channels-runserver 3.0.5 inner_run, driving daphne directly."""
         from daphne.server import Server
-        from django import get_version
-        from django.conf import settings
-        from django.core.management.base import BaseCommand
-        from django.utils import autoreload
 
-        autoreload.raise_last_exception()
-
-        cmd = BaseCommand()
-        cmd.stdout.write("Performing system checks...\n\n")
-        cmd.check(display_num_errors=True)
-        cmd.check_migrations()
-
-        now = datetime.now().strftime("%B %d, %Y - %X")
-        cmd.stdout.write(
-            f"{now}\n"
-            f"Django version {get_version()}, using settings "
-            f"{settings.SETTINGS_MODULE!r}\n"
-            f"Starting ASGI development server at "
-            f"{self.protocol}://{self._display_addr()}:{self.port}/\n"
-            f"Quit the server with CONTROL-C.\n"
-        )
+        self._run_checks_and_banner()
 
         Server(
             application=self.get_application(),
@@ -223,12 +168,3 @@ class DaphneRunserver(BaseServerBackend):
                 "X-Forwarded-Proto" if self.proxy_headers else None
             ),
         ).run()
-
-    def start_server(self, *args: str) -> None:
-        """Run the dev server, optionally under the autoreloader."""
-        from django.utils import autoreload
-
-        if self.use_reloader:
-            autoreload.run_with_reloader(self._inner_run)
-        else:
-            self._inner_run()
