@@ -78,6 +78,10 @@ PRODUCTION_PROCESSES = {
         "BACKEND": "django_prodserver.backends.django_tasks.DjangoTasksWorker",
         "ARGS": {},
     },
+    "dev": {
+        "BACKEND": "django_prodserver.backends.django_runserver.DjangoRunserver",
+        "ARGS": {"addrport": "127.0.0.1:8000"},
+    },
 }
 
 
