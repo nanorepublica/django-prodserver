@@ -1,5 +1,20 @@
 # Changelog
 
+## v3.0.0 (Unreleased)
+
+### Features
+
+- Add new `server` management command as the primary way to start configured production processes. Invoke it as `python manage.py server <process_name>`.
+
+### Deprecations
+
+- The `prodserver` management command is now a deprecated alias for `server`. Existing invocations (`python manage.py prodserver ...`) continue to work but emit a `DeprecationWarning`. The alias will be removed in **v4.0.0**.
+
+### Notes
+
+- The `PRODUCTION_PROCESSES` setting name is unchanged and continues to be the configuration entry point.
+- The `django_prodserver` package name and all backend import paths are unchanged.
+
 ## v2.4.0 (2025-12-04)
 
 ### Features

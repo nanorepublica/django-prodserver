@@ -98,7 +98,7 @@ PRODUCTION_PROCESSES = {
 4. **Test in staging:**
 
    ```bash
-   python manage.py prodserver web --settings=myproject.settings.staging
+   python manage.py server web --settings=myproject.settings.staging
    ```
 
 5. **Deploy to production**

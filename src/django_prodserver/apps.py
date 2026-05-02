@@ -6,4 +6,4 @@ class ProdserverAppConfig(AppConfig):
     """App config for Django prodserver."""
 
     name = "django_prodserver"
-    verbose_name = _("prodserver")
+    verbose_name = _("server")

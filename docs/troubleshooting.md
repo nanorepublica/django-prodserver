@@ -31,7 +31,7 @@ Ensure the process name matches your config:
 
 ```bash
 # If configured as "web":
-python manage.py prodserver web
+python manage.py server web
 ```
 
 ---
@@ -173,7 +173,7 @@ pip show django-prodserver
 python manage.py check
 
 # Verbose output
-python manage.py prodserver web --verbosity 3
+python manage.py server web --verbosity 3
 
 # Check processes
 ps aux | grep python

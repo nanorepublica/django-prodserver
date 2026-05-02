@@ -104,12 +104,14 @@ PRODUCTION_PROCESSES = {
 Once the `PRODUCTION_PROCESSES` setting has been configured you can then start the processes as follows:
 
 ```sh
-python manage.py prodserver web
+python manage.py server web
 ```
 
 ```sh
-python manage.py prodserver worker
+python manage.py server worker
 ```
+
+> **Deprecated:** `python manage.py prodserver` continues to work as an alias but is deprecated and will be removed in django-prodserver 4.0.0. Use `python manage.py server` instead.
 
 ## Creating a new backend.
 

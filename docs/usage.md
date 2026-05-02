@@ -5,7 +5,12 @@
 ## Basic Command
 
 ```bash
-python manage.py prodserver <process_name>
+python manage.py server <process_name>
+```
+
+```{deprecated} 3.0.0
+The `prodserver` command has been renamed to `server`. The old name continues
+to work as an alias but will be removed in django-prodserver 4.0.0.
 ```
 
 ## Common Patterns
@@ -22,7 +27,7 @@ PRODUCTION_PROCESSES = {
 ```
 
 ```bash
-python manage.py prodserver web
+python manage.py server web
 ```
 
 ### Web + Worker
@@ -43,8 +48,8 @@ PRODUCTION_PROCESSES = {
 
 ```bash
 # Run in separate terminals/services
-python manage.py prodserver web
-python manage.py prodserver worker
+python manage.py server web
+python manage.py server worker
 ```
 
 ### Full Stack (Web + Worker + Scheduler)
@@ -103,7 +108,7 @@ After=network.target
 Type=simple
 User=www-data
 WorkingDirectory=/path/to/myproject
-ExecStart=/path/to/venv/bin/python manage.py prodserver web
+ExecStart=/path/to/venv/bin/python manage.py server web
 Restart=always
 
 [Install]
@@ -115,9 +120,9 @@ WantedBy=multi-user.target
 ```yaml
 services:
   web:
-    command: python manage.py prodserver web
+    command: python manage.py server web
   worker:
-    command: python manage.py prodserver worker
+    command: python manage.py server worker
 ```
 
 See {ref}`guide-multi-process` for complete examples.
@@ -128,10 +133,10 @@ See {ref}`guide-multi-process` for complete examples.
 
 ## Development vs Production
 
-| Command                           | Use Case                               |
-| --------------------------------- | -------------------------------------- |
-| `python manage.py devserver`      | Local development (auto-reload, debug) |
-| `python manage.py prodserver web` | Production (multi-worker, optimized)   |
+| Command                        | Use Case                               |
+| ------------------------------ | -------------------------------------- |
+| `python manage.py devserver`   | Local development (auto-reload, debug) |
+| `python manage.py server web`  | Production (multi-worker, optimized)   |
 
 ### Environment-Specific Settings
 
@@ -146,7 +151,7 @@ PRODUCTION_PROCESSES = {
 ```
 
 ```bash
-python manage.py prodserver web --settings=myproject.settings_prod
+python manage.py server web --settings=myproject.settings_prod
 ```
 
 ---
