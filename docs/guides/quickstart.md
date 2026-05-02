@@ -92,10 +92,15 @@ PRODUCTION_PROCESSES = {
 
 ## Step 4: Run Your Production Server
 
-Start your server with the `prodserver` management command:
+Start your server with the `server` management command:
 
 ```bash
-python manage.py prodserver web
+python manage.py server web
+```
+
+```{deprecated} 3.0.0
+The `prodserver` command has been renamed to `server`. The old name continues
+to work as an alias but will be removed in django-prodserver 4.0.0.
 ```
 
 You should see output like:
@@ -168,7 +173,7 @@ WORKDIR /app
 COPY requirements.txt .
 RUN pip install -r requirements.txt
 COPY . .
-CMD ["python", "manage.py", "prodserver", "web"]
+CMD ["python", "manage.py", "server", "web"]
 ```
 
 See {ref}`guide-docker` for complete Docker deployment.
@@ -228,7 +233,7 @@ A: Django's `runserver` is for development only. django-prodserver uses producti
 
 **Q: Can I use this in development?**
 
-A: Yes, but `runserver` is better for development because it auto-reloads when code changes. Use `prodserver` for staging, testing production configurations, and production deployments.
+A: Yes, but `runserver` is better for development because it auto-reloads when code changes. Use `server` for staging, testing production configurations, and production deployments.
 
 **Q: Do I need to configure nginx or Apache?**
 
@@ -263,13 +268,13 @@ A: Check the {ref}`troubleshooting` guide for common issues. Common problems:
 
 ```bash
 # Start web server
-python manage.py prodserver web
+python manage.py server web
 
 # Start with specific settings
-python manage.py prodserver web --settings=myproject.settings_prod
+python manage.py server web --settings=myproject.settings_prod
 
 # Run in foreground (Ctrl+C to stop)
-python manage.py prodserver web
+python manage.py server web
 ```
 
 ### Basic Configuration

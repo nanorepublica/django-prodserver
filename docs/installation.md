@@ -30,7 +30,12 @@ PRODUCTION_PROCESSES = {
 Run your server:
 
 ```bash
-python manage.py prodserver web
+python manage.py server web
+```
+
+```{deprecated} 3.0.0
+The `prodserver` command has been renamed to `server`. The old name continues
+to work as an alias but will be removed in django-prodserver 4.0.0.
 ```
 
 ---

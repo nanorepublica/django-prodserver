@@ -52,7 +52,7 @@ RUN python manage.py collectstatic --noinput
 EXPOSE 8000
 
 # Run server
-CMD ["python", "manage.py", "prodserver", "web"]
+CMD ["python", "manage.py", "server", "web"]
 ```
 
 ### Build and Run
@@ -124,7 +124,7 @@ RUN python manage.py collectstatic --noinput
 
 EXPOSE 8000
 
-CMD ["python", "manage.py", "prodserver", "web"]
+CMD ["python", "manage.py", "server", "web"]
 ```
 
 **Benefits:**
@@ -158,7 +158,7 @@ services:
 
   web:
     build: .
-    command: python manage.py prodserver web
+    command: python manage.py server web
     volumes:
       - ./staticfiles:/app/staticfiles
     ports:
@@ -203,7 +203,7 @@ services:
 
   web:
     build: .
-    command: python manage.py prodserver web
+    command: python manage.py server web
     volumes:
       - ./staticfiles:/app/staticfiles
     ports:
@@ -217,7 +217,7 @@ services:
 
   worker:
     build: .
-    command: python manage.py prodserver worker
+    command: python manage.py server worker
     environment:
       - DATABASE_URL=postgres://myapp:changeme@db:5432/myapp
       - CELERY_BROKER_URL=redis://redis:6379/0
@@ -227,7 +227,7 @@ services:
 
   beat:
     build: .
-    command: python manage.py prodserver beat
+    command: python manage.py server beat
     environment:
       - DATABASE_URL=postgres://myapp:changeme@db:5432/myapp
       - CELERY_BROKER_URL=redis://redis:6379/0
@@ -387,7 +387,7 @@ COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
 ENTRYPOINT ["/entrypoint.sh"]
-CMD ["python", "manage.py", "prodserver", "web"]
+CMD ["python", "manage.py", "server", "web"]
 ```
 
 ## Health Checks
@@ -558,7 +558,7 @@ app = "myapp"
     "dockerfilePath": "Dockerfile"
   },
   "deploy": {
-    "startCommand": "python manage.py prodserver web",
+    "startCommand": "python manage.py server web",
     "healthcheckPath": "/health/"
   }
 }
