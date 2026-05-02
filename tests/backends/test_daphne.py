@@ -8,13 +8,15 @@ from django.core.exceptions import ImproperlyConfigured
 from django.test import override_settings
 from django.utils.module_loading import import_string
 
-from django_prodserver.backends.base import BaseServerBackend
-from django_prodserver.backends.daphne import (
-    DEFAULT_ADDR,
-    DEFAULT_ADDR_IPV6,
-    DEFAULT_PORT,
-    DaphneRunserver,
+from django_prodserver.backends._runserver_base import (
+    BaseRunserverBackend,
 )
+from django_prodserver.backends.base import BaseServerBackend
+from django_prodserver.backends.daphne import DaphneRunserver
+
+DEFAULT_ADDR = BaseRunserverBackend.DEFAULT_ADDR
+DEFAULT_ADDR_IPV6 = BaseRunserverBackend.DEFAULT_ADDR_IPV6
+DEFAULT_PORT = BaseRunserverBackend.DEFAULT_PORT
 
 
 class TestParseAddrport:
