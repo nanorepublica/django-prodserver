@@ -33,7 +33,7 @@ new_backend extra:
 tests *FLAGS:
     python manage.py test {{FLAGS}}
 
-envs := 'waitress,gunicorn,celery,uvicorn,daphne'
+envs := 'waitress,gunicorn,celery,uvicorn,daphne,werkzeug'
 tox extras=envs:
     tox run -e py312-django52,{{extras}} && tox run -e coverage
 

@@ -705,11 +705,20 @@ granian = [
 gunicorn = [
     { name = "gunicorn" },
 ]
+runserver-plus = [
+    { name = "pygments" },
+    { name = "pyopenssl" },
+    { name = "sqlparse" },
+    { name = "werkzeug" },
+]
 uvicorn = [
     { name = "uvicorn" },
 ]
 waitress = [
     { name = "waitress" },
+]
+werkzeug = [
+    { name = "werkzeug" },
 ]
 
 [package.dev-dependencies]
@@ -735,10 +744,15 @@ requires-dist = [
     { name = "django-tasks", marker = "extra == 'django-tasks'", specifier = ">=0.7.0" },
     { name = "granian", marker = "extra == 'granian'", specifier = ">=1.0.0" },
     { name = "gunicorn", marker = "extra == 'gunicorn'", specifier = ">=23.0.0" },
+    { name = "pygments", marker = "extra == 'runserver-plus'" },
+    { name = "pyopenssl", marker = "extra == 'runserver-plus'" },
+    { name = "sqlparse", marker = "extra == 'runserver-plus'" },
     { name = "uvicorn", marker = "extra == 'uvicorn'", specifier = ">=0.34.2" },
     { name = "waitress", marker = "extra == 'waitress'", specifier = ">=3.0.2" },
+    { name = "werkzeug", marker = "extra == 'runserver-plus'", specifier = ">=3.0" },
+    { name = "werkzeug", marker = "extra == 'werkzeug'", specifier = ">=3.0" },
 ]
-provides-extras = ["gunicorn", "django-tasks", "celery", "django-q2", "granian", "uvicorn", "waitress", "daphne"]
+provides-extras = ["gunicorn", "django-tasks", "celery", "django-q2", "granian", "uvicorn", "waitress", "daphne", "werkzeug", "runserver-plus"]
 
 [package.metadata.requires-dev]
 dev = [
@@ -2104,6 +2118,18 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/04/e4/120ff3180b0872b1fe6637f6f995bcb009fb5c87d597c1fc21456f50c848/websockets-15.0.1-pp39-pypy39_pp73-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:4b826973a4a2ae47ba357e4e82fa44a463b8f168e1ca775ac64521442b19e87f", size = 174150, upload-time = "2025-03-05T20:03:35.757Z" },
     { url = "https://files.pythonhosted.org/packages/cb/c3/30e2f9c539b8da8b1d76f64012f3b19253271a63413b2d3adb94b143407f/websockets-15.0.1-pp39-pypy39_pp73-win_amd64.whl", hash = "sha256:21c1fa28a6a7e3cbdc171c694398b6df4744613ce9b36b1a498e816787e28123", size = 176877, upload-time = "2025-03-05T20:03:37.199Z" },
     { url = "https://files.pythonhosted.org/packages/fa/a8/5b41e0da817d64113292ab1f8247140aac61cbf6cfd085d6a0fa77f4984f/websockets-15.0.1-py3-none-any.whl", hash = "sha256:f7a866fbc1e97b5c617ee4116daaa09b722101d4a3c170c787450ba409f9736f", size = 169743, upload-time = "2025-03-05T20:03:39.41Z" },
+]
+
+[[package]]
+name = "werkzeug"
+version = "3.1.8"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "markupsafe" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/dd/b2/381be8cfdee792dd117872481b6e378f85c957dd7c5bca38897b08f765fd/werkzeug-3.1.8.tar.gz", hash = "sha256:9bad61a4268dac112f1c5cd4630a56ede601b6ed420300677a869083d70a4c44", size = 875852, upload-time = "2026-04-02T18:49:14.268Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/93/8c/2e650f2afeb7ee576912636c23ddb621c91ac6a98e66dc8d29c3c69446e1/werkzeug-3.1.8-py3-none-any.whl", hash = "sha256:63a77fb8892bf28ebc3178683445222aa500e48ebad5ec77b0ad80f8726b1f50", size = 226459, upload-time = "2026-04-02T18:49:12.72Z" },
 ]
 
 [[package]]
