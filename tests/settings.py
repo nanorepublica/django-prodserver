@@ -86,6 +86,10 @@ PRODUCTION_PROCESSES = {
         "BACKEND": "django_prodserver.backends.daphne.DaphneRunserver",
         "ARGS": {},
     },
+    "dev-werkzeug": {
+        "BACKEND": "django_prodserver.backends.werkzeug.WerkzeugRunserver",
+        "ARGS": {},
+    },
 }
 
 

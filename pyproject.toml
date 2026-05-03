@@ -37,6 +37,13 @@ granian = ["granian>=1.0.0"]
 uvicorn = ["uvicorn>=0.34.2"]
 waitress = ["waitress>=3.0.2"]
 daphne = ["daphne>=4.0"]
+werkzeug = ["werkzeug>=3.0"]
+runserver-plus = [
+    "werkzeug>=3.0",
+    "pyOpenSSL",
+    "sqlparse",
+    "pygments",
+]
 
 [dependency-groups]
 dev = ["pytest>=8,<9", "pytest-cov>=6,<7", "pytest-django>=4.5,<5"]
