@@ -53,15 +53,10 @@ class DjangoRunserver(BaseRunserverBackend):
 
     def _inner_run(self) -> None:
         """1:1 mirror of django.core.management.commands.runserver.Command.inner_run."""
-        from django.core.servers.basehttp import (
-            ThreadedWSGIServer,
-            WSGIServer,
-            run,
-        )
+        from django.core.servers.basehttp import WSGIServer, run
 
         cmd = self._run_checks_and_banner()
 
-        server_cls = ThreadedWSGIServer if self.use_threading else WSGIServer
         try:
             run(
                 self.addr,
@@ -69,7 +64,7 @@ class DjangoRunserver(BaseRunserverBackend):
                 self.get_handler(),
                 ipv6=self.use_ipv6,
                 threading=self.use_threading,
-                server_cls=server_cls,
+                server_cls=WSGIServer,
             )
         except OSError as e:
             errors = {

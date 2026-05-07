@@ -191,7 +191,11 @@ class TestInnerRun:
         _mock_check_migrations,
         mock_run,
     ):
-        from django.core.servers.basehttp import ThreadedWSGIServer
+        # Django's basehttp.run() adds ThreadingMixIn internally when
+        # threading=True; passing ThreadedWSGIServer as server_cls would
+        # double-wrap and raise "inconsistent MRO". Always pass plain
+        # WSGIServer and let `threading=...` control the mixin.
+        from django.core.servers.basehttp import WSGIServer
 
         backend = DjangoRunserver(
             ARGS={
@@ -207,7 +211,7 @@ class TestInnerRun:
         assert args == ("0.0.0.0", 9000, "HANDLER")
         assert kwargs["ipv6"] is False
         assert kwargs["threading"] is True
-        assert kwargs["server_cls"] is ThreadedWSGIServer
+        assert kwargs["server_cls"] is WSGIServer
 
     @patch("django.core.servers.basehttp.run")
     @patch("django.core.management.base.BaseCommand.check_migrations")
