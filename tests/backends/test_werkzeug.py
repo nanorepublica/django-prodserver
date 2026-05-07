@@ -328,9 +328,10 @@ class TestInnerRun:
     @patch("django.core.management.base.BaseCommand.check")
     @patch("django.utils.autoreload.raise_last_exception")
     def test_run_simple_called_with_defaults(self, _r, _c, _cm, mock_run):
-        # With noreload, runserver_plus sets WERKZEUG_RUN_MAIN=true before the
-        # wrap conditional, so the explicit DebuggedApplication wrap is
-        # skipped — run_simple(use_debugger=True) does it internally.
+        # WERKZEUG_RUN_MAIN is unset (we're either the noreload path or the
+        # reloader parent), so the explicit DebuggedApplication wrap fires.
+        from werkzeug.debug import DebuggedApplication
+
         backend = WerkzeugRunserver(ARGS={"noreload": True, "nostatic": True})
         with patch.object(backend, "get_handler", return_value="HANDLER"):
             backend._inner_run()
@@ -338,7 +339,7 @@ class TestInnerRun:
         args, kwargs = mock_run.call_args
         assert args[0] == "127.0.0.1"
         assert args[1] == 8000
-        assert args[2] == "HANDLER"
+        assert isinstance(args[2], DebuggedApplication)
         assert kwargs["use_reloader"] is False
         assert kwargs["use_debugger"] is True
         assert kwargs["use_evalex"] is True
@@ -369,12 +370,15 @@ class TestInnerRun:
     @patch("django.core.management.base.BaseCommand.check_migrations")
     @patch("django.core.management.base.BaseCommand.check")
     @patch("django.utils.autoreload.raise_last_exception")
-    def test_no_reload_sets_werkzeug_run_main(self, _r, _c, _cm, mock_run):
+    def test_noreload_does_not_set_werkzeug_run_main(self, _r, _c, _cm, mock_run):
+        # We must NOT set WERKZEUG_RUN_MAIN ourselves — werkzeug 3.x reads it as
+        # "I'm the reloader child, expect WERKZEUG_SERVER_FD" and crashes.
+        # Werkzeug sets it itself when its reloader spawns the child.
         assert "WERKZEUG_RUN_MAIN" not in os.environ
         backend = WerkzeugRunserver(ARGS={"noreload": True, "nostatic": True})
         with patch.object(backend, "get_handler", return_value="H"):
             backend._inner_run()
-        assert os.environ.get("WERKZEUG_RUN_MAIN") == "true"
+        assert "WERKZEUG_RUN_MAIN" not in os.environ
 
     @patch("werkzeug.serving.run_simple")
     @patch("django.core.management.base.BaseCommand.check_migrations")
@@ -538,15 +542,43 @@ class TestPrintSqlPatch:
             db_utils.CursorDebugWrapper = original
 
 
-class TestPdbHook:
-    def test_replaces_excepthook_with_pdb_post_mortem(self):
-        backend = WerkzeugRunserver(ARGS={"pdb": True})
-        original = sys.excepthook
+class TestTechnical500Handler:
+    """Tests for the technical_500_response patch that lets exceptions through."""
+
+    def test_default_handler_reraises_exception(self):
+        from django.views import debug as django_debug
+
+        original = django_debug.technical_500_response
+        backend = WerkzeugRunserver()
         try:
-            backend._apply_pdb_hook()
-            assert sys.excepthook is not original
+            backend._install_technical_500_handler()
+            handler = django_debug.technical_500_response
+            assert handler is not original
+            try:
+                raise ValueError("boom")
+            except ValueError as e:
+                tb = e.__traceback__
+                with pytest.raises(ValueError, match="boom"):
+                    handler(None, type(e), e, tb)
         finally:
-            sys.excepthook = original
+            django_debug.technical_500_response = original
+
+    def test_pm_handler_drops_to_pdb(self):
+        from django.views import debug as django_debug
+
+        original = django_debug.technical_500_response
+        backend = WerkzeugRunserver(ARGS={"pm": True})
+        try:
+            with patch("pdb.post_mortem") as mock_pm:
+                backend._install_technical_500_handler()
+                handler = django_debug.technical_500_response
+                try:
+                    raise RuntimeError("fail")
+                except RuntimeError as e:
+                    handler(None, type(e), e, e.__traceback__)
+            mock_pm.assert_called_once()
+        finally:
+            django_debug.technical_500_response = original
 
     def test_ipdb_missing_raises(self):
         backend = WerkzeugRunserver(ARGS={"ipdb": True})
@@ -559,7 +591,48 @@ class TestPdbHook:
 
         with patch("builtins.__import__", side_effect=fake_import):
             with pytest.raises(ImproperlyConfigured, match="ipdb is required"):
-                backend._apply_pdb_hook()
+                backend._install_technical_500_handler()
+
+    @patch("werkzeug.serving.run_simple")
+    @patch("django.core.management.base.BaseCommand.check_migrations")
+    @patch("django.core.management.base.BaseCommand.check")
+    @patch("django.utils.autoreload.raise_last_exception")
+    def test_inner_run_installs_handler_when_use_debugger(self, *_):
+        from django.views import debug as django_debug
+
+        original = django_debug.technical_500_response
+        backend = WerkzeugRunserver(ARGS={"noreload": True, "nostatic": True})
+        try:
+            with patch.object(backend, "get_handler", return_value="H"):
+                backend._inner_run()
+            assert django_debug.technical_500_response is not original
+        finally:
+            django_debug.technical_500_response = original
+
+    @patch("werkzeug.serving.run_simple")
+    @patch("django.core.management.base.BaseCommand.check_migrations")
+    @patch("django.core.management.base.BaseCommand.check")
+    @patch("django.utils.autoreload.raise_last_exception")
+    def test_inner_run_skips_handler_when_no_debug_features(self, *_):
+        from django.views import debug as django_debug
+
+        original = django_debug.technical_500_response
+        backend = WerkzeugRunserver(
+            ARGS={
+                "noreload": True,
+                "nostatic": True,
+                "use_debugger": False,
+                "pm": False,
+                "pdb": False,
+                "ipdb": False,
+            }
+        )
+        try:
+            with patch.object(backend, "get_handler", return_value="H"):
+                backend._inner_run()
+            assert django_debug.technical_500_response is original
+        finally:
+            django_debug.technical_500_response = original
 
 
 class TestOutputRedirect:
