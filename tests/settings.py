@@ -9,7 +9,9 @@ DATABASES = {
         "ATOMIC_REQUESTS": True,
     },
 }
-
+DEBUG=True
+STATIC_URL = 'static/'
+STATIC_ROOT = 'static'
 USE_TZ = True
 TIME_ZONE = "UTC"
 ROOT_URLCONF = "tests.urls"
@@ -80,15 +82,15 @@ PRODUCTION_PROCESSES = {
     },
     "dev": {
         "BACKEND": "django_prodserver.backends.django_runserver.DjangoRunserver",
-        "ARGS": {"addrport": "127.0.0.1:8000"},
+        "ARGS": {"addrport": "0.0.0.0:9000"},
     },
     "dev-asgi": {
         "BACKEND": "django_prodserver.backends.daphne.DaphneRunserver",
-        "ARGS": {},
+        "ARGS": {"addrport": "0.0.0.0:9000"},
     },
     "dev-werkzeug": {
         "BACKEND": "django_prodserver.backends.werkzeug.WerkzeugRunserver",
-        "ARGS": {},
+        "ARGS": {"addrport": "0.0.0.0:9000"},
     },
 }
 
