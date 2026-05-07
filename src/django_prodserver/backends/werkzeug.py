@@ -232,36 +232,58 @@ class WerkzeugRunserver(BaseRunserverBackend):
 
         db_utils.CursorDebugWrapper = PrintCursorDebugWrapper
 
-    def _apply_pdb_hook(self) -> None:
-        """Install a post-mortem excepthook + patch Django's technical_500_response."""
-        if self.ipdb:
-            try:
-                import ipdb as _debugger
-            except ImportError as e:
-                raise ImproperlyConfigured(
-                    "ipdb is required when ARGS['ipdb']=True. "
-                    "Install it with: pip install ipdb"
-                ) from e
-        else:
-            import pdb as _debugger
+    def _install_technical_500_handler(self) -> None:
+        """
+        Replace Django's technical_500_response so exceptions reach Werkzeug.
 
-        def _post_mortem_excepthook(exc_type, exc_value, tb):  # type: ignore[no-untyped-def]
-            _debugger.post_mortem(tb)
+        Without this, Django's WSGI handler catches every exception and
+        renders its own yellow debug page; Werkzeug's DebuggedApplication
+        never sees the exception and the runserver_plus-style interactive
+        in-browser debugger never fires.
 
-        sys.excepthook = _post_mortem_excepthook
-
+        Mirrors runserver_plus's unconditional patch:
+        - ``pm``/``pdb``/``ipdb`` set → drop into the chosen debugger on
+          every uncaught exception (post-mortem).
+        - Otherwise → re-raise so DebuggedApplication can render the
+          interactive debug page.
+        """
         try:
             from django.views import debug as django_debug
         except ImportError:
             return
 
-        def _null_500(request, exc_type, exc_value, tb):  # type: ignore[no-untyped-def]
-            _debugger.post_mortem(tb)
-            from django.http import HttpResponseServerError
+        if self.pm or self.pdb or self.ipdb:
+            if self.ipdb:
+                try:
+                    import ipdb as _debugger
+                except ImportError as e:
+                    raise ImproperlyConfigured(
+                        "ipdb is required when ARGS['ipdb']=True. "
+                        "Install it with: pip install ipdb"
+                    ) from e
+            else:
+                import pdb as _debugger
 
-            return HttpResponseServerError("Dropped to debugger.")
+            def _handler(  # type: ignore[no-untyped-def]
+                request, exc_type, exc_value, tb, status_code=500
+            ):
+                print(
+                    f"Exception occurred: {exc_type.__name__}: {exc_value}",
+                    file=sys.stderr,
+                )
+                _debugger.post_mortem(tb)
+        else:
 
-        django_debug.technical_500_response = _null_500  # type: ignore[assignment]
+            def _handler(  # type: ignore[no-redef, no-untyped-def]
+                request, exc_type, exc_value, tb, status_code=500
+            ):
+                if exc_value is None:
+                    exc_value = exc_type()
+                if exc_value.__traceback__ is not tb:
+                    raise exc_value.with_traceback(tb)
+                raise exc_value
+
+        django_debug.technical_500_response = _handler  # type: ignore[assignment]
 
     def _apply_output_redirect(self) -> None:
         """Redirect sys.stdout/sys.stderr to the configured file."""
@@ -304,8 +326,8 @@ class WerkzeugRunserver(BaseRunserverBackend):
             self._apply_output_redirect()
         if self.print_sql:
             self._apply_print_sql_patch()
-        if self.pdb or self.ipdb or self.pm:
-            self._apply_pdb_hook()
+        if self.use_debugger or self.pm or self.pdb or self.ipdb:
+            self._install_technical_500_handler()
 
         if self._should_print_banner():
             self._run_checks_and_banner()
@@ -317,9 +339,12 @@ class WerkzeugRunserver(BaseRunserverBackend):
 
         if self.use_reloader:
             self._add_i18n_extras()
-        else:
-            os.environ["WERKZEUG_RUN_MAIN"] = "true"
 
+        # WERKZEUG_RUN_MAIN is set by werkzeug's reloader when it spawns the
+        # child process (along with WERKZEUG_SERVER_FD). When unset we're
+        # either the noreload path or the reloader's parent — wrap once.
+        # When set we're the reloader child — werkzeug.run_simple(use_debugger=True)
+        # will handle the wrap there, so we skip ours.
         if os.environ.get("WERKZEUG_RUN_MAIN") != "true":
             if self.nopin:
                 os.environ["WERKZEUG_DEBUG_PIN"] = "off"
