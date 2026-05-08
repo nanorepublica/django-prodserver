@@ -72,7 +72,7 @@ class DjangoRunserver(BaseRunserverBackend):
                 errno.EADDRINUSE: "That port is already in use.",
                 errno.EADDRNOTAVAIL: "That IP address can't be assigned to.",
             }
-            cmd.stderr.write(f"Error: {errors.get(e.errno, str(e))}")
+            cmd.stderr.write(f"Error: {errors.get(e.errno or 0, str(e))}")
             sys.exit(1)
         except KeyboardInterrupt:
             sys.exit(0)

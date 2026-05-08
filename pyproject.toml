@@ -46,7 +46,11 @@ runserver-plus = [
 ]
 
 [dependency-groups]
-dev = ["pytest>=8,<9", "pytest-cov>=6,<7", "pytest-django>=4.5,<5"]
+dev = [
+    "pytest>=8,<9",
+    "pytest-cov>=6,<7",
+    "pytest-django>=4.5,<5",
+]
 docs = [
     "furo>=2023.5.20; python_version>='3.11'",
     "myst-parser>=0.16; python_version>='3.11'",

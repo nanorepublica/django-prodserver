@@ -91,4 +91,3 @@ class TestProdserverDeprecation(TestCase):
         assert "server" in DEPRECATION_MESSAGE
         assert "4.0.0" in DEPRECATION_MESSAGE
         assert "prodserver" in DEPRECATION_MESSAGE
-

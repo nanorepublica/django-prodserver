@@ -1,5 +1,6 @@
 """Pure-Python WSGI dev server backend mirroring runserver_plus via Werkzeug."""
 
+import importlib
 import logging
 import os
 import sys
@@ -101,12 +102,12 @@ class WerkzeugRunserver(BaseRunserverBackend):
         self.trusted_hosts = list(args.get("trusted_hosts") or [])
         self.evalex = bool(args.get("evalex", True))
 
-        self.cert_file = args.get("cert_file")
-        self.key_file = args.get("key_file")
-        self.ssl_dev_cert_dir = args.get("ssl_dev_cert_dir")
+        self.cert_file: str | None = args.get("cert_file")
+        self.key_file: str | None = args.get("key_file")
+        self.ssl_dev_cert_dir: str | None = args.get("ssl_dev_cert_dir")
 
         self.browser = bool(args.get("browser", False))
-        self.output_path = args.get("output")
+        self.output_path: str | None = args.get("output")
         self.print_sql = bool(args.get("print_sql", False))
         self.truncate_sql = int(args.get("truncate_sql", 1000))
         self.print_sql_location = bool(args.get("print_sql_location", False))
@@ -135,7 +136,7 @@ class WerkzeugRunserver(BaseRunserverBackend):
         if not (self.cert_file or self.key_file):
             return None
         try:
-            import OpenSSL  # noqa: F401
+            import OpenSSL  # type: ignore[import-untyped]  # noqa: F401
         except ImportError as e:
             raise ImproperlyConfigured(
                 "pyOpenSSL is required for SSL support. Install it with: "
@@ -144,6 +145,7 @@ class WerkzeugRunserver(BaseRunserverBackend):
 
         cert = self.cert_file or self.key_file
         key = self.key_file or self.cert_file
+        assert cert is not None and key is not None  # noqa: S101
         if Path(cert).exists() and Path(key).exists():
             return (str(cert), str(key))
 
@@ -151,9 +153,7 @@ class WerkzeugRunserver(BaseRunserverBackend):
 
         base_dir = self.ssl_dev_cert_dir or str(Path(cert).parent or ".")
         base_name = Path(cert).stem or "devcert"
-        cert, key = make_ssl_devcert(
-            str(Path(base_dir) / base_name), host="localhost"
-        )
+        cert, key = make_ssl_devcert(str(Path(base_dir) / base_name), host="localhost")
         return (cert, key)
 
     def _wrap_debugger(self, handler: Any) -> Any:
@@ -188,13 +188,13 @@ class WerkzeugRunserver(BaseRunserverBackend):
         try:
             import sqlparse
         except ImportError:
-            sqlparse = None  # type: ignore[assignment]
+            sqlparse = None
         try:
             from pygments import highlight
             from pygments.formatters import TerminalFormatter
             from pygments.lexers import SqlLexer
         except ImportError:
-            highlight = None  # type: ignore[assignment]
+            highlight = None
 
         logger = logging.getLogger("django.db.backends")
         truncate = self.truncate_sql
@@ -255,14 +255,14 @@ class WerkzeugRunserver(BaseRunserverBackend):
         if self.pm or self.pdb or self.ipdb:
             if self.ipdb:
                 try:
-                    import ipdb as _debugger
+                    _debugger = importlib.import_module("ipdb")
                 except ImportError as e:
                     raise ImproperlyConfigured(
                         "ipdb is required when ARGS['ipdb']=True. "
                         "Install it with: pip install ipdb"
                     ) from e
             else:
-                import pdb as _debugger
+                _debugger = importlib.import_module("pdb")
 
             def _handler(  # type: ignore[no-untyped-def]
                 request, exc_type, exc_value, tb, status_code=500
@@ -274,7 +274,7 @@ class WerkzeugRunserver(BaseRunserverBackend):
                 _debugger.post_mortem(tb)
         else:
 
-            def _handler(  # type: ignore[no-redef, no-untyped-def]
+            def _handler(  # type: ignore[no-untyped-def]
                 request, exc_type, exc_value, tb, status_code=500
             ):
                 if exc_value is None:
@@ -283,13 +283,14 @@ class WerkzeugRunserver(BaseRunserverBackend):
                     raise exc_value.with_traceback(tb)
                 raise exc_value
 
-        django_debug.technical_500_response = _handler  # type: ignore[assignment]
+        django_debug.technical_500_response = _handler
 
     def _apply_output_redirect(self) -> None:
         """Redirect sys.stdout/sys.stderr to the configured file."""
+        assert self.output_path is not None  # guarded by caller  # noqa: S101
         stream = open(self.output_path, "w", buffering=1)
-        sys.stdout = stream  # type: ignore[assignment]
-        sys.stderr = stream  # type: ignore[assignment]
+        sys.stdout = stream
+        sys.stderr = stream
 
     def _bind_url(self) -> str:
         return f"{self.protocol}://{self._display_addr()}:{self.port}/"

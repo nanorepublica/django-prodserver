@@ -9,9 +9,9 @@ DATABASES = {
         "ATOMIC_REQUESTS": True,
     },
 }
-DEBUG=True
-STATIC_URL = 'static/'
-STATIC_ROOT = 'static'
+DEBUG = True
+STATIC_URL = "static/"
+STATIC_ROOT = "static"
 USE_TZ = True
 TIME_ZONE = "UTC"
 ROOT_URLCONF = "tests.urls"

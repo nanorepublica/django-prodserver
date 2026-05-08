@@ -1,4 +1,5 @@
 import warnings
+from typing import Any
 
 from django.core.management.commands.runserver import Command as RunServerCommand
 
@@ -11,8 +12,8 @@ DEPRECATION_MESSAGE = (
 class Command(RunServerCommand):
     """Class to override the name of 'runserver'."""
 
-    def handle(self, *args, **kwargs):
-        """"Override this to provide the deprecation message."""
+    def handle(self, *args: Any, **kwargs: Any) -> None:
+        """Override this to provide the deprecation message."""
         warnings.warn(DEPRECATION_MESSAGE, DeprecationWarning, stacklevel=2)
         self.stderr.write(
             self.style.WARNING(f"DeprecationWarning: {DEPRECATION_MESSAGE}")

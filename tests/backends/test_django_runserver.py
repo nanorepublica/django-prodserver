@@ -127,9 +127,7 @@ class TestGetHandler:
         "django.core.servers.basehttp.get_internal_wsgi_application",
         return_value="WSGI_APP",
     )
-    def test_returns_plain_app_when_debug_false_and_not_insecure(
-        self, _mock_get_app
-    ):
+    def test_returns_plain_app_when_debug_false_and_not_insecure(self, _mock_get_app):
         backend = DjangoRunserver(ARGS={"insecure": False})
         assert backend.get_handler() == "WSGI_APP"
 
@@ -384,9 +382,7 @@ class TestInitFlagCombinations:
 
 def test_backend_resolves_via_import_string():
     """The dispatcher uses import_string; ensure the dotted path resolves."""
-    cls = import_string(
-        "django_prodserver.backends.django_runserver.DjangoRunserver"
-    )
+    cls = import_string("django_prodserver.backends.django_runserver.DjangoRunserver")
     assert cls is DjangoRunserver
     instance = cls(ARGS={"addrport": "127.0.0.1:8000"})
     assert isinstance(instance, BaseServerBackend)
