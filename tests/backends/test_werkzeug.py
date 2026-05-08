@@ -5,13 +5,22 @@ import sys
 from unittest.mock import MagicMock, patch
 
 import pytest
-from django.core.exceptions import ImproperlyConfigured
-from django.test import override_settings
-from django.utils.module_loading import import_string
 
-from django_prodserver.backends._runserver_base import BaseRunserverBackend
-from django_prodserver.backends.base import BaseServerBackend
-from django_prodserver.backends.werkzeug import RunserverPlus, WerkzeugRunserver
+# Handle optional dependency
+werkzeug = pytest.importorskip("werkzeug")
+
+from django.core.exceptions import ImproperlyConfigured  # NOQA: E402
+from django.test import override_settings  # NOQA: E402
+from django.utils.module_loading import import_string  # NOQA: E402
+
+from django_prodserver.backends._runserver_base import (  # NOQA: E402
+    BaseRunserverBackend,
+)
+from django_prodserver.backends.base import BaseServerBackend  # NOQA: E402
+from django_prodserver.backends.werkzeug import (  # NOQA: E402
+    RunserverPlus,
+    WerkzeugRunserver,
+)
 
 
 @pytest.fixture(autouse=True)

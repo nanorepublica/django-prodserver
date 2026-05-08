@@ -48,6 +48,8 @@ jobs:
           - waitress
           - celery
           - uvicorn
+          - daphne
+          - werkzeug
         include:
           - backend: gunicorn
             os: ubuntu-latest
