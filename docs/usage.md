@@ -133,10 +133,10 @@ See {ref}`guide-multi-process` for complete examples.
 
 ## Development vs Production
 
-| Command                        | Use Case                               |
-| ------------------------------ | -------------------------------------- |
-| `python manage.py devserver`   | Local development (auto-reload, debug) |
-| `python manage.py server web`  | Production (multi-worker, optimized)   |
+| Command                       | Use Case                               |
+| ----------------------------- | -------------------------------------- |
+| `python manage.py devserver`  | Local development (auto-reload, debug) |
+| `python manage.py server web` | Production (multi-worker, optimized)   |
 
 ### Environment-Specific Settings
 

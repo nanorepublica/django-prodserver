@@ -247,9 +247,7 @@ class TestBuildSslContext:
         key = tmp_path / "k.pem"
         cert.write_text("x")
         key.write_text("y")
-        backend = WerkzeugRunserver(
-            ARGS={"cert_file": str(cert), "key_file": str(key)}
-        )
+        backend = WerkzeugRunserver(ARGS={"cert_file": str(cert), "key_file": str(key)})
         with patch.dict(sys.modules, {"OpenSSL": MagicMock()}):
             assert backend._build_ssl_context() == (str(cert), str(key))
 
@@ -363,9 +361,7 @@ class TestInnerRun:
     @patch("django.core.management.base.BaseCommand.check_migrations")
     @patch("django.core.management.base.BaseCommand.check")
     @patch("django.utils.autoreload.raise_last_exception")
-    def test_handler_wrapped_in_parent_when_reloader_on(
-        self, _r, _c, _cm, mock_run
-    ):
+    def test_handler_wrapped_in_parent_when_reloader_on(self, _r, _c, _cm, mock_run):
         # With reloader on (default) and WERKZEUG_RUN_MAIN unset, we're in
         # the parent process: explicit DebuggedApplication wrap fires.
         backend = WerkzeugRunserver(ARGS={"nostatic": True})
@@ -422,9 +418,7 @@ class TestInnerRun:
         # Wrap-block only fires in the parent (env != "true"), so use the
         # default reloader path (don't pass noreload).
         assert "WERKZEUG_DEBUG_PIN" not in os.environ
-        backend = WerkzeugRunserver(
-            ARGS={"nostatic": True, "nopin": True}
-        )
+        backend = WerkzeugRunserver(ARGS={"nostatic": True, "nopin": True})
         with patch.object(backend, "get_handler", return_value="H"):
             backend._inner_run()
         assert os.environ.get("WERKZEUG_DEBUG_PIN") == "off"
@@ -437,8 +431,9 @@ class TestInnerRun:
         backend = WerkzeugRunserver(
             ARGS={"noreload": True, "nostatic": True, "browser": True}
         )
-        with patch("webbrowser.open") as mock_open, patch.object(
-            backend, "get_handler", return_value="H"
+        with (
+            patch("webbrowser.open") as mock_open,
+            patch.object(backend, "get_handler", return_value="H"),
         ):
             backend._inner_run()
         mock_open.assert_called_once_with("http://127.0.0.1:8000/")
@@ -449,11 +444,10 @@ class TestInnerRun:
     @patch("django.utils.autoreload.raise_last_exception")
     def test_browser_skipped_in_child(self, _r, _c, _cm, _mr):
         os.environ["WERKZEUG_RUN_MAIN"] = "true"
-        backend = WerkzeugRunserver(
-            ARGS={"nostatic": True, "browser": True}
-        )
-        with patch("webbrowser.open") as mock_open, patch.object(
-            backend, "get_handler", return_value="H"
+        backend = WerkzeugRunserver(ARGS={"nostatic": True, "browser": True})
+        with (
+            patch("webbrowser.open") as mock_open,
+            patch.object(backend, "get_handler", return_value="H"),
         ):
             backend._inner_run()
         mock_open.assert_not_called()
@@ -529,9 +523,10 @@ class TestInnerRun:
 class TestStartServer:
     def test_does_not_use_django_autoreload(self):
         backend = WerkzeugRunserver()
-        with patch(
-            "django.utils.autoreload.run_with_reloader"
-        ) as mock_arl, patch.object(backend, "_inner_run") as mock_inner:
+        with (
+            patch("django.utils.autoreload.run_with_reloader") as mock_arl,
+            patch.object(backend, "_inner_run") as mock_inner,
+        ):
             backend.start_server()
         mock_arl.assert_not_called()
         mock_inner.assert_called_once_with()
