@@ -4,15 +4,19 @@ import sys
 from unittest.mock import patch
 
 import pytest
-from django.core.exceptions import ImproperlyConfigured
-from django.test import override_settings
-from django.utils.module_loading import import_string
 
-from django_prodserver.backends._runserver_base import (
+# Handle optional dependency
+daphne = pytest.importorskip("daphne")
+
+from django.core.exceptions import ImproperlyConfigured  # NOQA: E402
+from django.test import override_settings  # NOQA: E402
+from django.utils.module_loading import import_string  # NOQA: E402
+
+from django_prodserver.backends._runserver_base import (  # NOQA: E402
     BaseRunserverBackend,
 )
-from django_prodserver.backends.base import BaseServerBackend
-from django_prodserver.backends.daphne import DaphneRunserver
+from django_prodserver.backends.base import BaseServerBackend  # NOQA: E402
+from django_prodserver.backends.daphne import DaphneRunserver  # NOQA: E402
 
 DEFAULT_ADDR = BaseRunserverBackend.DEFAULT_ADDR
 DEFAULT_ADDR_IPV6 = BaseRunserverBackend.DEFAULT_ADDR_IPV6

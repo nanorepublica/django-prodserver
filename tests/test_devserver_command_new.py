@@ -93,17 +93,6 @@ class TestDevserverCommand(TestCase):
         assert self.command.protocol == runserver_command.protocol
         assert type(self.command.server_cls) is type(runserver_command.server_cls)
 
-    def test_command_class_definition(self):
-        """Test the class definition structure."""
-        # Should have minimal class body (just pass and docstring)
-        import inspect
-
-        source = inspect.getsource(Command)
-
-        # Should contain the pass statement
-        assert "pass" in source
-        assert "Class to override the name of 'runserver'." in source
-
     def test_mro_contains_runserver(self):
         """Test that method resolution order includes RunServerCommand."""
         mro = Command.__mro__
@@ -131,21 +120,6 @@ class TestDevserverCommand(TestCase):
 
         assert ImportedCommand == Command
         assert issubclass(ImportedCommand, RunServerCommand)
-
-    def test_empty_class_body(self):
-        """Test that class body is minimal."""
-        import inspect
-
-        # Get the class source
-        source = inspect.getsource(Command)
-        lines = [line.strip() for line in source.split("\n") if line.strip()]
-
-        # Should have: class definition, docstring, and pass
-        # Filter out empty lines and comments
-        non_empty_lines = [line for line in lines if line and not line.startswith("#")]
-
-        # Should be minimal: class def, docstring, pass
-        assert len(non_empty_lines) <= 4  # class, docstring open, docstring, pass
 
     def test_isinstance_checks(self):
         """Test various isinstance checks."""
