@@ -220,14 +220,14 @@ CELERY_BROKER_URL = 'redis://localhost:6379/0'
 
 PRODUCTION_PROCESSES = {
     "worker": {
-        "BACKEND": "django_prodserver.backends.celery.CeleryWorker",
+        "BACKEND": "django_prodserver.backends.workers.celery.CeleryWorker",
         "APP": "myproject.celery.app",
         "ARGS": {
             "concurrency": "4",
         }
     },
     "beat": {
-        "BACKEND": "django_prodserver.backends.celery.CeleryBeat",
+        "BACKEND": "django_prodserver.backends.workers.celery.CeleryBeat",
         "APP": "myproject.celery.app",
         "ARGS": {}
     }
@@ -245,7 +245,7 @@ INSTALLED_APPS = [
 
 PRODUCTION_PROCESSES = {
     "worker": {
-        "BACKEND": "django_prodserver.backends.django_tasks.DjangoTasksWorker",
+        "BACKEND": "django_prodserver.backends.workers.django_tasks.DjangoTasksWorker",
         "ARGS": {
             "processes": "4",
         }
@@ -312,7 +312,7 @@ PRODUCTION_PROCESSES = {
 ```python
 PRODUCTION_PROCESSES = {
     "worker": {
-        "BACKEND": "django_prodserver.backends.django_tasks.DjangoTasksWorker",
+        "BACKEND": "django_prodserver.backends.workers.django_tasks.DjangoTasksWorker",
         "ARGS": {
             "processes": "2",
         }
@@ -328,14 +328,14 @@ CELERY_BROKER_URL = 'redis://localhost:6379/0'
 
 PRODUCTION_PROCESSES = {
     "worker": {
-        "BACKEND": "django_prodserver.backends.celery.CeleryWorker",
+        "BACKEND": "django_prodserver.backends.workers.celery.CeleryWorker",
         "APP": "myproject.celery.app",
         "ARGS": {
             "concurrency": "4",
         }
     },
     "beat": {
-        "BACKEND": "django_prodserver.backends.celery.CeleryBeat",
+        "BACKEND": "django_prodserver.backends.workers.celery.CeleryBeat",
         "APP": "myproject.celery.app",
         "ARGS": {}
     }
@@ -371,7 +371,7 @@ PRODUCTION_PROCESSES = {
 ```python
 PRODUCTION_PROCESSES = {
     "worker": {
-        "BACKEND": "django_prodserver.backends.celery.CeleryWorker",
+        "BACKEND": "django_prodserver.backends.workers.celery.CeleryWorker",
         "APP": "myproject.celery.app",
         "ARGS": {"concurrency": "4"}
     }
@@ -395,7 +395,7 @@ Q_CLUSTER = {
 
 PRODUCTION_PROCESSES = {
     "worker": {
-        "BACKEND": "django_prodserver.backends.django_q2.DjangoQ2Worker",
+        "BACKEND": "django_prodserver.backends.workers.django_q2.DjangoQ2Worker",
         "ARGS": {"verbosity": "1"}
     }
 }

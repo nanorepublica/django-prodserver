@@ -1,57 +1,15 @@
-from typing import Any
+"""Deprecated; see ``django_prodserver.backends.workers.celery``."""
 
-from django.core.exceptions import ImproperlyConfigured
-from django.utils.module_loading import import_string
+import warnings
 
-from .base import BaseServerBackend
+from .workers.celery import CeleryBeat, CeleryFlower, CeleryWorker
 
+warnings.warn(
+    "django_prodserver.backends.celery is deprecated; import from "
+    "django_prodserver.backends.workers.celery instead. This module will be "
+    "removed in django-prodserver 4.0.0.",
+    DeprecationWarning,
+    stacklevel=2,
+)
 
-class CeleryWorker(BaseServerBackend):
-    """Backend to start a celery worker."""
-
-    def __init__(self, **server_config: Any) -> None:
-        celery_app_str = server_config.get("APP")
-        self.app = import_string(celery_app_str)
-        super().__init__(**server_config)
-
-    def start_server(self, *args: str) -> None:
-        """Start Celery Worker via the ``worker`` subcommand on the Celery app."""
-        self.app.start(argv=["worker", *args])
-
-
-class CeleryBeat(CeleryWorker):
-    """Backend to start a celery beat process."""
-
-    def start_server(self, *args: str) -> None:
-        """Start Celery beat via the ``beat`` subcommand on the Celery app."""
-        self.app.start(argv=["beat", *args])
-
-
-class CeleryFlower(CeleryWorker):
-    """Backend to start a Celery Flower monitoring server."""
-
-    def __init__(self, **server_config: Any) -> None:
-        """
-        Initialize the Celery Flower backend.
-
-        Validates that the ``flower`` package is installed, since it is an
-        optional dependency that registers the ``flower`` subcommand on the
-        Celery app.
-
-        Raises:
-            ImproperlyConfigured: If the ``flower`` package is not installed.
-
-        """
-        try:
-            import flower  # noqa: F401
-        except ImportError as e:
-            raise ImproperlyConfigured(
-                "flower is required to use the CeleryFlower backend. "
-                "Install it with: pip install django-prodserver[flower]"
-            ) from e
-
-        super().__init__(**server_config)
-
-    def start_server(self, *args: str) -> None:
-        """Start Celery Flower via the ``flower`` subcommand on the Celery app."""
-        self.app.start(argv=["flower", *args])
+__all__ = ["CeleryBeat", "CeleryFlower", "CeleryWorker"]

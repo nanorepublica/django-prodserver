@@ -17,26 +17,26 @@ django\_prodserver.backends.base module
    :show-inheritance:
    :undoc-members:
 
-django\_prodserver.backends.celery module
------------------------------------------
+django\_prodserver.backends.workers.celery module
+-------------------------------------------------
 
-.. automodule:: django_prodserver.backends.celery
+.. automodule:: django_prodserver.backends.workers.celery
    :members:
    :show-inheritance:
    :undoc-members:
 
-django\_prodserver.backends.django\_q2 module
----------------------------------------------
+django\_prodserver.backends.workers.django\_q2 module
+-----------------------------------------------------
 
-.. automodule:: django_prodserver.backends.django_q2
+.. automodule:: django_prodserver.backends.workers.django_q2
    :members:
    :show-inheritance:
    :undoc-members:
 
-django\_prodserver.backends.django\_tasks module
-------------------------------------------------
+django\_prodserver.backends.workers.django\_tasks module
+--------------------------------------------------------
 
-.. automodule:: django_prodserver.backends.django_tasks
+.. automodule:: django_prodserver.backends.workers.django_tasks
    :members:
    :show-inheritance:
    :undoc-members:

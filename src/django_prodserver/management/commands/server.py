@@ -6,11 +6,28 @@ from django.core.management import BaseCommand, CommandError, handle_default_opt
 from django.core.management.base import SystemCheckError
 from django.utils.module_loading import import_string
 
+from ...backends.base import (
+    BaseProcessBackend,
+    BaseServerBackend,
+    BaseWorkerBackend,
+)
 from ...conf import app_settings
 
 
-class Command(BaseCommand):
-    """The main server command."""
+class BaseProcessCommand(BaseCommand):
+    """
+    Shared implementation behind the ``server`` and ``worker`` commands.
+
+    Subclasses select which kind of process they manage by setting
+    :attr:`process_label` (used in user-facing messages) and
+    :attr:`backend_base_class` (the base class a configured backend must
+    subclass to be runnable by the command).
+    """
+
+    #: Human readable noun for the kind of process managed (e.g. ``"server"``).
+    process_label: str = "process"
+    #: Backends configured for this command must subclass this class.
+    backend_base_class: type[BaseProcessBackend] = BaseProcessBackend
 
     def add_arguments(self, parser: ArgumentParser) -> None:
         """Add arguments."""
@@ -25,11 +42,12 @@ class Command(BaseCommand):
             default = next(iter(choices))
         except StopIteration:
             raise CommandError(
-                "No servers configured in the PRODUCTION_PROCESSES setting.\n"
-                "Configure your servers before running this command."
+                f"No {self.process_label}s configured in the PRODUCTION_PROCESSES "
+                f"setting.\nConfigure your {self.process_label}s before running this "
+                "command."
             ) from None
         parser.add_argument(
-            "server_name",
+            "process_name",
             type=str,
             choices=choices,
             nargs="?",
@@ -61,7 +79,7 @@ class Command(BaseCommand):
             return
 
         try:
-            self.start_server(*args, **cmd_options)
+            self.start_process(*args, **cmd_options)
         except CommandError as e:
             if options.traceback:
                 raise
@@ -73,39 +91,75 @@ class Command(BaseCommand):
                 self.stderr.write(f"{e.__class__.__name__}: {e}")
             sys.exit(e.returncode)
 
-    def start_server(
-        self, server_name: str, *args: list[str], **kwargs: Mapping[str, str]
+    def start_process(
+        self, process_name: str, *args: list[str], **kwargs: Mapping[str, str]
     ) -> None:
         """Start the correct process based on the provided name."""
-        # this try/except could be removed, keeping for now as it's a nicer
         try:
-            server_config = app_settings.PRODUCTION_PROCESSES[server_name]
+            process_config = app_settings.PRODUCTION_PROCESSES[process_name]
         except KeyError:
-            available_servers = "\n ".join(app_settings.PRODUCTION_PROCESSES.keys())
+            available = "\n ".join(app_settings.PRODUCTION_PROCESSES.keys())
+            label = self.process_label.capitalize()
             raise CommandError(
-                f"Server named '{server_name}' not found in the PRODUCTION_PROCESSES"
-                f" setting\nAvailable names are:\n {available_servers}"
+                f"{label} named '{process_name}' not found in the "
+                f"PRODUCTION_PROCESSES setting\nAvailable names are:\n {available}"
             ) from None
 
-        self.stdout.write(self.style.NOTICE(f"Starting server named {server_name}"))
-
         try:
-            server_backend = server_config["BACKEND"]
+            backend_path = process_config["BACKEND"]
         except KeyError:
             raise CommandError(
-                f"Backend not configured for server named {server_name}"
+                f"Backend not configured for {self.process_label} named {process_name}"
             ) from None
 
-        backend_class = import_string(server_backend)
+        backend_class = import_string(backend_path)
 
-        backend = backend_class(**server_config)
+        if isinstance(backend_class, type) and not issubclass(
+            backend_class, self.backend_base_class
+        ):
+            raise CommandError(
+                self._wrong_backend_message(process_name, backend_path, backend_class)
+            )
+
+        self.stdout.write(
+            self.style.NOTICE(f"Starting {self.process_label} named {process_name}")
+        )
+
+        backend = backend_class(**process_config)
         backend.start_server(*backend.prep_server_args())
+
+    def _wrong_backend_message(
+        self, process_name: str, backend_path: str, backend_class: type
+    ) -> str:
+        hint = ""
+        if issubclass(backend_class, BaseWorkerBackend):
+            hint = (
+                f"\nThat backend is a worker backend; run "
+                f"`python manage.py worker {process_name}` instead."
+            )
+        elif issubclass(backend_class, BaseServerBackend):
+            hint = (
+                f"\nThat backend is a server backend; run "
+                f"`python manage.py server {process_name}` instead."
+            )
+        return (
+            f"Backend '{backend_path}' configured for {self.process_label} named "
+            f"'{process_name}' is not a valid {self.process_label} backend.{hint}"
+        )
 
     def list_process_names(self) -> None:
         """Simple function to return a list of the configured processes."""
-        available_servers = "\n ".join(app_settings.PRODUCTION_PROCESSES.keys())
+        available = "\n ".join(app_settings.PRODUCTION_PROCESSES.keys())
         self.stdout.write(
             self.style.SUCCESS(
-                f"Available server process names are:\n {available_servers}"
+                f"Available {self.process_label} process names are:\n {available}"
             )
         )
+
+
+class Command(BaseProcessCommand):
+    """The main server command."""
+
+    help = "Start a configured production server process."
+    process_label = "server"
+    backend_base_class = BaseServerBackend

@@ -34,7 +34,7 @@ python manage.py migrate
 ```python
 PRODUCTION_PROCESSES = {
     "worker": {
-        "BACKEND": "django_prodserver.backends.django_tasks.DjangoTasksWorker",
+        "BACKEND": "django_prodserver.backends.workers.django_tasks.DjangoTasksWorker",
         "ARGS": {
             "processes": "4",
             "threads": "1",
@@ -63,7 +63,7 @@ PRODUCTION_PROCESSES = {
         "ARGS": {"bind": "0.0.0.0:8000", "workers": "4"},
     },
     "worker": {
-        "BACKEND": "django_prodserver.backends.django_tasks.DjangoTasksWorker",
+        "BACKEND": "django_prodserver.backends.workers.django_tasks.DjangoTasksWorker",
         "ARGS": {"processes": "2", "threads": "2"},
     },
 }

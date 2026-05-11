@@ -2,11 +2,24 @@
 
 # Usage
 
-## Basic Command
+## Basic Commands
+
+Start a web/ASGI/WSGI process with the `server` command:
 
 ```bash
 python manage.py server <process_name>
 ```
+
+Start a background task worker with the `worker` command:
+
+```bash
+python manage.py worker <process_name>
+```
+
+Both commands read from the same `PRODUCTION_PROCESSES` setting. `server` only
+accepts server backends and `worker` only accepts worker backends; pointing one
+at the wrong kind of backend produces an error telling you which command to use.
+Pass `--list` to either command to print the configured process names.
 
 ```{deprecated} 3.0.0
 The `prodserver` command has been renamed to `server`. The old name continues
@@ -39,7 +52,7 @@ PRODUCTION_PROCESSES = {
         "ARGS": {"bind": "0.0.0.0:8000", "workers": "4"},
     },
     "worker": {
-        "BACKEND": "django_prodserver.backends.celery.CeleryWorker",
+        "BACKEND": "django_prodserver.backends.workers.celery.CeleryWorker",
         "APP": "myproject.celery.app",
         "ARGS": {"concurrency": "4"},
     },
@@ -49,7 +62,7 @@ PRODUCTION_PROCESSES = {
 ```bash
 # Run in separate terminals/services
 python manage.py server web
-python manage.py server worker
+python manage.py worker worker
 ```
 
 ### Full Stack (Web + Worker + Scheduler)
@@ -61,12 +74,12 @@ PRODUCTION_PROCESSES = {
         "ARGS": {"host": "0.0.0.0", "port": "8000", "workers": "4"},
     },
     "worker": {
-        "BACKEND": "django_prodserver.backends.celery.CeleryWorker",
+        "BACKEND": "django_prodserver.backends.workers.celery.CeleryWorker",
         "APP": "myproject.celery.app",
         "ARGS": {"concurrency": "4"},
     },
     "beat": {
-        "BACKEND": "django_prodserver.backends.celery.CeleryBeat",
+        "BACKEND": "django_prodserver.backends.workers.celery.CeleryBeat",
         "APP": "myproject.celery.app",
         "ARGS": {"loglevel": "info"},
     },
@@ -122,7 +135,7 @@ services:
   web:
     command: python manage.py server web
   worker:
-    command: python manage.py server worker
+    command: python manage.py worker worker
 ```
 
 See {ref}`guide-multi-process` for complete examples.
@@ -160,12 +173,24 @@ python manage.py server web --settings=myproject.settings_prod
 
 ### Custom Backends
 
+Subclass `BaseServerBackend` for a web server, or `BaseWorkerBackend` for a
+background task worker:
+
 ```python
 from django_prodserver.backends.base import BaseServerBackend
 
 class CustomServer(BaseServerBackend):
     def start_server(self, *args: str) -> None:
         # Custom startup logic
+        pass
+```
+
+```python
+from django_prodserver.backends.base import BaseWorkerBackend
+
+class CustomWorker(BaseWorkerBackend):
+    def start_server(self, *args: str) -> None:
+        # Custom worker startup logic
         pass
 ```
 

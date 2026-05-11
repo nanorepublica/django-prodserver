@@ -1,11 +1,15 @@
-from django.core import management
+"""Deprecated; see ``django_prodserver.backends.workers.django_tasks``."""
 
-from .base import BaseServerBackend
+import warnings
 
+from .workers.django_tasks import DjangoTasksWorker
 
-class DjangoTasksWorker(BaseServerBackend):
-    """Backend to start a django task db worker."""
+warnings.warn(
+    "django_prodserver.backends.django_tasks is deprecated; import from "
+    "django_prodserver.backends.workers.django_tasks instead. This module will "
+    "be removed in django-prodserver 4.0.0.",
+    DeprecationWarning,
+    stacklevel=2,
+)
 
-    def start_server(self, *args: str) -> None:
-        """Call django-tasks management command."""
-        management.call_command("db_worker", *args)
+__all__ = ["DjangoTasksWorker"]

@@ -5,16 +5,20 @@
 ### Features
 
 - Add new `server` management command as the primary way to start configured production processes. Invoke it as `python manage.py server <process_name>`.
-- Add `CeleryFlower` backend (`django_prodserver.backends.celery.CeleryFlower`) for running the [Flower](https://flower.readthedocs.io/) monitoring web UI. Install with the new `flower` extra: `pip install django-prodserver[flower]`.
+- Add new `worker` management command for starting background task worker processes (`python manage.py worker <process_name>`). It shares its implementation with `server` (both via the new `BaseProcessCommand`) and reads the same `PRODUCTION_PROCESSES` setting. `server` now only accepts server backends (subclasses of `BaseServerBackend`) and `worker` only accepts worker backends (subclasses of the new `BaseWorkerBackend`); using the wrong command for a backend produces an error pointing at the correct one.
+- Worker backends now live under the `django_prodserver.backends.workers` subpackage: `django_prodserver.backends.workers.celery` (`CeleryWorker`, `CeleryBeat`, `CeleryFlower`), `django_prodserver.backends.workers.django_tasks` (`DjangoTasksWorker`) and `django_prodserver.backends.workers.django_q2` (`DjangoQ2Worker`).
+- Add `CeleryFlower` backend (`django_prodserver.backends.workers.celery.CeleryFlower`) for running the [Flower](https://flower.readthedocs.io/) monitoring web UI. Install with the new `flower` extra: `pip install django-prodserver[flower]`.
 
 ### Deprecations
 
 - The `prodserver` management command is now a deprecated alias for `server`. Existing invocations (`python manage.py prodserver ...`) continue to work but emit a `DeprecationWarning`. The alias will be removed in **v4.0.0**.
+- The `django_prodserver.backends.celery`, `django_prodserver.backends.django_tasks` and `django_prodserver.backends.django_q2` modules are now deprecated import shims that re-export from the new `django_prodserver.backends.workers.*` locations and emit a `DeprecationWarning` on import. They will be removed in **v4.0.0**.
 
 ### Notes
 
 - The `PRODUCTION_PROCESSES` setting name is unchanged and continues to be the configuration entry point.
-- The `django_prodserver` package name and all backend import paths are unchanged.
+- The `django_prodserver` package name and the WSGI/ASGI server backend import paths are unchanged.
+- `BaseServerBackend` and the new `BaseWorkerBackend` both subclass the new `BaseProcessBackend` base class in `django_prodserver.backends.base`. Custom server backends that subclass `BaseServerBackend` continue to work unchanged with `server`; custom worker backends should subclass `BaseWorkerBackend` to be runnable via `worker`.
 
 ## v2.4.0 (2025-12-04)
 

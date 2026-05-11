@@ -217,7 +217,7 @@ services:
 
   worker:
     build: .
-    command: python manage.py server worker
+    command: python manage.py worker worker
     environment:
       - DATABASE_URL=postgres://myapp:changeme@db:5432/myapp
       - CELERY_BROKER_URL=redis://redis:6379/0
@@ -227,7 +227,7 @@ services:
 
   beat:
     build: .
-    command: python manage.py server beat
+    command: python manage.py worker beat
     environment:
       - DATABASE_URL=postgres://myapp:changeme@db:5432/myapp
       - CELERY_BROKER_URL=redis://redis:6379/0
@@ -279,14 +279,14 @@ PRODUCTION_PROCESSES = {
         }
     },
     "worker": {
-        "BACKEND": "django_prodserver.backends.celery.CeleryWorker",
+        "BACKEND": "django_prodserver.backends.workers.celery.CeleryWorker",
         "APP": "myproject.celery.app",
         "ARGS": {
             "concurrency": os.getenv('WORKER_CONCURRENCY', '4'),
         }
     },
     "beat": {
-        "BACKEND": "django_prodserver.backends.celery.CeleryBeat",
+        "BACKEND": "django_prodserver.backends.workers.celery.CeleryBeat",
         "APP": "myproject.celery.app",
         "ARGS": {}
     }

@@ -2,7 +2,7 @@ from unittest.mock import patch
 
 import pytest
 
-from django_prodserver.backends.django_tasks import DjangoTasksWorker
+from django_prodserver.backends.workers.django_tasks import DjangoTasksWorker
 
 
 class TestDjangoTasksWorker:
@@ -50,11 +50,11 @@ class TestDjangoTasksWorker:
         assert args == []
 
     def test_inheritance_from_base_backend(self):
-        """Test that DjangoTasksWorker properly inherits from BaseServerBackend."""
-        from django_prodserver.backends.base import BaseServerBackend
+        """Test that DjangoTasksWorker properly inherits from BaseWorkerBackend."""
+        from django_prodserver.backends.base import BaseWorkerBackend
 
         worker = DjangoTasksWorker()
-        assert isinstance(worker, BaseServerBackend)
+        assert isinstance(worker, BaseWorkerBackend)
 
     def test_init_with_empty_args(self):
         """Test DjangoTasksWorker initialization with empty ARGS dict."""

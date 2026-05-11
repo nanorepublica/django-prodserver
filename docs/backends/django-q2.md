@@ -39,7 +39,7 @@ Q_CLUSTER = {
 # django-prodserver
 PRODUCTION_PROCESSES = {
     "worker": {
-        "BACKEND": "django_prodserver.backends.django_q2.DjangoQ2Worker",
+        "BACKEND": "django_prodserver.backends.workers.django_q2.DjangoQ2Worker",
         "ARGS": {"verbosity": "1"},
     }
 }
@@ -82,7 +82,7 @@ PRODUCTION_PROCESSES = {
         "ARGS": {"bind": "0.0.0.0:8000", "workers": "4"},
     },
     "worker": {
-        "BACKEND": "django_prodserver.backends.django_q2.DjangoQ2Worker",
+        "BACKEND": "django_prodserver.backends.workers.django_q2.DjangoQ2Worker",
         "ARGS": {"verbosity": "1"},
     },
 }

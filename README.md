@@ -88,21 +88,21 @@ PRODUCTION_PROCESSES = {
     #     "ARGS": {},
     # },
     "worker": {
-        "BACKEND": "django_prodserver.backends.celery.CeleryWorker",
+        "BACKEND": "django_prodserver.backends.workers.celery.CeleryWorker",
         "APP": "tests.celery.app",
         "ARGS": {},
     },
     # "worker": {
-    #     "BACKEND": "django_prodserver.backends.django_tasks.DjangoTasksWorker",
+    #     "BACKEND": "django_prodserver.backends.workers.django_tasks.DjangoTasksWorker",
     #     "ARGS": {},
     # },
     # "beat": {
-    #     "BACKEND": "django_prodserver.backends.celery.CeleryBeat",
+    #     "BACKEND": "django_prodserver.backends.workers.celery.CeleryBeat",
     #     "APP": "tests.celery.app",
     #     "ARGS": {},
     # },
     # "flower": {
-    #     "BACKEND": "django_prodserver.backends.celery.CeleryFlower",
+    #     "BACKEND": "django_prodserver.backends.workers.celery.CeleryFlower",
     #     "APP": "tests.celery.app",
     #     "ARGS": {"port": "5555", "address": "0.0.0.0"},
     # },
@@ -111,27 +111,39 @@ PRODUCTION_PROCESSES = {
 
 ## Usage
 
-Once the `PRODUCTION_PROCESSES` setting has been configured you can then start the processes as follows:
+Once the `PRODUCTION_PROCESSES` setting has been configured you can then start the processes.
+
+Use the `server` command to start a web/ASGI/WSGI process:
 
 ```sh
 python manage.py server web
 ```
 
+Use the `worker` command to start a background task worker process:
+
 ```sh
-python manage.py server worker
+python manage.py worker worker
 ```
+
+Both commands read from the same `PRODUCTION_PROCESSES` setting; `server` only accepts
+server backends and `worker` only accepts worker backends. If you point one at the wrong
+kind of backend it will tell you which command to use instead. Run either command with
+`--list` to see the configured process names.
 
 > **Deprecated:** `python manage.py prodserver` continues to work as an alias but is deprecated and will be removed in django-prodserver 4.0.0. Use `python manage.py server` instead.
 
 ## Creating a new backend.
 
-Creating a backend is fairly simple. Subclass the `BaseServerBackend` class, then implement
-the `start_server` method which should call the underlying process in the best possible way for a production
-setting. You can also optionally override `prep_server_args` method to aid with this to provide any default arguments
+Creating a backend is fairly simple. Subclass `BaseServerBackend` (for a web server) or
+`BaseWorkerBackend` (for a background task worker) from `django_prodserver.backends.base`,
+then implement the `start_server` method which should call the underlying process in the
+best possible way for a production setting. You can also optionally override the
+`prep_server_args` method to aid with this to provide any default arguments
 or formatting to the `start_server` command.
 
-See `django_prodserver.backends` for examples of existing backends for inspiration. Pull Request's are welcome for
-additional backends.
+See `django_prodserver.backends` (server backends) and `django_prodserver.backends.workers`
+(worker backends) for examples of existing backends for inspiration. Pull Request's are
+welcome for additional backends.
 
 ## Contributors ✨
 
