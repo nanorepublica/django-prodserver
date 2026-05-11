@@ -47,6 +47,7 @@ jobs:
         backend:
           - waitress
           - celery
+          - flower
           - uvicorn
           - daphne
           - werkzeug

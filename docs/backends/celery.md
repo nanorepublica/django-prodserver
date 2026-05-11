@@ -98,6 +98,52 @@ PRODUCTION_PROCESSES = {
 | `loglevel`  | `info`  | Log level       |
 | `scheduler` | Default | Scheduler class |
 
+(backend-celery-flower)=
+
+## Flower (Monitoring)
+
+[Flower](https://flower.readthedocs.io/) is a web-based tool for monitoring and
+administering Celery clusters. The `CeleryFlower` backend starts Flower via the
+`flower` subcommand registered on your Celery app.
+
+### Installation
+
+```bash
+pip install django-prodserver[flower]
+```
+
+### Configuration
+
+```python
+PRODUCTION_PROCESSES = {
+    "flower": {
+        "BACKEND": "django_prodserver.backends.celery.CeleryFlower",
+        "APP": "myproject.celery.app",
+        "ARGS": {"port": "5555", "address": "0.0.0.0"},
+    }
+}
+```
+
+```bash
+python manage.py server flower
+```
+
+### Flower ARGS
+
+| Argument     | Default   | Description                                |
+| ------------ | --------- | ------------------------------------------ |
+| `port`       | `5555`    | Port the Flower web server listens on      |
+| `address`    | `0.0.0.0` | Address to bind to                         |
+| `url_prefix` | `None`    | Run Flower under a URL prefix              |
+| `basic_auth` | `None`    | `user:password` pairs for HTTP basic auth  |
+| `persistent` | `False`   | Persist monitoring data across restarts    |
+| `db`         | `flower`  | Database file when `persistent` is enabled |
+| `max_tasks`  | `10000`   | Maximum number of tasks to keep in memory  |
+
+See the [Flower documentation](https://flower.readthedocs.io/en/latest/config.html)
+for the full list of options. Options can also be supplied via `FLOWER_*`
+environment variables.
+
 ## Examples
 
 ### Full Stack

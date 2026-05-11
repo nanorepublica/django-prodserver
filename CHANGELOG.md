@@ -5,6 +5,7 @@
 ### Features
 
 - Add new `server` management command as the primary way to start configured production processes. Invoke it as `python manage.py server <process_name>`.
+- Add `CeleryFlower` backend (`django_prodserver.backends.celery.CeleryFlower`) for running the [Flower](https://flower.readthedocs.io/) monitoring web UI. Install with the new `flower` extra: `pip install django-prodserver[flower]`.
 
 ### Deprecations
 
