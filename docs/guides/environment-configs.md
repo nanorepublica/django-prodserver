@@ -126,7 +126,7 @@ PRODUCTION_PROCESSES = {
         }
     },
     "worker": {
-        "BACKEND": "django_prodserver.backends.celery.CeleryWorker",
+        "BACKEND": "django_prodserver.backends.workers.celery.CeleryWorker",
         "APP": "myproject.celery.app",
         "ARGS": {
             "concurrency": "2",
@@ -177,7 +177,7 @@ PRODUCTION_PROCESSES = {
         }
     },
     "worker": {
-        "BACKEND": "django_prodserver.backends.celery.CeleryWorker",
+        "BACKEND": "django_prodserver.backends.workers.celery.CeleryWorker",
         "APP": "myproject.celery.app",
         "ARGS": {
             "concurrency": "8",
@@ -186,7 +186,7 @@ PRODUCTION_PROCESSES = {
         }
     },
     "beat": {
-        "BACKEND": "django_prodserver.backends.celery.CeleryBeat",
+        "BACKEND": "django_prodserver.backends.workers.celery.CeleryBeat",
         "APP": "myproject.celery.app",
         "ARGS": {
             "loglevel": "info",
@@ -278,7 +278,7 @@ PRODUCTION_PROCESSES = {
         }
     },
     "worker": {
-        "BACKEND": "django_prodserver.backends.celery.CeleryWorker",
+        "BACKEND": "django_prodserver.backends.workers.celery.CeleryWorker",
         "APP": "myproject.celery.app",
         "ARGS": {
             "concurrency": WORKER_CONCURRENCY,
@@ -390,7 +390,7 @@ PRODUCTION_PROCESSES = {
     },
     # Lightweight task queue for development
     "worker": {
-        "BACKEND": "django_prodserver.backends.django_tasks.DjangoTasksWorker",
+        "BACKEND": "django_prodserver.backends.workers.django_tasks.DjangoTasksWorker",
         "ARGS": {
             "processes": "1",
         }
@@ -429,7 +429,7 @@ PRODUCTION_PROCESSES = {
         }
     },
     "worker": {
-        "BACKEND": "django_prodserver.backends.celery.CeleryWorker",
+        "BACKEND": "django_prodserver.backends.workers.celery.CeleryWorker",
         "APP": "myproject.celery.app",
         "ARGS": {
             "concurrency": "4",
@@ -437,7 +437,7 @@ PRODUCTION_PROCESSES = {
         }
     },
     "beat": {
-        "BACKEND": "django_prodserver.backends.celery.CeleryBeat",
+        "BACKEND": "django_prodserver.backends.workers.celery.CeleryBeat",
         "APP": "myproject.celery.app",
         "ARGS": {
             "loglevel": "debug",
@@ -467,7 +467,7 @@ PRODUCTION_PROCESSES = {
         }
     },
     "worker": {
-        "BACKEND": "django_prodserver.backends.celery.CeleryWorker",
+        "BACKEND": "django_prodserver.backends.workers.celery.CeleryWorker",
         "APP": "myproject.celery.app",
         "ARGS": {
             "concurrency": "8",
@@ -477,7 +477,7 @@ PRODUCTION_PROCESSES = {
         }
     },
     "beat": {
-        "BACKEND": "django_prodserver.backends.celery.CeleryBeat",
+        "BACKEND": "django_prodserver.backends.workers.celery.CeleryBeat",
         "APP": "myproject.celery.app",
         "ARGS": {
             "loglevel": "info",

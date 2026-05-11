@@ -19,6 +19,9 @@ django-prodserver supports multiple production-ready server backends for WSGI/AS
 
 ### Background Workers
 
+Worker backends live under `django_prodserver.backends.workers` and are started
+with the `worker` management command (`python manage.py worker <process_name>`).
+
 | Backend                                      | Best For                             |
 | -------------------------------------------- | ------------------------------------ |
 | {ref}`Celery Worker <backend-celery-worker>` | Distributed tasks, complex workflows |
@@ -26,6 +29,8 @@ django-prodserver supports multiple production-ready server backends for WSGI/AS
 | {ref}`Celery Flower <backend-celery-flower>` | Monitoring/admin web UI for Celery   |
 | {ref}`Django Tasks <backend-django-tasks>`   | Simple tasks, no dependencies        |
 | {ref}`Django-Q2 <backend-django-q2>`         | ORM-backed, admin interface          |
+
+Web servers are started with the `server` command (`python manage.py server <process_name>`).
 
 ## Quick Comparison
 

@@ -52,7 +52,7 @@ CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
 ```python
 PRODUCTION_PROCESSES = {
     "worker": {
-        "BACKEND": "django_prodserver.backends.celery.CeleryWorker",
+        "BACKEND": "django_prodserver.backends.workers.celery.CeleryWorker",
         "APP": "myproject.celery.app",
         "ARGS": {
             "concurrency": "4",
@@ -82,7 +82,7 @@ PRODUCTION_PROCESSES = {
 ```python
 PRODUCTION_PROCESSES = {
     "beat": {
-        "BACKEND": "django_prodserver.backends.celery.CeleryBeat",
+        "BACKEND": "django_prodserver.backends.workers.celery.CeleryBeat",
         "APP": "myproject.celery.app",
         "ARGS": {"loglevel": "info"},
     }
@@ -117,7 +117,7 @@ pip install django-prodserver[flower]
 ```python
 PRODUCTION_PROCESSES = {
     "flower": {
-        "BACKEND": "django_prodserver.backends.celery.CeleryFlower",
+        "BACKEND": "django_prodserver.backends.workers.celery.CeleryFlower",
         "APP": "myproject.celery.app",
         "ARGS": {"port": "5555", "address": "0.0.0.0"},
     }
@@ -155,12 +155,12 @@ PRODUCTION_PROCESSES = {
         "ARGS": {"bind": "0.0.0.0:8000", "workers": "4"},
     },
     "worker": {
-        "BACKEND": "django_prodserver.backends.celery.CeleryWorker",
+        "BACKEND": "django_prodserver.backends.workers.celery.CeleryWorker",
         "APP": "myproject.celery.app",
         "ARGS": {"concurrency": "4", "max-tasks-per-child": "1000"},
     },
     "beat": {
-        "BACKEND": "django_prodserver.backends.celery.CeleryBeat",
+        "BACKEND": "django_prodserver.backends.workers.celery.CeleryBeat",
         "APP": "myproject.celery.app",
         "ARGS": {"loglevel": "info"},
     },
@@ -172,12 +172,12 @@ PRODUCTION_PROCESSES = {
 ```python
 PRODUCTION_PROCESSES = {
     "default_worker": {
-        "BACKEND": "django_prodserver.backends.celery.CeleryWorker",
+        "BACKEND": "django_prodserver.backends.workers.celery.CeleryWorker",
         "APP": "myproject.celery.app",
         "ARGS": {"queues": "default", "concurrency": "4"},
     },
     "priority_worker": {
-        "BACKEND": "django_prodserver.backends.celery.CeleryWorker",
+        "BACKEND": "django_prodserver.backends.workers.celery.CeleryWorker",
         "APP": "myproject.celery.app",
         "ARGS": {"queues": "priority", "concurrency": "2"},
     },

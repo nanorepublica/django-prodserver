@@ -4,7 +4,7 @@ from unittest.mock import Mock, patch
 import pytest
 from django.core.exceptions import ImproperlyConfigured
 
-from django_prodserver.backends.django_q2 import DjangoQ2Worker
+from django_prodserver.backends.workers.django_q2 import DjangoQ2Worker
 
 
 class TestDjangoQ2WorkerImportErrors:
@@ -195,11 +195,11 @@ class TestDjangoQ2WorkerFunctionality:
         assert args == []
 
     def test_inheritance_from_base_backend(self):
-        """Test that DjangoQ2Worker properly inherits from BaseServerBackend."""
-        from django_prodserver.backends.base import BaseServerBackend
+        """Test that DjangoQ2Worker properly inherits from BaseWorkerBackend."""
+        from django_prodserver.backends.base import BaseWorkerBackend
 
         worker = DjangoQ2Worker()
-        assert isinstance(worker, BaseServerBackend)
+        assert isinstance(worker, BaseWorkerBackend)
 
     @patch("django.core.management.call_command")
     def test_start_server_with_various_args(self, mock_call_command):

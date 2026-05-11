@@ -2,11 +2,15 @@ from collections.abc import Collection, Mapping
 from typing import Any
 
 
-class BaseServerBackend:
+class BaseProcessBackend:
     """
     Base class to configure an individual process backend.
 
-    You are required to override "start_server" in the subclass
+    You are required to override ``start_server`` in the subclass. Most
+    backends should subclass :class:`BaseServerBackend` (for web/ASGI/WSGI
+    servers) or :class:`BaseWorkerBackend` (for background task workers)
+    rather than this class directly so the ``server`` and ``worker``
+    management commands can tell the two apart.
 
     {
         "BACKEND": "django_prodserver.backends.gunicorn.GunicornServer",
@@ -68,3 +72,19 @@ class BaseServerBackend:
     #         if getattr(settings, "WEBSERVER_WARMUP_HEALTHCHECK", None):
     #             wsgi_healthcheck(app, settings.WEBSERVER_WARMUP_HEALTHCHECK)
     #     # self.start_server(*self.prep_server_args())
+
+
+class BaseServerBackend(BaseProcessBackend):
+    """
+    Base class for web server backends (WSGI / ASGI).
+
+    Backends that subclass this are runnable via ``python manage.py server``.
+    """
+
+
+class BaseWorkerBackend(BaseProcessBackend):
+    """
+    Base class for background task worker backends.
+
+    Backends that subclass this are runnable via ``python manage.py worker``.
+    """

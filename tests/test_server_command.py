@@ -75,25 +75,21 @@ class TestServerCommand(TestCase):
     @override_settings(
         PRODUCTION_PROCESSES={
             "test-server": {
-                "BACKEND": "django_prodserver.backends.django_tasks.DjangoTasksWorker",
+                "BACKEND": (
+                    "django_prodserver.backends.workers.django_tasks.DjangoTasksWorker"
+                ),
                 "ARGS": {"queues": "default"},
             }
         }
     )
-    @patch("django.core.management.call_command")
-    def test_django_tasks_backend_integration(self, mock_call_command):
-        """Test integration with django-tasks backend."""
-        with patch(
-            "django_prodserver.management.commands.server.import_string"
-        ) as mock_import:
-            from django_prodserver.backends.django_tasks import DjangoTasksWorker
+    def test_server_command_rejects_worker_backend(self):
+        """The `server` command refuses to start a worker backend."""
+        with pytest.raises(CommandError) as exc_info:
+            self.command.start_process("test-server")
 
-            mock_import.return_value = DjangoTasksWorker
-
-            self.command.run_from_argv(["manage.py", "server", "test-server"])
-
-            # Should have called the management command
-            mock_call_command.assert_called()
+        message = str(exc_info.value)
+        assert "is not a valid server backend" in message
+        assert "python manage.py worker test-server" in message
 
     def test_command_instance_creation(self):
         """Test that command can be instantiated."""
@@ -117,7 +113,7 @@ class TestServerCommand(TestCase):
         # First call should be for server_name
         server_name_call = calls[0]
         args, kwargs = server_name_call
-        assert args[0] == "server_name"
+        assert args[0] == "process_name"
         assert set(kwargs["choices"]) == {"web", "worker"}
 
         # Second call should be for --list
@@ -176,7 +172,7 @@ class TestServerCommand(TestCase):
         mock_backend_class.return_value = mock_backend_instance
         mock_import_string.return_value = mock_backend_class
 
-        self.command.start_server("web")
+        self.command.start_process("web")
 
         # Verify import_string was called with correct backend
         mock_import_string.assert_called_once_with(
@@ -194,7 +190,7 @@ class TestServerCommand(TestCase):
     def test_start_server_nonexistent_server(self):
         """Test start_server with nonexistent server name."""
         with pytest.raises(CommandError) as exc_info:
-            self.command.start_server("nonexistent")
+            self.command.start_process("nonexistent")
 
         assert "Server named 'nonexistent' not found" in str(exc_info.value)
 
@@ -202,7 +198,7 @@ class TestServerCommand(TestCase):
     def test_start_server_missing_backend(self):
         """Test start_server with missing BACKEND configuration."""
         with pytest.raises(CommandError) as exc_info:
-            self.command.start_server("web")
+            self.command.start_process("web")
 
         assert "Backend not configured for server named web" in str(exc_info.value)
 
@@ -215,7 +211,7 @@ class TestServerCommand(TestCase):
         mock_import_string.side_effect = ImportError("Cannot import backend")
 
         with pytest.raises(ImportError):
-            self.command.start_server("web")
+            self.command.start_process("web")
 
     @override_settings(
         PRODUCTION_PROCESSES={
@@ -234,7 +230,7 @@ class TestServerCommand(TestCase):
         mock_backend_class.return_value = mock_backend_instance
         mock_import_string.return_value = mock_backend_class
 
-        self.command.start_server("web")
+        self.command.start_process("web")
 
         # Verify backend was instantiated with full config
         mock_backend_class.assert_called_once_with(
@@ -274,7 +270,7 @@ class TestServerCommand(TestCase):
     @patch("sys.exit")
     def test_run_from_argv_command_error(self, mock_exit):
         """Test run_from_argv with CommandError."""
-        with patch.object(self.command, "start_server") as mock_start:
+        with patch.object(self.command, "start_process") as mock_start:
             mock_start.side_effect = CommandError("Test error")
 
             self.command.run_from_argv(["manage.py", "server", "nonexistent"])
@@ -284,7 +280,7 @@ class TestServerCommand(TestCase):
     @patch("sys.exit")
     def test_run_from_argv_system_check_error(self, mock_exit):
         """Test run_from_argv with SystemCheckError."""
-        with patch.object(self.command, "start_server") as mock_start:
+        with patch.object(self.command, "start_process") as mock_start:
             mock_start.side_effect = lambda *x, **y: SystemCheckError(
                 "System check failed"
             )
@@ -297,7 +293,7 @@ class TestServerCommand(TestCase):
     @patch("sys.exit")
     def test_run_from_argv_traceback_option(self, mock_exit):
         """Test run_from_argv with --traceback option."""
-        with patch.object(self.command, "start_server") as mock_start:
+        with patch.object(self.command, "start_process") as mock_start:
             mock_start.side_effect = CommandError("Test error")
 
             with pytest.raises(CommandError):
@@ -317,7 +313,7 @@ class TestServerCommand(TestCase):
         """Test that _called_from_command_line is set correctly."""
         assert hasattr(self.command, "_called_from_command_line")
 
-        with patch.object(self.command, "start_server"):
+        with patch.object(self.command, "start_process"):
             self.command.run_from_argv(["manage.py", "server", "--list"])
 
         assert self.command._called_from_command_line is True
@@ -360,7 +356,7 @@ class TestServerCommand(TestCase):
             mock_backend_class.return_value = mock_backend_instance
             mock_import.return_value = mock_backend_class
 
-            self.command.start_server("web")
+            self.command.start_process("web")
 
         output = self.command.stdout.getvalue()
         assert "Starting server named web" in output
@@ -374,7 +370,7 @@ class TestServerCommand(TestCase):
         server_name_call = calls[0]
         args, kwargs = server_name_call
 
-        assert args[0] == "server_name"
+        assert args[0] == "process_name"
         assert kwargs["type"] is str
         assert kwargs["nargs"] == "?"
 
@@ -396,7 +392,7 @@ class TestServerCommand(TestCase):
         mock_backend_class.return_value = mock_backend_instance
         mock_import_string.return_value = mock_backend_class
 
-        self.command.start_server("web")
+        self.command.start_process("web")
 
         # Should pass the entire server config to the backend
         expected_config = {
@@ -415,7 +411,7 @@ class TestServerCommand(TestCase):
             }
         ):
             with pytest.raises(CommandError) as exc_info:
-                self.command.start_server("nonexistent")
+                self.command.start_process("nonexistent")
 
             error_message = str(exc_info.value)
             assert "web" in error_message
@@ -454,7 +450,7 @@ class TestServerCommand(TestCase):
         mock_import_string.return_value = mock_backend_class
 
         with pytest.raises(RuntimeError, match="Server failed"):
-            self.command.start_server("test")
+            self.command.start_process("test")
 
     def test_command_help_text(self):
         """Test that command has appropriate help text."""

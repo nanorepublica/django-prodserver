@@ -104,7 +104,7 @@ Group=www-data
 WorkingDirectory=/var/www/myapp
 Environment="PATH=/var/www/myapp/venv/bin"
 Environment="DJANGO_SETTINGS_MODULE=myproject.settings.prod"
-ExecStart=/var/www/myapp/venv/bin/python manage.py server worker
+ExecStart=/var/www/myapp/venv/bin/python manage.py worker worker
 Restart=always
 RestartSec=10
 StandardOutput=journal
@@ -135,7 +135,7 @@ Group=www-data
 WorkingDirectory=/var/www/myapp
 Environment="PATH=/var/www/myapp/venv/bin"
 Environment="DJANGO_SETTINGS_MODULE=myproject.settings.prod"
-ExecStart=/var/www/myapp/venv/bin/python manage.py server beat
+ExecStart=/var/www/myapp/venv/bin/python manage.py worker beat
 Restart=always
 RestartSec=10
 StandardOutput=journal
@@ -264,7 +264,7 @@ services:
 
   worker:
     build: .
-    command: python manage.py server worker
+    command: python manage.py worker worker
     environment:
       - DJANGO_SETTINGS_MODULE=myproject.settings.prod
       - DATABASE_URL=postgres://myapp:${DB_PASSWORD}@db:5432/myapp
@@ -282,7 +282,7 @@ services:
 
   beat:
     build: .
-    command: python manage.py server beat
+    command: python manage.py worker beat
     environment:
       - DJANGO_SETTINGS_MODULE=myproject.settings.prod
       - DATABASE_URL=postgres://myapp:${DB_PASSWORD}@db:5432/myapp
@@ -371,7 +371,7 @@ stdout_logfile=/var/log/myapp/web.log
 environment=DJANGO_SETTINGS_MODULE="myproject.settings.prod"
 
 [program:myapp-worker]
-command=/var/www/myapp/venv/bin/python manage.py server worker
+command=/var/www/myapp/venv/bin/python manage.py worker worker
 directory=/var/www/myapp
 user=www-data
 autostart=true
@@ -383,7 +383,7 @@ numprocs=2
 process_name=%(program_name)s_%(process_num)02d
 
 [program:myapp-beat]
-command=/var/www/myapp/venv/bin/python manage.py server beat
+command=/var/www/myapp/venv/bin/python manage.py worker beat
 directory=/var/www/myapp
 user=www-data
 autostart=true
@@ -435,7 +435,7 @@ PRODUCTION_PROCESSES = {
         }
     },
     "worker": {
-        "BACKEND": "django_prodserver.backends.celery.CeleryWorker",
+        "BACKEND": "django_prodserver.backends.workers.celery.CeleryWorker",
         "APP": "myproject.celery.app",
         "ARGS": {
             "concurrency": "8",
@@ -444,7 +444,7 @@ PRODUCTION_PROCESSES = {
         }
     },
     "beat": {
-        "BACKEND": "django_prodserver.backends.celery.CeleryBeat",
+        "BACKEND": "django_prodserver.backends.workers.celery.CeleryBeat",
         "APP": "myproject.celery.app",
         "ARGS": {
             "loglevel": "info",

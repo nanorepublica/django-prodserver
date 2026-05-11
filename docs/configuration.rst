@@ -47,15 +47,15 @@ Python import path to the backend class:
 +--------------------------------------------------+-------------+
 | ``django_prodserver.backends.granian.GranianASGIServer``  | ASGI        |
 +--------------------------------------------------+-------------+
-| ``django_prodserver.backends.celery.CeleryWorker``        | Worker      |
+| ``django_prodserver.backends.workers.celery.CeleryWorker``        | Worker      |
 +--------------------------------------------------+-------------+
-| ``django_prodserver.backends.celery.CeleryBeat``          | Scheduler   |
+| ``django_prodserver.backends.workers.celery.CeleryBeat``          | Scheduler   |
 +--------------------------------------------------+-------------+
-| ``django_prodserver.backends.celery.CeleryFlower``        | Monitoring  |
+| ``django_prodserver.backends.workers.celery.CeleryFlower``        | Monitoring  |
 +--------------------------------------------------+-------------+
-| ``django_prodserver.backends.django_tasks.DjangoTasksWorker`` | Worker  |
+| ``django_prodserver.backends.workers.django_tasks.DjangoTasksWorker`` | Worker  |
 +--------------------------------------------------+-------------+
-| ``django_prodserver.backends.django_q2.DjangoQ2Worker``   | Worker      |
+| ``django_prodserver.backends.workers.django_q2.DjangoQ2Worker``   | Worker      |
 +--------------------------------------------------+-------------+
 
 APP (Celery only)
@@ -137,12 +137,12 @@ Web + Worker + Beat
             "ARGS": {"bind": "0.0.0.0:8000", "workers": "4"},
         },
         "worker": {
-            "BACKEND": "django_prodserver.backends.celery.CeleryWorker",
+            "BACKEND": "django_prodserver.backends.workers.celery.CeleryWorker",
             "APP": "myproject.celery.app",
             "ARGS": {"concurrency": "4", "loglevel": "info"},
         },
         "beat": {
-            "BACKEND": "django_prodserver.backends.celery.CeleryBeat",
+            "BACKEND": "django_prodserver.backends.workers.celery.CeleryBeat",
             "APP": "myproject.celery.app",
             "ARGS": {"loglevel": "info"},
         },
