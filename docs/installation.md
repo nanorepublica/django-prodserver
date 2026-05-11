@@ -58,6 +58,7 @@ to work as an alias but will be removed in django-prodserver 4.0.0.
 | Backend                                    | Best For                                             |
 | ------------------------------------------ | ---------------------------------------------------- |
 | {ref}`Celery <backend-celery-worker>`      | Distributed tasks, complex workflows, Redis/RabbitMQ |
+| {ref}`Celery Flower <backend-celery-flower>` | Monitoring/admin web UI for Celery clusters        |
 | {ref}`Django Tasks <backend-django-tasks>` | Simple tasks, no external dependencies               |
 | {ref}`Django-Q2 <backend-django-q2>`       | ORM-backed queues, scheduled tasks                   |
 
@@ -75,6 +76,7 @@ pip install django-prodserver[uvicorn]
 pip install django-prodserver[waitress]
 pip install django-prodserver[granian]
 pip install django-prodserver[celery]
+pip install django-prodserver[flower]
 pip install django-prodserver[django-tasks]
 pip install django-prodserver[django-q2]
 

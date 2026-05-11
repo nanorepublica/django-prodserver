@@ -96,6 +96,16 @@ PRODUCTION_PROCESSES = {
     #     "BACKEND": "django_prodserver.backends.django_tasks.DjangoTasksWorker",
     #     "ARGS": {},
     # },
+    # "beat": {
+    #     "BACKEND": "django_prodserver.backends.celery.CeleryBeat",
+    #     "APP": "tests.celery.app",
+    #     "ARGS": {},
+    # },
+    # "flower": {
+    #     "BACKEND": "django_prodserver.backends.celery.CeleryFlower",
+    #     "APP": "tests.celery.app",
+    #     "ARGS": {"port": "5555", "address": "0.0.0.0"},
+    # },
 }
 ```
 

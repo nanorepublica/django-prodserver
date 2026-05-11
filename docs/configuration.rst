@@ -51,6 +51,8 @@ Python import path to the backend class:
 +--------------------------------------------------+-------------+
 | ``django_prodserver.backends.celery.CeleryBeat``          | Scheduler   |
 +--------------------------------------------------+-------------+
+| ``django_prodserver.backends.celery.CeleryFlower``        | Monitoring  |
++--------------------------------------------------+-------------+
 | ``django_prodserver.backends.django_tasks.DjangoTasksWorker`` | Worker  |
 +--------------------------------------------------+-------------+
 | ``django_prodserver.backends.django_q2.DjangoQ2Worker``   | Worker      |

@@ -23,6 +23,7 @@ django-prodserver supports multiple production-ready server backends for WSGI/AS
 | -------------------------------------------- | ------------------------------------ |
 | {ref}`Celery Worker <backend-celery-worker>` | Distributed tasks, complex workflows |
 | {ref}`Celery Beat <backend-celery-beat>`     | Scheduled/periodic tasks             |
+| {ref}`Celery Flower <backend-celery-flower>` | Monitoring/admin web UI for Celery   |
 | {ref}`Django Tasks <backend-django-tasks>`   | Simple tasks, no dependencies        |
 | {ref}`Django-Q2 <backend-django-q2>`         | ORM-backed, admin interface          |
 
