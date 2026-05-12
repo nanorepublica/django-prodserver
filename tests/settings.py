@@ -73,8 +73,18 @@ PRODUCTION_PROCESSES = {
     },
     "worker-celery": {
         "BACKEND": "django_prodserver.backends.celery.CeleryWorker",
-        "APP": "example_project.celery.app",
-        "ARGS": {},
+        "APP": "tests.celery.app",
+        "ARGS": {"loglevel": "info"},
+    },
+    "beat-celery": {
+        "BACKEND": "django_prodserver.backends.celery.CeleryBeat",
+        "APP": "tests.celery.app",
+        "ARGS": {"loglevel": "info"},
+    },
+    "flower": {
+        "BACKEND": "django_prodserver.backends.celery.CeleryFlower",
+        "APP": "tests.celery.app",
+        "ARGS": {"port": "5555", "address": "0.0.0.0"},
     },
     "worker": {
         "BACKEND": "django_prodserver.backends.django_tasks.DjangoTasksWorker",

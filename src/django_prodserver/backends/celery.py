@@ -15,16 +15,16 @@ class CeleryWorker(BaseServerBackend):
         super().__init__(**server_config)
 
     def start_server(self, *args: str) -> None:
-        """Start Celery Worker."""
-        self.app.Worker(*args).start()
+        """Start Celery Worker via the ``worker`` subcommand on the Celery app."""
+        self.app.start(argv=["worker", *args])
 
 
 class CeleryBeat(CeleryWorker):
     """Backend to start a celery beat process."""
 
     def start_server(self, *args: str) -> None:
-        """Start Celery beat."""
-        self.app.Beat(*args).start()
+        """Start Celery beat via the ``beat`` subcommand on the Celery app."""
+        self.app.start(argv=["beat", *args])
 
 
 class CeleryFlower(CeleryWorker):

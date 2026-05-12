@@ -60,8 +60,6 @@ class TestCeleryWorker:
     def test_start_server(self, mock_import_string):
         """Test start_server method."""
         mock_app = Mock()
-        mock_worker_instance = Mock()
-        mock_app.Worker.return_value = mock_worker_instance
         mock_import_string.return_value = mock_app
 
         server_config = {"APP": "myproject.celery.app"}
@@ -70,15 +68,12 @@ class TestCeleryWorker:
         args = ["--loglevel=info", "--concurrency=4"]
         worker.start_server(*args)
 
-        mock_app.Worker.assert_called_once_with(*args)
-        mock_worker_instance.start.assert_called_once()
+        mock_app.start.assert_called_once_with(argv=["worker", *args])
 
     @patch("django_prodserver.backends.celery.import_string")
     def test_start_server_no_args(self, mock_import_string):
         """Test start_server method with no args."""
         mock_app = Mock()
-        mock_worker_instance = Mock()
-        mock_app.Worker.return_value = mock_worker_instance
         mock_import_string.return_value = mock_app
 
         server_config = {"APP": "myproject.celery.app"}
@@ -86,8 +81,7 @@ class TestCeleryWorker:
 
         worker.start_server()
 
-        mock_app.Worker.assert_called_once_with()
-        mock_worker_instance.start.assert_called_once()
+        mock_app.start.assert_called_once_with(argv=["worker"])
 
     def test_inheritance_from_base_backend(self):
         """Test that CeleryWorker properly inherits from BaseServerBackend."""
@@ -171,8 +165,6 @@ class TestCeleryWorker:
     def test_start_server_with_mixed_args(self, mock_import_string):
         """Test start_server with a mix of initialization and runtime args."""
         mock_app = Mock()
-        mock_worker_instance = Mock()
-        mock_app.Worker.return_value = mock_worker_instance
         mock_import_string.return_value = mock_app
 
         # Initialize with some args
@@ -184,9 +176,8 @@ class TestCeleryWorker:
         runtime_args = ["--queues=urgent", "--prefetch-multiplier=1"]
         worker.start_server(*runtime_args)
 
-        # Should call Worker with the runtime args passed to start_server
-        mock_app.Worker.assert_called_once_with(*runtime_args)
-        mock_worker_instance.start.assert_called_once()
+        # Should dispatch through the celery CLI with the worker subcommand
+        mock_app.start.assert_called_once_with(argv=["worker", *runtime_args])
 
     @patch("django_prodserver.backends.celery.import_string")
     def test_import_string_exception_propagation(self, mock_import_string):
@@ -202,9 +193,7 @@ class TestCeleryWorker:
     def test_worker_start_exception_propagation(self, mock_import_string):
         """Test that worker start exceptions are properly propagated."""
         mock_app = Mock()
-        mock_worker_instance = Mock()
-        mock_worker_instance.start.side_effect = RuntimeError("Worker failed to start")
-        mock_app.Worker.return_value = mock_worker_instance
+        mock_app.start.side_effect = RuntimeError("Worker failed to start")
         mock_import_string.return_value = mock_app
 
         worker = CeleryWorker(APP="myproject.celery.app")
@@ -212,13 +201,13 @@ class TestCeleryWorker:
         with pytest.raises(RuntimeError, match="Worker failed to start"):
             worker.start_server()
 
-        mock_worker_instance.start.assert_called_once()
+        mock_app.start.assert_called_once_with(argv=["worker"])
 
     @patch("django_prodserver.backends.celery.import_string")
     def test_worker_creation_exception_propagation(self, mock_import_string):
         """Test that worker creation exceptions are properly propagated."""
         mock_app = Mock()
-        mock_app.Worker.side_effect = ValueError("Invalid worker configuration")
+        mock_app.start.side_effect = ValueError("Invalid worker configuration")
         mock_import_string.return_value = mock_app
 
         worker = CeleryWorker(APP="myproject.celery.app")
@@ -226,7 +215,7 @@ class TestCeleryWorker:
         with pytest.raises(ValueError, match="Invalid worker configuration"):
             worker.start_server("--invalid-arg")
 
-        mock_app.Worker.assert_called_once_with("--invalid-arg")
+        mock_app.start.assert_called_once_with(argv=["worker", "--invalid-arg"])
 
     @patch("django_prodserver.backends.celery.import_string")
     def test_app_attribute_access(self, mock_import_string):
@@ -286,8 +275,6 @@ class TestCeleryBeat:
     def test_start_server_no_args(self, mock_import_string):
         """Test start_server method with no args."""
         mock_app = Mock()
-        mock_beat_instance = Mock()
-        mock_app.Beat.return_value = mock_beat_instance
         mock_import_string.return_value = mock_app
 
         server_config = {"APP": "myproject.celery.app"}
@@ -295,15 +282,12 @@ class TestCeleryBeat:
 
         beat.start_server()
 
-        mock_app.Beat.assert_called_once_with()
-        mock_beat_instance.start.assert_called_once()
+        mock_app.start.assert_called_once_with(argv=["beat"])
 
     @patch("django_prodserver.backends.celery.import_string")
     def test_start_server_with_mixed_args(self, mock_import_string):
         """Test start_server with a mix of initialization and runtime args."""
         mock_app = Mock()
-        mock_beat_instance = Mock()
-        mock_app.Beat.return_value = mock_beat_instance
         mock_import_string.return_value = mock_app
 
         # Initialize with some args
@@ -313,6 +297,5 @@ class TestCeleryBeat:
         runtime_args = ["--scheduler=some.Scheduler"]
         beat.start_server(*runtime_args)
 
-        # Should call Beat with the runtime args passed to start_server
-        mock_app.Beat.assert_called_once_with(*runtime_args)
-        mock_beat_instance.start.assert_called_once()
+        # Should dispatch through the celery CLI with the beat subcommand
+        mock_app.start.assert_called_once_with(argv=["beat", *runtime_args])
