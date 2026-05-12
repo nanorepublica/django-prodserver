@@ -5,7 +5,7 @@ import pytest
 # Handle optional dependency
 waitress = pytest.importorskip("waitress")
 
-from django_prodserver.backends.waitress import WaitressServer  # NOQA: E402
+from django_prodserver.backends.servers.waitress import WaitressServer  # NOQA: E402
 
 
 class TestWaitressServer:
@@ -22,7 +22,7 @@ class TestWaitressServer:
         assert server.args == ["--host=127.0.0.1", "--port=8000"]
 
     @patch(
-        "django_prodserver.backends.waitress.wsgi_app_name",
+        "django_prodserver.backends.servers.waitress.wsgi_app_name",
         return_value="tests.wsgi:application",
     )
     def test_prep_server_args(self, mock_wsgi_app_name):
@@ -39,7 +39,7 @@ class TestWaitressServer:
         mock_wsgi_app_name.assert_called_once()
 
     @patch(
-        "django_prodserver.backends.waitress.wsgi_app_name",
+        "django_prodserver.backends.servers.waitress.wsgi_app_name",
         return_value="tests.wsgi:application",
     )
     def test_prep_server_args_no_args(self, mock_wsgi_app_name):
@@ -77,7 +77,7 @@ class TestWaitressServer:
         assert isinstance(server, BaseServerBackend)
 
     @patch(
-        "django_prodserver.backends.waitress.wsgi_app_name",
+        "django_prodserver.backends.servers.waitress.wsgi_app_name",
         return_value="myapp.wsgi:application",
     )
     def test_prep_server_args_with_complex_args(self, mock_wsgi_app_name):
@@ -102,7 +102,7 @@ class TestWaitressServer:
 
     @patch("waitress.runner.run")
     @patch(
-        "django_prodserver.backends.waitress.wsgi_app_name",
+        "django_prodserver.backends.servers.waitress.wsgi_app_name",
         return_value="tests.wsgi:application",
     )
     def test_full_workflow(self, mock_wsgi_app_name, mock_waitress_run):
@@ -128,7 +128,7 @@ class TestWaitressServer:
         assert args[0] == "waitress"
 
     @patch(
-        "django_prodserver.backends.waitress.wsgi_app_name",
+        "django_prodserver.backends.servers.waitress.wsgi_app_name",
         return_value="custom.wsgi:app",
     )
     def test_custom_wsgi_app_name(self, mock_wsgi_app_name):
@@ -142,7 +142,7 @@ class TestWaitressServer:
     def test_wsgi_app_always_last_arg(self):
         """Test that WSGI app name is always the last argument."""
         with patch(
-            "django_prodserver.backends.waitress.wsgi_app_name",
+            "django_prodserver.backends.servers.waitress.wsgi_app_name",
             return_value="tests.wsgi:application",
         ):
             server = WaitressServer(ARGS={"host": "127.0.0.1", "port": "9000"})
@@ -184,7 +184,7 @@ class TestWaitressServer:
         assert len(server.args) == 4
 
     @patch(
-        "django_prodserver.backends.waitress.wsgi_app_name",
+        "django_prodserver.backends.servers.waitress.wsgi_app_name",
         return_value="tests.wsgi:application",
     )
     def test_empty_args_dict(self, mock_wsgi_app_name):

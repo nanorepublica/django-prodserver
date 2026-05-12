@@ -33,7 +33,7 @@ to work as an alias but will be removed in django-prodserver 4.0.0.
 ```python
 PRODUCTION_PROCESSES = {
     "web": {
-        "BACKEND": "django_prodserver.backends.gunicorn.GunicornServer",
+        "BACKEND": "django_prodserver.backends.servers.gunicorn.GunicornServer",
         "ARGS": {"bind": "0.0.0.0:8000", "workers": "4"},
     }
 }
@@ -48,7 +48,7 @@ python manage.py server web
 ```python
 PRODUCTION_PROCESSES = {
     "web": {
-        "BACKEND": "django_prodserver.backends.gunicorn.GunicornServer",
+        "BACKEND": "django_prodserver.backends.servers.gunicorn.GunicornServer",
         "ARGS": {"bind": "0.0.0.0:8000", "workers": "4"},
     },
     "worker": {
@@ -70,7 +70,7 @@ python manage.py worker worker
 ```python
 PRODUCTION_PROCESSES = {
     "web": {
-        "BACKEND": "django_prodserver.backends.uvicorn.UvicornServer",
+        "BACKEND": "django_prodserver.backends.servers.uvicorn.UvicornServer",
         "ARGS": {"host": "0.0.0.0", "port": "8000", "workers": "4"},
     },
     "worker": {
@@ -157,7 +157,7 @@ See {ref}`guide-multi-process` for complete examples.
 # settings_prod.py
 PRODUCTION_PROCESSES = {
     "web": {
-        "BACKEND": "django_prodserver.backends.gunicorn.GunicornServer",
+        "BACKEND": "django_prodserver.backends.servers.gunicorn.GunicornServer",
         "ARGS": {"bind": "0.0.0.0:8000", "workers": "4", "timeout": "60"},
     },
 }

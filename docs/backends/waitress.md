@@ -18,7 +18,7 @@ pip install django-prodserver[waitress]
 ```python
 PRODUCTION_PROCESSES = {
     "web": {
-        "BACKEND": "django_prodserver.backends.waitress.WaitressServer",
+        "BACKEND": "django_prodserver.backends.servers.waitress.WaitressServer",
         "ARGS": {
             "host": "0.0.0.0",
             "port": "8000",

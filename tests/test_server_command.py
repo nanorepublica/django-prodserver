@@ -24,7 +24,7 @@ class TestServerCommand(TestCase):
 
     @override_settings(
         PRODUCTION_PROCESSES={
-            "web": {"BACKEND": "django_prodserver.backends.gunicorn.GunicornServer"}
+            "web": {"BACKEND": "django_prodserver.backends.servers.gunicorn.GunicornServer"}
         }
     )
     @patch("sys.argv", ["manage.py", "server", "web"])
@@ -98,7 +98,7 @@ class TestServerCommand(TestCase):
 
     @override_settings(
         PRODUCTION_PROCESSES={
-            "web": {"BACKEND": "django_prodserver.backends.gunicorn.GunicornServer"},
+            "web": {"BACKEND": "django_prodserver.backends.servers.gunicorn.GunicornServer"},
             "worker": {"BACKEND": "django_prodserver.backends.celery.CeleryWorker"},
         }
     )
@@ -137,7 +137,7 @@ class TestServerCommand(TestCase):
 
     @override_settings(
         PRODUCTION_PROCESSES={
-            "web": {"BACKEND": "django_prodserver.backends.gunicorn.GunicornServer"},
+            "web": {"BACKEND": "django_prodserver.backends.servers.gunicorn.GunicornServer"},
             "worker": {"BACKEND": "django_prodserver.backends.celery.CeleryWorker"},
         }
     )
@@ -160,10 +160,10 @@ class TestServerCommand(TestCase):
 
     @override_settings(
         PRODUCTION_PROCESSES={
-            "web": {"BACKEND": "django_prodserver.backends.gunicorn.GunicornServer"}
+            "web": {"BACKEND": "django_prodserver.backends.servers.gunicorn.GunicornServer"}
         }
     )
-    @patch("django_prodserver.management.commands.server.import_string")
+    @patch("django_prodserver.management.base.import_string")
     def test_start_server_success(self, mock_import_string):
         """Test successful server start."""
         mock_backend_class = Mock()
@@ -176,12 +176,12 @@ class TestServerCommand(TestCase):
 
         # Verify import_string was called with correct backend
         mock_import_string.assert_called_once_with(
-            "django_prodserver.backends.gunicorn.GunicornServer"
+            "django_prodserver.backends.servers.gunicorn.GunicornServer"
         )
 
         # Verify backend was instantiated with server config
         mock_backend_class.assert_called_once_with(
-            BACKEND="django_prodserver.backends.gunicorn.GunicornServer"
+            BACKEND="django_prodserver.backends.servers.gunicorn.GunicornServer"
         )
 
         # Verify start_server was called with prepared args
@@ -205,7 +205,7 @@ class TestServerCommand(TestCase):
     @override_settings(
         PRODUCTION_PROCESSES={"web": {"BACKEND": "nonexistent.backend.Class"}}
     )
-    @patch("django_prodserver.management.commands.server.import_string")
+    @patch("django_prodserver.management.base.import_string")
     def test_start_server_import_error(self, mock_import_string):
         """Test start_server with import error."""
         mock_import_string.side_effect = ImportError("Cannot import backend")
@@ -216,12 +216,12 @@ class TestServerCommand(TestCase):
     @override_settings(
         PRODUCTION_PROCESSES={
             "web": {
-                "BACKEND": "django_prodserver.backends.gunicorn.GunicornServer",
+                "BACKEND": "django_prodserver.backends.servers.gunicorn.GunicornServer",
                 "ARGS": {"bind": "0.0.0.0:8000"},
             }
         }
     )
-    @patch("django_prodserver.management.commands.server.import_string")
+    @patch("django_prodserver.management.base.import_string")
     def test_start_server_with_args(self, mock_import_string):
         """Test start_server with server arguments."""
         mock_backend_class = Mock()
@@ -234,7 +234,7 @@ class TestServerCommand(TestCase):
 
         # Verify backend was instantiated with full config
         mock_backend_class.assert_called_once_with(
-            BACKEND="django_prodserver.backends.gunicorn.GunicornServer",
+            BACKEND="django_prodserver.backends.servers.gunicorn.GunicornServer",
             ARGS={"bind": "0.0.0.0:8000"},
         )
 
@@ -249,10 +249,10 @@ class TestServerCommand(TestCase):
 
     @override_settings(
         PRODUCTION_PROCESSES={
-            "web": {"BACKEND": "django_prodserver.backends.gunicorn.GunicornServer"}
+            "web": {"BACKEND": "django_prodserver.backends.servers.gunicorn.GunicornServer"}
         }
     )
-    @patch("django_prodserver.management.commands.server.import_string")
+    @patch("django_prodserver.management.base.import_string")
     @patch("sys.exit")
     def test_run_from_argv_start_server(self, mock_exit, mock_import_string):
         """Test run_from_argv starting a server."""
@@ -320,8 +320,8 @@ class TestServerCommand(TestCase):
 
     @override_settings(
         PRODUCTION_PROCESSES={
-            "web1": {"BACKEND": "django_prodserver.backends.gunicorn.GunicornServer"},
-            "web2": {"BACKEND": "django_prodserver.backends.uvicorn.UvicornServer"},
+            "web1": {"BACKEND": "django_prodserver.backends.servers.gunicorn.GunicornServer"},
+            "web2": {"BACKEND": "django_prodserver.backends.servers.uvicorn.UvicornServer"},
             "worker": {"BACKEND": "django_prodserver.backends.celery.CeleryWorker"},
         }
     )
@@ -341,13 +341,13 @@ class TestServerCommand(TestCase):
 
     @override_settings(
         PRODUCTION_PROCESSES={
-            "web": {"BACKEND": "django_prodserver.backends.gunicorn.GunicornServer"}
+            "web": {"BACKEND": "django_prodserver.backends.servers.gunicorn.GunicornServer"}
         }
     )
     def test_stdout_output_on_start(self):
         """Test that starting server outputs to stdout."""
         with patch(
-            "django_prodserver.management.commands.server.import_string"
+            "django_prodserver.management.base.import_string"
         ) as mock_import:
             # Mock the backend to prevent actual server starting
             mock_backend_class = Mock()
@@ -377,13 +377,13 @@ class TestServerCommand(TestCase):
     @override_settings(
         PRODUCTION_PROCESSES={
             "web": {
-                "BACKEND": "django_prodserver.backends.gunicorn.GunicornServer",
+                "BACKEND": "django_prodserver.backends.servers.gunicorn.GunicornServer",
                 "ARGS": {"workers": "4", "bind": "0.0.0.0:8000"},
                 "EXTRA_CONFIG": "ignored",
             }
         }
     )
-    @patch("django_prodserver.management.commands.server.import_string")
+    @patch("django_prodserver.management.base.import_string")
     def test_start_server_passes_full_config(self, mock_import_string):
         """Test that start_server passes the complete server configuration."""
         mock_backend_class = Mock()
@@ -396,7 +396,7 @@ class TestServerCommand(TestCase):
 
         # Should pass the entire server config to the backend
         expected_config = {
-            "BACKEND": "django_prodserver.backends.gunicorn.GunicornServer",
+            "BACKEND": "django_prodserver.backends.servers.gunicorn.GunicornServer",
             "ARGS": {"workers": "4", "bind": "0.0.0.0:8000"},
             "EXTRA_CONFIG": "ignored",
         }
@@ -418,7 +418,7 @@ class TestServerCommand(TestCase):
             assert "worker" in error_message
             assert "Available names are:" in error_message
 
-    @patch("django_prodserver.management.commands.server.handle_default_options")
+    @patch("django_prodserver.management.base.handle_default_options")
     def test_handle_default_options_called(self, mock_handle_default_options):
         """Test that handle_default_options is called during run_from_argv."""
         with patch.object(self.command, "create_parser") as mock_create_parser:
@@ -436,10 +436,10 @@ class TestServerCommand(TestCase):
 
     @override_settings(
         PRODUCTION_PROCESSES={
-            "test": {"BACKEND": "django_prodserver.backends.gunicorn.GunicornServer"}
+            "test": {"BACKEND": "django_prodserver.backends.servers.gunicorn.GunicornServer"}
         }
     )
-    @patch("django_prodserver.management.commands.server.import_string")
+    @patch("django_prodserver.management.base.import_string")
     def test_backend_start_server_exception_propagation(self, mock_import_string):
         """Test that exceptions from backend.start_server are propagated."""
         mock_backend_class = Mock()

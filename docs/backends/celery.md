@@ -117,7 +117,7 @@ pip install django-prodserver[flower]
 ```python
 PRODUCTION_PROCESSES = {
     "flower": {
-        "BACKEND": "django_prodserver.backends.workers.celery.CeleryFlower",
+        "BACKEND": "django_prodserver.backends.servers.flower.CeleryFlower",
         "APP": "myproject.celery.app",
         "ARGS": {"port": "5555", "address": "0.0.0.0"},
     }
@@ -151,7 +151,7 @@ environment variables.
 ```python
 PRODUCTION_PROCESSES = {
     "web": {
-        "BACKEND": "django_prodserver.backends.gunicorn.GunicornServer",
+        "BACKEND": "django_prodserver.backends.servers.gunicorn.GunicornServer",
         "ARGS": {"bind": "0.0.0.0:8000", "workers": "4"},
     },
     "worker": {

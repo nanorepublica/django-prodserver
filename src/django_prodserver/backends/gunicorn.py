@@ -1,31 +1,15 @@
-import sys
-from argparse import ArgumentParser, Namespace
+"""Deprecated; see ``django_prodserver.backends.servers.gunicorn``."""
 
-from gunicorn.app.wsgiapp import WSGIApplication
+import warnings
 
-from ..utils import wsgi_app_name
-from .base import BaseServerBackend
+from .servers.gunicorn import DjangoApplication, GunicornServer
 
+warnings.warn(
+    "django_prodserver.backends.gunicorn is deprecated; import from "
+    "django_prodserver.backends.servers.gunicorn instead. This module will be "
+    "removed in django-prodserver 4.0.0.",
+    DeprecationWarning,
+    stacklevel=2,
+)
 
-class DjangoApplication(WSGIApplication):
-    """Dynamic Gunicorn WSGI Application."""
-
-    def init(self, parser: ArgumentParser, opts: Namespace, args: object) -> None:
-        """Initialised the Gunicorn Server."""
-        # strip mgmt command name from args and insert WSGI module
-        args = (wsgi_app_name(),)
-        super().init(parser, opts, args)
-
-
-class GunicornServer(BaseServerBackend):
-    """
-    Backend for gunicorn WSGI server.
-
-    Bypasses any Django handling of the command and sends all arguments straight
-    to gunicorn.
-    """
-
-    def start_server(self, *args: str) -> None:
-        """Add args back into sys.argv and run the server."""
-        sys.argv.extend(args)
-        DjangoApplication("%(prog)s [OPTIONS]").run()
+__all__ = ["DjangoApplication", "GunicornServer"]

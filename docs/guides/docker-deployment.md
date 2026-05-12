@@ -272,7 +272,7 @@ CELERY_BROKER_URL = os.getenv('CELERY_BROKER_URL', 'redis://redis:6379/0')
 # Production processes
 PRODUCTION_PROCESSES = {
     "web": {
-        "BACKEND": "django_prodserver.backends.gunicorn.GunicornServer",
+        "BACKEND": "django_prodserver.backends.servers.gunicorn.GunicornServer",
         "ARGS": {
             "bind": "0.0.0.0:8000",
             "workers": os.getenv('WEB_WORKERS', '4'),

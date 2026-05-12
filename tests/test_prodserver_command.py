@@ -38,7 +38,7 @@ class TestProdserverDeprecation(TestCase):
 
     @override_settings(
         PRODUCTION_PROCESSES={
-            "web": {"BACKEND": "django_prodserver.backends.gunicorn.GunicornServer"}
+            "web": {"BACKEND": "django_prodserver.backends.servers.gunicorn.GunicornServer"}
         }
     )
     def test_run_from_argv_emits_deprecation_warning(self):
@@ -54,7 +54,7 @@ class TestProdserverDeprecation(TestCase):
 
     @override_settings(
         PRODUCTION_PROCESSES={
-            "web": {"BACKEND": "django_prodserver.backends.gunicorn.GunicornServer"}
+            "web": {"BACKEND": "django_prodserver.backends.servers.gunicorn.GunicornServer"}
         }
     )
     def test_run_from_argv_writes_warning_to_stderr(self):
@@ -68,10 +68,10 @@ class TestProdserverDeprecation(TestCase):
 
     @override_settings(
         PRODUCTION_PROCESSES={
-            "web": {"BACKEND": "django_prodserver.backends.gunicorn.GunicornServer"}
+            "web": {"BACKEND": "django_prodserver.backends.servers.gunicorn.GunicornServer"}
         }
     )
-    @patch("django_prodserver.management.commands.server.import_string")
+    @patch("django_prodserver.management.base.import_string")
     def test_run_from_argv_still_starts_server(self, mock_import_string):
         """Despite the warning, the command must still start the server."""
         mock_backend_class = Mock()

@@ -56,19 +56,19 @@ TEMPLATES = [
 
 PRODUCTION_PROCESSES = {
     "web-g": {
-        "BACKEND": "django_prodserver.backends.gunicorn.GunicornServer",
+        "BACKEND": "django_prodserver.backends.servers.gunicorn.GunicornServer",
         "ARGS": {"bind": "0.0.0.0:8222", "workers": "2"},
     },
     "web-w": {
-        "BACKEND": "django_prodserver.backends.waitress.WaitressServer",
+        "BACKEND": "django_prodserver.backends.servers.waitress.WaitressServer",
         "ARGS": {},
     },
     "web-u": {
-        "BACKEND": "django_prodserver.backends.uvicorn.UvicornServer",
+        "BACKEND": "django_prodserver.backends.servers.uvicorn.UvicornServer",
         "ARGS": {},
     },
     "web-uw": {
-        "BACKEND": "django_prodserver.backends.uvicorn.UvicornWSGIServer",
+        "BACKEND": "django_prodserver.backends.servers.uvicorn.UvicornWSGIServer",
         "ARGS": {},
     },
     "worker-celery": {
@@ -82,7 +82,7 @@ PRODUCTION_PROCESSES = {
         "ARGS": {"loglevel": "info"},
     },
     "flower": {
-        "BACKEND": "django_prodserver.backends.workers.celery.CeleryFlower",
+        "BACKEND": "django_prodserver.backends.servers.flower.CeleryFlower",
         "APP": "tests.celery.app",
         "ARGS": {"port": "5555", "address": "0.0.0.0"},
     },
@@ -91,15 +91,15 @@ PRODUCTION_PROCESSES = {
         "ARGS": {},
     },
     "dev": {
-        "BACKEND": "django_prodserver.backends.django_runserver.DjangoRunserver",
+        "BACKEND": "django_prodserver.backends.dev.django_runserver.DjangoRunserver",
         "ARGS": {"addrport": "0.0.0.0:9000"},
     },
     "dev-asgi": {
-        "BACKEND": "django_prodserver.backends.daphne.DaphneRunserver",
+        "BACKEND": "django_prodserver.backends.dev.daphne.DaphneRunserver",
         "ARGS": {"addrport": "0.0.0.0:9000"},
     },
     "dev-werkzeug": {
-        "BACKEND": "django_prodserver.backends.werkzeug.WerkzeugRunserver",
+        "BACKEND": "django_prodserver.backends.dev.werkzeug.WerkzeugRunserver",
         "ARGS": {"addrport": "0.0.0.0:9000"},
     },
 }

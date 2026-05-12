@@ -16,7 +16,7 @@ from django_prodserver.backends._runserver_base import (  # NOQA: E402
     BaseRunserverBackend,
 )
 from django_prodserver.backends.base import BaseServerBackend  # NOQA: E402
-from django_prodserver.backends.daphne import DaphneRunserver  # NOQA: E402
+from django_prodserver.backends.dev.daphne import DaphneRunserver  # NOQA: E402
 
 DEFAULT_ADDR = BaseRunserverBackend.DEFAULT_ADDR
 DEFAULT_ADDR_IPV6 = BaseRunserverBackend.DEFAULT_ADDR_IPV6
@@ -470,7 +470,7 @@ class TestDisplayAddr:
 
 def test_backend_resolves_via_import_string():
     """The dispatcher uses import_string; ensure the dotted path resolves."""
-    cls = import_string("django_prodserver.backends.daphne.DaphneRunserver")
+    cls = import_string("django_prodserver.backends.dev.daphne.DaphneRunserver")
     assert cls is DaphneRunserver
     instance = cls(ARGS={"addrport": "127.0.0.1:8000"})
     assert isinstance(instance, BaseServerBackend)

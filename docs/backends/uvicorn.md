@@ -27,7 +27,7 @@ For async Django with WebSocket support:
 ```python
 PRODUCTION_PROCESSES = {
     "web": {
-        "BACKEND": "django_prodserver.backends.uvicorn.UvicornServer",
+        "BACKEND": "django_prodserver.backends.servers.uvicorn.UvicornServer",
         "ARGS": {
             "host": "0.0.0.0",
             "port": "8000",
@@ -46,7 +46,7 @@ For traditional Django with Uvicorn performance:
 ```python
 PRODUCTION_PROCESSES = {
     "web": {
-        "BACKEND": "django_prodserver.backends.uvicorn.UvicornWSGIServer",
+        "BACKEND": "django_prodserver.backends.servers.uvicorn.UvicornWSGIServer",
         "ARGS": {
             "host": "0.0.0.0",
             "port": "8000",

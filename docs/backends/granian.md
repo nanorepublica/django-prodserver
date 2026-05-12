@@ -24,7 +24,7 @@ For async Django with WebSocket support:
 ```python
 PRODUCTION_PROCESSES = {
     "web": {
-        "BACKEND": "django_prodserver.backends.granian.GranianASGIServer",
+        "BACKEND": "django_prodserver.backends.servers.granian.GranianASGIServer",
         "ARGS": {
             "address": "0.0.0.0",
             "port": "8000",
@@ -43,7 +43,7 @@ For traditional Django:
 ```python
 PRODUCTION_PROCESSES = {
     "web": {
-        "BACKEND": "django_prodserver.backends.granian.GranianWSGIServer",
+        "BACKEND": "django_prodserver.backends.servers.granian.GranianWSGIServer",
         "ARGS": {
             "address": "0.0.0.0",
             "port": "8000",

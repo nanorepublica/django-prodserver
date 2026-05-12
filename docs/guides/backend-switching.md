@@ -47,7 +47,7 @@ Common reasons to switch:
 ```python
 PRODUCTION_PROCESSES = {
     "web": {
-        "BACKEND": "django_prodserver.backends.gunicorn.GunicornServer",
+        "BACKEND": "django_prodserver.backends.servers.gunicorn.GunicornServer",
         "ARGS": {
             "bind": "0.0.0.0:8000",
             "workers": "4",
@@ -62,7 +62,7 @@ PRODUCTION_PROCESSES = {
 ```python
 PRODUCTION_PROCESSES = {
     "web": {
-        "BACKEND": "django_prodserver.backends.uvicorn.UvicornServer",
+        "BACKEND": "django_prodserver.backends.servers.uvicorn.UvicornServer",
         "ARGS": {
             "host": "0.0.0.0",
             "port": "8000",
@@ -118,7 +118,7 @@ PRODUCTION_PROCESSES = {
 ```python
 PRODUCTION_PROCESSES = {
     "web": {
-        "BACKEND": "django_prodserver.backends.gunicorn.GunicornServer",
+        "BACKEND": "django_prodserver.backends.servers.gunicorn.GunicornServer",
         "ARGS": {
             "bind": "0.0.0.0:8000",
             "workers": "4",
@@ -132,7 +132,7 @@ PRODUCTION_PROCESSES = {
 ```python
 PRODUCTION_PROCESSES = {
     "web": {
-        "BACKEND": "django_prodserver.backends.granian.GranianWSGIServer",
+        "BACKEND": "django_prodserver.backends.servers.granian.GranianWSGIServer",
         "ARGS": {
             "address": "0.0.0.0",
             "port": "8000",
@@ -166,7 +166,7 @@ PRODUCTION_PROCESSES = {
 ```python
 PRODUCTION_PROCESSES = {
     "web": {
-        "BACKEND": "django_prodserver.backends.waitress.WaitressServer",
+        "BACKEND": "django_prodserver.backends.servers.waitress.WaitressServer",
         "ARGS": {
             "host": "0.0.0.0",
             "port": "8000",
@@ -181,7 +181,7 @@ PRODUCTION_PROCESSES = {
 ```python
 PRODUCTION_PROCESSES = {
     "web": {
-        "BACKEND": "django_prodserver.backends.gunicorn.GunicornServer",
+        "BACKEND": "django_prodserver.backends.servers.gunicorn.GunicornServer",
         "ARGS": {
             "bind": "0.0.0.0:8000",
             "workers": "4",

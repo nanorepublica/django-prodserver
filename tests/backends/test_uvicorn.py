@@ -5,7 +5,7 @@ import pytest
 # Handle optional dependency
 uvicorn = pytest.importorskip("uvicorn")
 
-from django_prodserver.backends.uvicorn import (  # NOQA: E402
+from django_prodserver.backends.servers.uvicorn import (  # NOQA: E402
     UvicornServer,
     UvicornWSGIServer,
 )
@@ -25,7 +25,7 @@ class TestUvicornServer:
         assert server.args == ["--host=127.0.0.1", "--port=8000"]
 
     @patch(
-        "django_prodserver.backends.uvicorn.asgi_app_name",
+        "django_prodserver.backends.servers.uvicorn.asgi_app_name",
         return_value="tests.asgi:application",
     )
     def test_prep_server_args(self, mock_asgi_app_name):
@@ -37,7 +37,7 @@ class TestUvicornServer:
         mock_asgi_app_name.assert_called_once()
 
     @patch(
-        "django_prodserver.backends.uvicorn.asgi_app_name",
+        "django_prodserver.backends.servers.uvicorn.asgi_app_name",
         return_value="tests.asgi:application",
     )
     def test_prep_server_args_no_args(self, mock_asgi_app_name):
@@ -48,7 +48,7 @@ class TestUvicornServer:
         assert args == ["tests.asgi:application"]
         mock_asgi_app_name.assert_called_once()
 
-    @patch("django_prodserver.backends.uvicorn.uvicorn.main.main")
+    @patch("django_prodserver.backends.servers.uvicorn.uvicorn.main.main")
     def test_start_server(self, mock_uvicorn_main):
         """Test start_server method."""
         server = UvicornServer()
@@ -58,7 +58,7 @@ class TestUvicornServer:
 
         mock_uvicorn_main.assert_called_once_with(tuple(args))
 
-    @patch("django_prodserver.backends.uvicorn.uvicorn.main.main")
+    @patch("django_prodserver.backends.servers.uvicorn.uvicorn.main.main")
     def test_start_server_no_args(self, mock_uvicorn_main):
         """Test start_server method with no args."""
         server = UvicornServer()
@@ -75,7 +75,7 @@ class TestUvicornServer:
         assert isinstance(server, BaseServerBackend)
 
     @patch(
-        "django_prodserver.backends.uvicorn.asgi_app_name",
+        "django_prodserver.backends.servers.uvicorn.asgi_app_name",
         return_value="myapp.asgi:application",
     )
     def test_prep_server_args_with_complex_args(self, mock_asgi_app_name):
@@ -94,7 +94,7 @@ class TestUvicornServer:
 
     # @patch("uvicorn.main.main")
     # @patch(
-    #     "django_prodserver.backends.uvicorn.asgi_app_name",
+    #     "django_prodserver.backends.servers.uvicorn.asgi_app_name",
     #     return_value="tests.asgi:application",
     # )
     # def test_full_workflow(self, mock_asgi_app_name, mock_uvicorn_main):
@@ -123,7 +123,7 @@ class TestUvicornWSGIServer:
         assert server.args == ["--host=127.0.0.1", "--port=8000"]
 
     @patch(
-        "django_prodserver.backends.uvicorn.wsgi_app_name",
+        "django_prodserver.backends.servers.uvicorn.wsgi_app_name",
         return_value="tests.wsgi:application",
     )
     def test_prep_server_args(self, mock_wsgi_app_name):
@@ -140,7 +140,7 @@ class TestUvicornWSGIServer:
         mock_wsgi_app_name.assert_called_once()
 
     @patch(
-        "django_prodserver.backends.uvicorn.wsgi_app_name",
+        "django_prodserver.backends.servers.uvicorn.wsgi_app_name",
         return_value="tests.wsgi:application",
     )
     def test_prep_server_args_no_args(self, mock_wsgi_app_name):
@@ -151,7 +151,7 @@ class TestUvicornWSGIServer:
         assert args == ["tests.wsgi:application", "--interface=wsgi"]
         mock_wsgi_app_name.assert_called_once()
 
-    @patch("django_prodserver.backends.uvicorn.uvicorn.main.main")
+    @patch("django_prodserver.backends.servers.uvicorn.uvicorn.main.main")
     def test_start_server(self, mock_uvicorn_main):
         """Test start_server method."""
         server = UvicornWSGIServer()
@@ -161,7 +161,7 @@ class TestUvicornWSGIServer:
 
         mock_uvicorn_main.assert_called_once_with(tuple(args))
 
-    @patch("django_prodserver.backends.uvicorn.uvicorn.main.main")
+    @patch("django_prodserver.backends.servers.uvicorn.uvicorn.main.main")
     def test_start_server_no_args(self, mock_uvicorn_main):
         """Test start_server method with no args."""
         server = UvicornWSGIServer()
@@ -178,7 +178,7 @@ class TestUvicornWSGIServer:
         assert isinstance(server, BaseServerBackend)
 
     @patch(
-        "django_prodserver.backends.uvicorn.wsgi_app_name",
+        "django_prodserver.backends.servers.uvicorn.wsgi_app_name",
         return_value="myapp.wsgi:application",
     )
     def test_prep_server_args_with_complex_args(self, mock_wsgi_app_name):
@@ -203,7 +203,7 @@ class TestUvicornWSGIServer:
 
     # @patch("uvicorn.main.main")
     # @patch(
-    #     "django_prodserver.backends.uvicorn.wsgi_app_name",
+    #     "django_prodserver.backends.servers.uvicorn.wsgi_app_name",
     #     return_value="tests.wsgi:application",
     # )
     # def test_full_workflow(self, mock_wsgi_app_name, mock_uvicorn_main):
@@ -229,7 +229,7 @@ class TestUvicornWSGIServer:
         assert "--interface=wsgi" in args
 
     @patch(
-        "django_prodserver.backends.uvicorn.wsgi_app_name",
+        "django_prodserver.backends.servers.uvicorn.wsgi_app_name",
         return_value="custom.wsgi:app",
     )
     def test_custom_wsgi_app_name(self, mock_wsgi_app_name):
@@ -245,11 +245,11 @@ class TestUvicornServerComparison:
     """Tests comparing UvicornServer and UvicornWSGIServer behavior."""
 
     @patch(
-        "django_prodserver.backends.uvicorn.asgi_app_name",
+        "django_prodserver.backends.servers.uvicorn.asgi_app_name",
         return_value="tests.asgi:application",
     )
     @patch(
-        "django_prodserver.backends.uvicorn.wsgi_app_name",
+        "django_prodserver.backends.servers.uvicorn.wsgi_app_name",
         return_value="tests.wsgi:application",
     )
     def test_different_app_names(self, mock_wsgi_app_name, mock_asgi_app_name):

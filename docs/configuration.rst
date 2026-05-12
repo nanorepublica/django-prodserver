@@ -28,30 +28,30 @@ Python import path to the backend class:
 
 .. code-block:: python
 
-    "BACKEND": "django_prodserver.backends.gunicorn.GunicornServer"
+    "BACKEND": "django_prodserver.backends.servers.gunicorn.GunicornServer"
 
 **Available backends:**
 
 +--------------------------------------------------+-------------+
 | Backend Class                                    | Type        |
 +==================================================+=============+
-| ``django_prodserver.backends.gunicorn.GunicornServer``    | WSGI        |
+| ``django_prodserver.backends.servers.gunicorn.GunicornServer``    | WSGI        |
 +--------------------------------------------------+-------------+
-| ``django_prodserver.backends.waitress.WaitressServer``    | WSGI        |
+| ``django_prodserver.backends.servers.waitress.WaitressServer``    | WSGI        |
 +--------------------------------------------------+-------------+
-| ``django_prodserver.backends.granian.GranianWSGIServer``  | WSGI        |
+| ``django_prodserver.backends.servers.granian.GranianWSGIServer``  | WSGI        |
 +--------------------------------------------------+-------------+
-| ``django_prodserver.backends.uvicorn.UvicornServer``      | ASGI        |
+| ``django_prodserver.backends.servers.uvicorn.UvicornServer``      | ASGI        |
 +--------------------------------------------------+-------------+
-| ``django_prodserver.backends.uvicorn.UvicornWSGIServer``  | WSGI        |
+| ``django_prodserver.backends.servers.uvicorn.UvicornWSGIServer``  | WSGI        |
 +--------------------------------------------------+-------------+
-| ``django_prodserver.backends.granian.GranianASGIServer``  | ASGI        |
+| ``django_prodserver.backends.servers.granian.GranianASGIServer``  | ASGI        |
 +--------------------------------------------------+-------------+
 | ``django_prodserver.backends.workers.celery.CeleryWorker``        | Worker      |
 +--------------------------------------------------+-------------+
 | ``django_prodserver.backends.workers.celery.CeleryBeat``          | Scheduler   |
 +--------------------------------------------------+-------------+
-| ``django_prodserver.backends.workers.celery.CeleryFlower``        | Monitoring  |
+| ``django_prodserver.backends.servers.flower.CeleryFlower``                | Monitoring  |
 +--------------------------------------------------+-------------+
 | ``django_prodserver.backends.workers.django_tasks.DjangoTasksWorker`` | Worker  |
 +--------------------------------------------------+-------------+
@@ -94,7 +94,7 @@ Arguments passed to the backend, converted to CLI flags:
     # Settings configuration
     PRODUCTION_PROCESSES = {
         "web": {
-            "BACKEND": "django_prodserver.backends.gunicorn.GunicornServer",
+            "BACKEND": "django_prodserver.backends.servers.gunicorn.GunicornServer",
             "ARGS": {
                 "bind": "0.0.0.0:8000",
                 "workers": "4",
@@ -121,7 +121,7 @@ Basic Gunicorn web server:
 
     PRODUCTION_PROCESSES = {
         "web": {
-            "BACKEND": "django_prodserver.backends.gunicorn.GunicornServer",
+            "BACKEND": "django_prodserver.backends.servers.gunicorn.GunicornServer",
             "ARGS": {"bind": "0.0.0.0:8000", "workers": "4"},
         }
     }
@@ -133,7 +133,7 @@ Web + Worker + Beat
 
     PRODUCTION_PROCESSES = {
         "web": {
-            "BACKEND": "django_prodserver.backends.gunicorn.GunicornServer",
+            "BACKEND": "django_prodserver.backends.servers.gunicorn.GunicornServer",
             "ARGS": {"bind": "0.0.0.0:8000", "workers": "4"},
         },
         "worker": {
@@ -157,7 +157,7 @@ Environment Variables
 
     PRODUCTION_PROCESSES = {
         "web": {
-            "BACKEND": "django_prodserver.backends.gunicorn.GunicornServer",
+            "BACKEND": "django_prodserver.backends.servers.gunicorn.GunicornServer",
             "ARGS": {
                 "bind": f"0.0.0.0:{os.getenv('PORT', '8000')}",
                 "workers": os.getenv('WEB_WORKERS', '4'),

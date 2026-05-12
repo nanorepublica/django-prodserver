@@ -6,7 +6,7 @@ from django.core.management import CommandError
 from django.test import TestCase, override_settings
 
 from django_prodserver.backends.base import BaseServerBackend
-from django_prodserver.management.commands.server import BaseProcessCommand
+from django_prodserver.management.base import BaseProcessCommand
 from django_prodserver.management.commands.worker import Command
 
 DJANGO_TASKS_WORKER = (
@@ -133,7 +133,7 @@ class TestWorkerCommand(TestCase):
         assert "Backend not configured for worker named worker" in str(exc_info.value)
 
     @override_settings(PRODUCTION_PROCESSES=ONE_WORKER)
-    @patch("django_prodserver.management.commands.server.import_string")
+    @patch("django_prodserver.management.base.import_string")
     @patch("sys.exit")
     def test_run_from_argv_command_error(self, mock_exit, mock_import_string):
         """Test run_from_argv converts CommandError to an exit code."""
@@ -144,7 +144,7 @@ class TestWorkerCommand(TestCase):
         mock_exit.assert_called_with(1)
 
     @override_settings(PRODUCTION_PROCESSES=ONE_WORKER)
-    @patch("django_prodserver.management.commands.server.import_string")
+    @patch("django_prodserver.management.base.import_string")
     def test_run_from_argv_list_option(self, mock_import_string):
         """Test run_from_argv with --list option short-circuits."""
         with patch.object(self.command, "list_process_names") as mock_list:
@@ -153,7 +153,7 @@ class TestWorkerCommand(TestCase):
         mock_import_string.assert_not_called()
 
     @override_settings(PRODUCTION_PROCESSES=ONE_WORKER)
-    @patch("django_prodserver.management.commands.server.import_string")
+    @patch("django_prodserver.management.base.import_string")
     def test_start_process_passes_full_config(self, mock_import_string):
         """The whole process config is passed to the backend constructor."""
         mock_backend_class = Mock()

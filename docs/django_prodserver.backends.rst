@@ -44,7 +44,7 @@ django\_prodserver.backends.workers.django\_tasks module
 django\_prodserver.backends.granian module
 ------------------------------------------
 
-.. automodule:: django_prodserver.backends.granian
+.. automodule:: django_prodserver.backends.servers.granian
    :members:
    :show-inheritance:
    :undoc-members:
@@ -52,7 +52,7 @@ django\_prodserver.backends.granian module
 django\_prodserver.backends.gunicorn module
 -------------------------------------------
 
-.. automodule:: django_prodserver.backends.gunicorn
+.. automodule:: django_prodserver.backends.servers.gunicorn
    :members:
    :show-inheritance:
    :undoc-members:
@@ -60,7 +60,7 @@ django\_prodserver.backends.gunicorn module
 django\_prodserver.backends.uvicorn module
 ------------------------------------------
 
-.. automodule:: django_prodserver.backends.uvicorn
+.. automodule:: django_prodserver.backends.servers.uvicorn
    :members:
    :show-inheritance:
    :undoc-members:
@@ -68,7 +68,7 @@ django\_prodserver.backends.uvicorn module
 django\_prodserver.backends.waitress module
 -------------------------------------------
 
-.. automodule:: django_prodserver.backends.waitress
+.. automodule:: django_prodserver.backends.servers.waitress
    :members:
    :show-inheritance:
    :undoc-members:
