@@ -7,7 +7,7 @@ import pytest
 # Handle optional dependency
 granian = pytest.importorskip("granian")
 
-from django_prodserver.backends.granian import (  # NOQA: E402
+from django_prodserver.backends.servers.granian import (  # NOQA: E402
     GranianASGIServer,
     GranianServerBase,
     GranianWSGIServer,
@@ -122,7 +122,7 @@ class TestGranianASGIServer:
         assert kwargs["reload"] is True
         assert kwargs["websockets"] is False
 
-    @patch("django_prodserver.backends.granian.asgi_app_name")
+    @patch("django_prodserver.backends.servers.granian.asgi_app_name")
     def test_start_server(self, mock_asgi_app_name):
         """Test start_server method."""
         mock_asgi_app_name.return_value = "tests.asgi:application"
@@ -147,7 +147,7 @@ class TestGranianASGIServer:
             # Verify serve was called
             mock_server.serve.assert_called_once()
 
-    @patch("django_prodserver.backends.granian.asgi_app_name")
+    @patch("django_prodserver.backends.servers.granian.asgi_app_name")
     def test_start_server_no_args(self, mock_asgi_app_name):
         """Test start_server method with no args."""
         mock_asgi_app_name.return_value = "tests.asgi:application"
@@ -192,7 +192,7 @@ class TestGranianASGIServer:
         assert kwargs["blocking_threads"] == 4
         assert kwargs["log_level"] == "debug"
 
-    @patch("django_prodserver.backends.granian.asgi_app_name")
+    @patch("django_prodserver.backends.servers.granian.asgi_app_name")
     def test_start_server_with_interface(self, mock_asgi_app_name):
         """Test that ASGI interface is correctly set."""
         mock_asgi_app_name.return_value = "tests.asgi:application"
@@ -257,7 +257,7 @@ class TestGranianWSGIServer:
         kwargs = server._parse_granian_kwargs()
         assert kwargs == {}
 
-    @patch("django_prodserver.backends.granian.wsgi_app_name")
+    @patch("django_prodserver.backends.servers.granian.wsgi_app_name")
     def test_start_server(self, mock_wsgi_app_name):
         """Test start_server method."""
         mock_wsgi_app_name.return_value = "tests.wsgi:application"
@@ -282,7 +282,7 @@ class TestGranianWSGIServer:
             # Verify serve was called
             mock_server.serve.assert_called_once()
 
-    @patch("django_prodserver.backends.granian.wsgi_app_name")
+    @patch("django_prodserver.backends.servers.granian.wsgi_app_name")
     def test_start_server_no_args(self, mock_wsgi_app_name):
         """Test start_server method with no args."""
         mock_wsgi_app_name.return_value = "tests.wsgi:application"
@@ -327,7 +327,7 @@ class TestGranianWSGIServer:
         assert kwargs["blocking_threads"] == 4
         assert kwargs["backlog"] == 2048
 
-    @patch("django_prodserver.backends.granian.wsgi_app_name")
+    @patch("django_prodserver.backends.servers.granian.wsgi_app_name")
     def test_start_server_with_interface(self, mock_wsgi_app_name):
         """Test that WSGI interface is correctly set."""
         mock_wsgi_app_name.return_value = "tests.wsgi:application"
@@ -351,10 +351,10 @@ class TestGranianWSGIServer:
 
         with patch("granian.Granian") as MockGranian:
             with patch(
-                "django_prodserver.backends.granian.asgi_app_name", return_value="app"
+                "django_prodserver.backends.servers.granian.asgi_app_name", return_value="app"
             ):
                 with patch(
-                    "django_prodserver.backends.granian.wsgi_app_name",
+                    "django_prodserver.backends.servers.granian.wsgi_app_name",
                     return_value="app",
                 ):
                     mock_server = Mock()

@@ -11,7 +11,7 @@ from django_prodserver.backends._runserver_base import (
     BaseRunserverBackend,
 )
 from django_prodserver.backends.base import BaseServerBackend
-from django_prodserver.backends.django_runserver import DjangoRunserver
+from django_prodserver.backends.dev.django_runserver import DjangoRunserver
 
 DEFAULT_ADDR = BaseRunserverBackend.DEFAULT_ADDR
 DEFAULT_ADDR_IPV6 = BaseRunserverBackend.DEFAULT_ADDR_IPV6
@@ -382,7 +382,7 @@ class TestInitFlagCombinations:
 
 def test_backend_resolves_via_import_string():
     """The dispatcher uses import_string; ensure the dotted path resolves."""
-    cls = import_string("django_prodserver.backends.django_runserver.DjangoRunserver")
+    cls = import_string("django_prodserver.backends.dev.django_runserver.DjangoRunserver")
     assert cls is DjangoRunserver
     instance = cls(ARGS={"addrport": "127.0.0.1:8000"})
     assert isinstance(instance, BaseServerBackend)

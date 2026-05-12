@@ -6,7 +6,7 @@ import pytest
 # Handle optional dependency
 gunicorn = pytest.importorskip("gunicorn")
 
-from django_prodserver.backends.gunicorn import (  # NOQA: E402
+from django_prodserver.backends.servers.gunicorn import (  # NOQA: E402
     DjangoApplication,
     GunicornServer,
 )
@@ -25,7 +25,7 @@ class TestDjangoApplication:
         # Mock the parent init method
         with patch.object(app.__class__.__bases__[0], "init") as mock_parent_init:
             with patch(
-                "django_prodserver.backends.gunicorn.wsgi_app_name",
+                "django_prodserver.backends.servers.gunicorn.wsgi_app_name",
                 return_value="tests.wsgi:application",
             ):
                 app.init(parser, opts, ["extra_arg1", "extra_arg2"])
@@ -50,7 +50,7 @@ class TestGunicornServer:
         assert server.args == ["--bind=0.0.0.0:8000", "--workers=4"]
 
     @patch("sys.argv", ["manage.py", "prodserver"])
-    @patch("django_prodserver.backends.gunicorn.DjangoApplication")
+    @patch("django_prodserver.backends.servers.gunicorn.DjangoApplication")
     def test_start_server(self, mock_django_app):
         """Test start_server method."""
         mock_app_instance = Mock()
@@ -72,7 +72,7 @@ class TestGunicornServer:
         mock_app_instance.run.assert_called_once()
 
     @patch("sys.argv", ["manage.py", "prodserver"])
-    @patch("django_prodserver.backends.gunicorn.DjangoApplication")
+    @patch("django_prodserver.backends.servers.gunicorn.DjangoApplication")
     def test_start_server_no_args(self, mock_django_app):
         """Test start_server method with no args."""
         mock_app_instance = Mock()
@@ -104,7 +104,7 @@ class TestGunicornServer:
         assert isinstance(server, BaseServerBackend)
 
     @patch("sys.argv", ["manage.py", "prodserver"])
-    @patch("django_prodserver.backends.gunicorn.DjangoApplication")
+    @patch("django_prodserver.backends.servers.gunicorn.DjangoApplication")
     def test_start_server_with_mixed_args(self, mock_django_app):
         """Test start_server method with various argument types."""
         mock_app_instance = Mock()

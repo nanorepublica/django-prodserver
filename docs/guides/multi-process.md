@@ -427,7 +427,7 @@ sudo supervisorctl tail -f myapp-web
 # settings.py
 PRODUCTION_PROCESSES = {
     "web": {
-        "BACKEND": "django_prodserver.backends.gunicorn.GunicornServer",
+        "BACKEND": "django_prodserver.backends.servers.gunicorn.GunicornServer",
         "ARGS": {
             "bind": "0.0.0.0:8000",
             "workers": "8",

@@ -21,7 +21,7 @@ INSTALLED_APPS = [
 
 PRODUCTION_PROCESSES = {
     "web": {
-        "BACKEND": "django_prodserver.backends.gunicorn.GunicornServer",
+        "BACKEND": "django_prodserver.backends.servers.gunicorn.GunicornServer",
         "ARGS": {"bind": "0.0.0.0:8000", "workers": "2"},
     }
 }
@@ -106,7 +106,7 @@ A more complete example with web and worker processes:
 ```python
 PRODUCTION_PROCESSES = {
     "web": {
-        "BACKEND": "django_prodserver.backends.gunicorn.GunicornServer",
+        "BACKEND": "django_prodserver.backends.servers.gunicorn.GunicornServer",
         "ARGS": {"bind": "0.0.0.0:8000", "workers": "4"},
     },
     "worker": {

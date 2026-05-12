@@ -80,7 +80,7 @@ DATABASES = {
 # Simple dev server
 PRODUCTION_PROCESSES = {
     "web": {
-        "BACKEND": "django_prodserver.backends.waitress.WaitressServer",
+        "BACKEND": "django_prodserver.backends.servers.waitress.WaitressServer",
         "ARGS": {
             "host": "127.0.0.1",
             "port": "8000",
@@ -117,7 +117,7 @@ DATABASES = {
 # Staging configuration - similar to production but with debug features
 PRODUCTION_PROCESSES = {
     "web": {
-        "BACKEND": "django_prodserver.backends.gunicorn.GunicornServer",
+        "BACKEND": "django_prodserver.backends.servers.gunicorn.GunicornServer",
         "ARGS": {
             "bind": "0.0.0.0:8000",
             "workers": "2",
@@ -164,7 +164,7 @@ DATABASES = {
 # Production server configuration
 PRODUCTION_PROCESSES = {
     "web": {
-        "BACKEND": "django_prodserver.backends.gunicorn.GunicornServer",
+        "BACKEND": "django_prodserver.backends.servers.gunicorn.GunicornServer",
         "ARGS": {
             "bind": "0.0.0.0:8000",
             "workers": "8",
@@ -270,7 +270,7 @@ else:  # development
 
 PRODUCTION_PROCESSES = {
     "web": {
-        "BACKEND": "django_prodserver.backends.gunicorn.GunicornServer",
+        "BACKEND": "django_prodserver.backends.servers.gunicorn.GunicornServer",
         "ARGS": {
             "bind": f"0.0.0.0:{os.getenv('PORT', '8000')}",
             "workers": WEB_WORKERS,
@@ -360,7 +360,7 @@ DATABASES = {
 
 PRODUCTION_PROCESSES = {
     "web": {
-        "BACKEND": "django_prodserver.backends.gunicorn.GunicornServer",
+        "BACKEND": "django_prodserver.backends.servers.gunicorn.GunicornServer",
         "ARGS": {
             "bind": f"0.0.0.0:{env('PORT', default=8000)}",
             "workers": env('WEB_WORKERS', default='4'),
@@ -381,7 +381,7 @@ ALLOWED_HOSTS = ['*']
 
 PRODUCTION_PROCESSES = {
     "web": {
-        "BACKEND": "django_prodserver.backends.waitress.WaitressServer",
+        "BACKEND": "django_prodserver.backends.servers.waitress.WaitressServer",
         "ARGS": {
             "host": "127.0.0.1",
             "port": "8000",
@@ -419,7 +419,7 @@ ALLOWED_HOSTS = ['staging.example.com']
 
 PRODUCTION_PROCESSES = {
     "web": {
-        "BACKEND": "django_prodserver.backends.gunicorn.GunicornServer",
+        "BACKEND": "django_prodserver.backends.servers.gunicorn.GunicornServer",
         "ARGS": {
             "bind": "0.0.0.0:8000",
             "workers": "4",
@@ -456,7 +456,7 @@ ALLOWED_HOSTS = ['example.com', 'www.example.com']
 
 PRODUCTION_PROCESSES = {
     "web": {
-        "BACKEND": "django_prodserver.backends.uvicorn.UvicornServer",
+        "BACKEND": "django_prodserver.backends.servers.uvicorn.UvicornServer",
         "ARGS": {
             "host": "0.0.0.0",
             "port": "8000",

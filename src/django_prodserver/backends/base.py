@@ -13,7 +13,7 @@ class BaseProcessBackend:
     management commands can tell the two apart.
 
     {
-        "BACKEND": "django_prodserver.backends.gunicorn.GunicornServer",
+        "BACKEND": "django_prodserver.backends.servers.gunicorn.GunicornServer",
         "ARGS": {"bind": "0.0.0.0:8111"}
     }
     """

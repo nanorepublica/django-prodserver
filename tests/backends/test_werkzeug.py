@@ -17,7 +17,7 @@ from django_prodserver.backends._runserver_base import (  # NOQA: E402
     BaseRunserverBackend,
 )
 from django_prodserver.backends.base import BaseServerBackend  # NOQA: E402
-from django_prodserver.backends.werkzeug import (  # NOQA: E402
+from django_prodserver.backends.dev.werkzeug import (  # NOQA: E402
     RunserverPlus,
     WerkzeugRunserver,
 )
@@ -669,7 +669,7 @@ class TestRunserverPlusAlias:
 
 
 def test_backend_resolves_via_import_string():
-    cls = import_string("django_prodserver.backends.werkzeug.WerkzeugRunserver")
+    cls = import_string("django_prodserver.backends.dev.werkzeug.WerkzeugRunserver")
     assert cls is WerkzeugRunserver
-    cls = import_string("django_prodserver.backends.werkzeug.RunserverPlus")
+    cls = import_string("django_prodserver.backends.dev.werkzeug.RunserverPlus")
     assert cls is RunserverPlus

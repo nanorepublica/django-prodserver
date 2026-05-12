@@ -2,7 +2,7 @@
 
 import warnings
 
-from .workers.celery import CeleryBeat, CeleryFlower, CeleryWorker
+from .workers.celery import CeleryBeat, CeleryWorker
 
 warnings.warn(
     "django_prodserver.backends.celery is deprecated; import from "
@@ -12,4 +12,4 @@ warnings.warn(
     stacklevel=2,
 )
 
-__all__ = ["CeleryBeat", "CeleryFlower", "CeleryWorker"]
+__all__ = ["CeleryBeat", "CeleryWorker"]

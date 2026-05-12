@@ -1,42 +1,15 @@
-import uvicorn.main
+"""Deprecated; see ``django_prodserver.backends.servers.uvicorn``."""
 
-from ..utils import asgi_app_name, wsgi_app_name
-from .base import BaseServerBackend
+import warnings
 
+from .servers.uvicorn import UvicornServer, UvicornWSGIServer
 
-class UvicornServer(BaseServerBackend):
-    """
-    Uvicorn ASGIServer Backend.
+warnings.warn(
+    "django_prodserver.backends.uvicorn is deprecated; import from "
+    "django_prodserver.backends.servers.uvicorn instead. This module will be "
+    "removed in django-prodserver 4.0.0.",
+    DeprecationWarning,
+    stacklevel=2,
+)
 
-    This bypasses any Django handling of the command and sends all arguments straight
-    to uvicorn.
-    """
-
-    def prep_server_args(self) -> list[str]:
-        """Prepare the server args."""
-        args = [asgi_app_name()]
-        args.extend(self.args)
-        return args
-
-    def start_server(self, *args: str) -> None:
-        """Start the server."""
-        uvicorn.main.main(args)
-
-
-class UvicornWSGIServer(BaseServerBackend):
-    """
-    Uvicorn WSGIServer Backend.
-
-    This bypasses any Django handling of the command and sends all arguments straight
-    to uvicorn.
-    """
-
-    def prep_server_args(self) -> list[str]:
-        """Prepare the server args."""
-        args = [wsgi_app_name(), "--interface=wsgi"]
-        args.extend(self.args)
-        return args
-
-    def start_server(self, *args: str) -> None:
-        """Start the server."""
-        uvicorn.main.main(args)
+__all__ = ["UvicornServer", "UvicornWSGIServer"]

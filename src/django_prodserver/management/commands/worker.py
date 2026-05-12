@@ -1,5 +1,5 @@
 from ...backends.base import BaseWorkerBackend
-from .server import BaseProcessCommand
+from ..base import BaseProcessCommand
 
 
 class Command(BaseProcessCommand):

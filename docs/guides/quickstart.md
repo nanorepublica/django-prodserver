@@ -72,7 +72,7 @@ Add the `PRODUCTION_PROCESSES` configuration to your `settings.py`:
 # Production server configuration
 PRODUCTION_PROCESSES = {
     "web": {
-        "BACKEND": "django_prodserver.backends.gunicorn.GunicornServer",
+        "BACKEND": "django_prodserver.backends.servers.gunicorn.GunicornServer",
         "ARGS": {
             "bind": "0.0.0.0:8000",
             "workers": "2",
@@ -145,7 +145,7 @@ Process tasks asynchronously with Celery:
 # settings.py
 PRODUCTION_PROCESSES = {
     "web": {
-        "BACKEND": "django_prodserver.backends.gunicorn.GunicornServer",
+        "BACKEND": "django_prodserver.backends.servers.gunicorn.GunicornServer",
         "ARGS": {
             "bind": "0.0.0.0:8000",
             "workers": "2",
@@ -191,7 +191,7 @@ ALLOWED_HOSTS = ['example.com']
 
 PRODUCTION_PROCESSES = {
     "web": {
-        "BACKEND": "django_prodserver.backends.gunicorn.GunicornServer",
+        "BACKEND": "django_prodserver.backends.servers.gunicorn.GunicornServer",
         "ARGS": {
             "bind": "0.0.0.0:8000",
             "workers": "4",
@@ -283,7 +283,7 @@ python manage.py server web
 # Minimal
 PRODUCTION_PROCESSES = {
     "web": {
-        "BACKEND": "django_prodserver.backends.gunicorn.GunicornServer",
+        "BACKEND": "django_prodserver.backends.servers.gunicorn.GunicornServer",
         "ARGS": {"bind": "0.0.0.0:8000"}
     }
 }
@@ -291,7 +291,7 @@ PRODUCTION_PROCESSES = {
 # Recommended
 PRODUCTION_PROCESSES = {
     "web": {
-        "BACKEND": "django_prodserver.backends.gunicorn.GunicornServer",
+        "BACKEND": "django_prodserver.backends.servers.gunicorn.GunicornServer",
         "ARGS": {
             "bind": "0.0.0.0:8000",
             "workers": "4",

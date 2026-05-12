@@ -64,27 +64,27 @@ The comments show other available backend processes that are available to use.
 ```py
 PRODUCTION_PROCESSES = {
     "web": {
-        "BACKEND": "django_prodserver.backends.gunicorn.GunicornServer",
+        "BACKEND": "django_prodserver.backends.servers.gunicorn.GunicornServer",
         "ARGS": {"bind": "0.0.0.0:8111"},
     },
     # "web": {
-    #     "BACKEND": "django_prodserver.backends.granian.GranianASGIServer",
+    #     "BACKEND": "django_prodserver.backends.servers.granian.GranianASGIServer",
     #     "ARGS": {"address": "0.0.0.0", "port": "8000", "workers": "4"},
     # },
     # "web": {
-    #     "BACKEND": "django_prodserver.backends.granian.GranianWSGIServer",
+    #     "BACKEND": "django_prodserver.backends.servers.granian.GranianWSGIServer",
     #     "ARGS": {"address": "0.0.0.0", "port": "8000", "workers": "4"},
     # },
     # "web": {
-    #     "BACKEND": "django_prodserver.backends.waitress.WaitressServer",
+    #     "BACKEND": "django_prodserver.backends.servers.waitress.WaitressServer",
     #     "ARGS": {},
     # },
     # "web": {
-    #     "BACKEND": "django_prodserver.backends.uvicorn.UvicornServer",
+    #     "BACKEND": "django_prodserver.backends.servers.uvicorn.UvicornServer",
     #     "ARGS": {},
     # },
     # "web": {
-    #     "BACKEND": "django_prodserver.backends.uvicorn.UvicornWSGIServer",
+    #     "BACKEND": "django_prodserver.backends.servers.uvicorn.UvicornWSGIServer",
     #     "ARGS": {},
     # },
     "worker": {
@@ -102,7 +102,7 @@ PRODUCTION_PROCESSES = {
     #     "ARGS": {},
     # },
     # "flower": {
-    #     "BACKEND": "django_prodserver.backends.workers.celery.CeleryFlower",
+    #     "BACKEND": "django_prodserver.backends.servers.flower.CeleryFlower",
     #     "APP": "tests.celery.app",
     #     "ARGS": {"port": "5555", "address": "0.0.0.0"},
     # },
@@ -141,9 +141,10 @@ best possible way for a production setting. You can also optionally override the
 `prep_server_args` method to aid with this to provide any default arguments
 or formatting to the `start_server` command.
 
-See `django_prodserver.backends` (server backends) and `django_prodserver.backends.workers`
-(worker backends) for examples of existing backends for inspiration. Pull Request's are
-welcome for additional backends.
+See `django_prodserver.backends.servers` (production server backends),
+`django_prodserver.backends.workers` (worker backends), and
+`django_prodserver.backends.dev` (development runserver-style backends) for examples
+of existing backends for inspiration. Pull Request's are welcome for additional backends.
 
 ## Contributors ✨
 
