@@ -1,27 +1,21 @@
 # Changelog
 
-## v3.0.0
+## v2.5.0 (2026-05-13)
 
 ### Features
 
-- Add new `server` management command as the primary way to start configured production processes. Invoke it as `python manage.py server <process_name>`.
-- Add new `worker` management command for starting background task worker processes (`python manage.py worker <process_name>`). It shares its implementation with `server` (both via the new `BaseProcessCommand`) and reads the same `PRODUCTION_PROCESSES` setting. `server` now only accepts server backends (subclasses of `BaseServerBackend`) and `worker` only accepts worker backends (subclasses of the new `BaseWorkerBackend`); using the wrong command for a backend produces an error pointing at the correct one.
-- Worker backends now live under the `django_prodserver.backends.workers` subpackage: `django_prodserver.backends.workers.celery` (`CeleryWorker`, `CeleryBeat`), `django_prodserver.backends.workers.django_tasks` (`DjangoTasksWorker`) and `django_prodserver.backends.workers.django_q2` (`DjangoQ2Worker`).
-- Production server backends now live under the `django_prodserver.backends.servers` subpackage: `gunicorn`, `waitress`, `uvicorn`, `granian`, and `flower`. Development runserver-style backends now live under the `django_prodserver.backends.dev` subpackage: `django_runserver`, `werkzeug`, and `daphne`. The old top-level module paths continue to work as deprecated import shims and will be removed in **v4.0.0**.
-- Add `CeleryFlower` backend (`django_prodserver.backends.servers.flower.CeleryFlower`) for running the [Flower](https://flower.readthedocs.io/) monitoring web UI. It is a server backend (run via `python manage.py server <name>`), not a worker. Install with the new `flower` extra: `pip install django-prodserver[flower]`.
+- V3.0.0 ([`a54488c`](https://github.com/nanorepublica/django-prodserver/commit/a54488c80b5bf481ba16f30257f56c6dda87c766))
+- Add celeryflower backend for celery monitoring ([`81132ef`](https://github.com/nanorepublica/django-prodserver/commit/81132ef2c0bec91d331f47d4dbbe497abb3b8f94))
+- Rename `prodserver` command to `server` (deprecate `prodserver`) ([`858cff9`](https://github.com/nanorepublica/django-prodserver/commit/858cff9ec08ddbe6aa86553eabb2eace3eea8372))
+- Add werkzeugrunserver / runserverplus dev backend ([`3764b38`](https://github.com/nanorepublica/django-prodserver/commit/3764b38b2ac7c75ef0efaf2923a83721ad35da10))
+- Add daphnerunserver asgi development backend ([`15975d4`](https://github.com/nanorepublica/django-prodserver/commit/15975d41dbd6f75be94f1c324dfe0d1448aaabe1))
+- Add djangorunserver development backend ([`96c9222`](https://github.com/nanorepublica/django-prodserver/commit/96c9222c320b918342d143353ed2b0d1cbc38892))
 
-### Deprecations
+### Bug fixes
 
-- The `prodserver` management command is now a deprecated alias for `server`. Existing invocations (`python manage.py prodserver ...`) continue to work but emit a `DeprecationWarning`. The alias will be removed in **v4.0.0**.
-- The `django_prodserver.backends.celery`, `django_prodserver.backends.django_tasks` and `django_prodserver.backends.django_q2` modules are now deprecated import shims that re-export from the new `django_prodserver.backends.workers.*` locations and emit a `DeprecationWarning` on import. They will be removed in **v4.0.0**.
-- The `django_prodserver.backends.gunicorn`, `.waitress`, `.uvicorn`, and `.granian` modules are now deprecated import shims that re-export from `django_prodserver.backends.servers.*`. They will be removed in **v4.0.0**.
-- The `django_prodserver.backends.django_runserver`, `.werkzeug`, and `.daphne` modules are now deprecated import shims that re-export from `django_prodserver.backends.dev.*`. They will be removed in **v4.0.0**.
-
-### Notes
-
-- The `PRODUCTION_PROCESSES` setting name is unchanged and continues to be the configuration entry point.
-- The `django_prodserver` package name and the WSGI/ASGI server backend import paths are unchanged.
-- `BaseServerBackend` and the new `BaseWorkerBackend` both subclass the new `BaseProcessBackend` base class in `django_prodserver.backends.base`. Custom server backends that subclass `BaseServerBackend` continue to work unchanged with `server`; custom worker backends should subclass `BaseWorkerBackend` to be runnable via `worker`.
+- Make werkzeug's debugger actually fire on exceptions ([`27a8cd9`](https://github.com/nanorepublica/django-prodserver/commit/27a8cd9f9914c909b195851d8451013507a5a228))
+- Don't double-wrap server class with threadingmixin ([`b272ad2`](https://github.com/nanorepublica/django-prodserver/commit/b272ad2ceacf9d1da50c4f6af7448cec43f1a170))
+- Allow passing arguments without values ([`175cc01`](https://github.com/nanorepublica/django-prodserver/commit/175cc016aa6c86147d514a36c49d9fc55935b614))
 
 ## v2.4.0 (2025-12-04)
 
