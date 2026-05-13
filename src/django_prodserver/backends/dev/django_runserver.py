@@ -15,7 +15,9 @@ class DjangoRunserver(BaseRunserverBackend):
     match runserver's CLI flags 1:1::
 
         {
-            "BACKEND": "django_prodserver.backends.dev.django_runserver.DjangoRunserver",
+            "BACKEND": (
+                "django_prodserver.backends.dev.django_runserver.DjangoRunserver"
+            ),
             "ARGS": {
                 "addrport": "127.0.0.1:8000",
                 "ipv6": False,

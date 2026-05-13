@@ -382,7 +382,9 @@ class TestInitFlagCombinations:
 
 def test_backend_resolves_via_import_string():
     """The dispatcher uses import_string; ensure the dotted path resolves."""
-    cls = import_string("django_prodserver.backends.dev.django_runserver.DjangoRunserver")
+    cls = import_string(
+        "django_prodserver.backends.dev.django_runserver.DjangoRunserver"
+    )
     assert cls is DjangoRunserver
     instance = cls(ARGS={"addrport": "127.0.0.1:8000"})
     assert isinstance(instance, BaseServerBackend)

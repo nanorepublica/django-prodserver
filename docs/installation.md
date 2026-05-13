@@ -55,12 +55,12 @@ to work as an alias but will be removed in django-prodserver 4.0.0.
 
 ### Background Workers
 
-| Backend                                    | Best For                                             |
-| ------------------------------------------ | ---------------------------------------------------- |
-| {ref}`Celery <backend-celery-worker>`      | Distributed tasks, complex workflows, Redis/RabbitMQ |
-| {ref}`Celery Flower <backend-celery-flower>` | Monitoring/admin web UI for Celery clusters        |
-| {ref}`Django Tasks <backend-django-tasks>` | Simple tasks, no external dependencies               |
-| {ref}`Django-Q2 <backend-django-q2>`       | ORM-backed queues, scheduled tasks                   |
+| Backend                                      | Best For                                             |
+| -------------------------------------------- | ---------------------------------------------------- |
+| {ref}`Celery <backend-celery-worker>`        | Distributed tasks, complex workflows, Redis/RabbitMQ |
+| {ref}`Celery Flower <backend-celery-flower>` | Monitoring/admin web UI for Celery clusters          |
+| {ref}`Django Tasks <backend-django-tasks>`   | Simple tasks, no external dependencies               |
+| {ref}`Django-Q2 <backend-django-q2>`         | ORM-backed queues, scheduled tasks                   |
 
 ---
 

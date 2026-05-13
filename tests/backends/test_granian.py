@@ -351,7 +351,8 @@ class TestGranianWSGIServer:
 
         with patch("granian.Granian") as MockGranian:
             with patch(
-                "django_prodserver.backends.servers.granian.asgi_app_name", return_value="app"
+                "django_prodserver.backends.servers.granian.asgi_app_name",
+                return_value="app",
             ):
                 with patch(
                     "django_prodserver.backends.servers.granian.wsgi_app_name",

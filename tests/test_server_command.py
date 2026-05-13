@@ -24,7 +24,9 @@ class TestServerCommand(TestCase):
 
     @override_settings(
         PRODUCTION_PROCESSES={
-            "web": {"BACKEND": "django_prodserver.backends.servers.gunicorn.GunicornServer"}
+            "web": {
+                "BACKEND": "django_prodserver.backends.servers.gunicorn.GunicornServer"
+            }
         }
     )
     @patch("sys.argv", ["manage.py", "server", "web"])
@@ -98,7 +100,9 @@ class TestServerCommand(TestCase):
 
     @override_settings(
         PRODUCTION_PROCESSES={
-            "web": {"BACKEND": "django_prodserver.backends.servers.gunicorn.GunicornServer"},
+            "web": {
+                "BACKEND": "django_prodserver.backends.servers.gunicorn.GunicornServer"
+            },
             "worker": {"BACKEND": "django_prodserver.backends.celery.CeleryWorker"},
         }
     )
@@ -137,7 +141,9 @@ class TestServerCommand(TestCase):
 
     @override_settings(
         PRODUCTION_PROCESSES={
-            "web": {"BACKEND": "django_prodserver.backends.servers.gunicorn.GunicornServer"},
+            "web": {
+                "BACKEND": "django_prodserver.backends.servers.gunicorn.GunicornServer"
+            },
             "worker": {"BACKEND": "django_prodserver.backends.celery.CeleryWorker"},
         }
     )
@@ -160,7 +166,9 @@ class TestServerCommand(TestCase):
 
     @override_settings(
         PRODUCTION_PROCESSES={
-            "web": {"BACKEND": "django_prodserver.backends.servers.gunicorn.GunicornServer"}
+            "web": {
+                "BACKEND": "django_prodserver.backends.servers.gunicorn.GunicornServer"
+            }
         }
     )
     @patch("django_prodserver.management.base.import_string")
@@ -249,7 +257,9 @@ class TestServerCommand(TestCase):
 
     @override_settings(
         PRODUCTION_PROCESSES={
-            "web": {"BACKEND": "django_prodserver.backends.servers.gunicorn.GunicornServer"}
+            "web": {
+                "BACKEND": "django_prodserver.backends.servers.gunicorn.GunicornServer"
+            }
         }
     )
     @patch("django_prodserver.management.base.import_string")
@@ -320,8 +330,12 @@ class TestServerCommand(TestCase):
 
     @override_settings(
         PRODUCTION_PROCESSES={
-            "web1": {"BACKEND": "django_prodserver.backends.servers.gunicorn.GunicornServer"},
-            "web2": {"BACKEND": "django_prodserver.backends.servers.uvicorn.UvicornServer"},
+            "web1": {
+                "BACKEND": "django_prodserver.backends.servers.gunicorn.GunicornServer"
+            },
+            "web2": {
+                "BACKEND": "django_prodserver.backends.servers.uvicorn.UvicornServer"
+            },
             "worker": {"BACKEND": "django_prodserver.backends.celery.CeleryWorker"},
         }
     )
@@ -341,14 +355,14 @@ class TestServerCommand(TestCase):
 
     @override_settings(
         PRODUCTION_PROCESSES={
-            "web": {"BACKEND": "django_prodserver.backends.servers.gunicorn.GunicornServer"}
+            "web": {
+                "BACKEND": "django_prodserver.backends.servers.gunicorn.GunicornServer"
+            }
         }
     )
     def test_stdout_output_on_start(self):
         """Test that starting server outputs to stdout."""
-        with patch(
-            "django_prodserver.management.base.import_string"
-        ) as mock_import:
+        with patch("django_prodserver.management.base.import_string") as mock_import:
             # Mock the backend to prevent actual server starting
             mock_backend_class = Mock()
             mock_backend_instance = Mock()
@@ -436,7 +450,9 @@ class TestServerCommand(TestCase):
 
     @override_settings(
         PRODUCTION_PROCESSES={
-            "test": {"BACKEND": "django_prodserver.backends.servers.gunicorn.GunicornServer"}
+            "test": {
+                "BACKEND": "django_prodserver.backends.servers.gunicorn.GunicornServer"
+            }
         }
     )
     @patch("django_prodserver.management.base.import_string")

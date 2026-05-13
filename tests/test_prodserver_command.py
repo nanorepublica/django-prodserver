@@ -38,7 +38,9 @@ class TestProdserverDeprecation(TestCase):
 
     @override_settings(
         PRODUCTION_PROCESSES={
-            "web": {"BACKEND": "django_prodserver.backends.servers.gunicorn.GunicornServer"}
+            "web": {
+                "BACKEND": "django_prodserver.backends.servers.gunicorn.GunicornServer"
+            }
         }
     )
     def test_run_from_argv_emits_deprecation_warning(self):
@@ -54,7 +56,9 @@ class TestProdserverDeprecation(TestCase):
 
     @override_settings(
         PRODUCTION_PROCESSES={
-            "web": {"BACKEND": "django_prodserver.backends.servers.gunicorn.GunicornServer"}
+            "web": {
+                "BACKEND": "django_prodserver.backends.servers.gunicorn.GunicornServer"
+            }
         }
     )
     def test_run_from_argv_writes_warning_to_stderr(self):
@@ -68,7 +72,9 @@ class TestProdserverDeprecation(TestCase):
 
     @override_settings(
         PRODUCTION_PROCESSES={
-            "web": {"BACKEND": "django_prodserver.backends.servers.gunicorn.GunicornServer"}
+            "web": {
+                "BACKEND": "django_prodserver.backends.servers.gunicorn.GunicornServer"
+            }
         }
     )
     @patch("django_prodserver.management.base.import_string")
