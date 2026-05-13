@@ -1,5 +1,11 @@
 # Changelog
 
+## v3.0.0 (2026-05-13)
+
+### Features
+
+- V3.0.0 ([`c53a01e`](https://github.com/nanorepublica/django-prodserver/commit/c53a01ea249ec60333e5020617615fc9810b8b43))
+
 ## v2.5.0 (2026-05-13)
 
 ### Features
