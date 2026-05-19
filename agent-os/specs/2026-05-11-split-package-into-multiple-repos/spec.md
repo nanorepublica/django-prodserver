@@ -82,10 +82,25 @@ prerequisite).
 - Publishing anything to PyPI as part of the spike — prototypes can be built and
   installed locally / from git, but actual releases are a separate decision.
 
-## Shared Prerequisite (applies to every option)
+## Phase 0 — Prerequisite (do this first, regardless of which split wins)
 
-Before any repo/package split, land these on a base branch that all option
-branches fork from. None of this is breaking.
+This was previously framed as "Option C" alongside A and B. It is **not** an
+exploration track — it's a hard prerequisite that lands on its own branch and
+merges to `main` before any of the split-option branches are started. The split
+branches then fork from this work.
+
+Phase 0 is independently valuable: even if no further split ever happens, it
+delivers the entry-point contract requested in #71 (so external packages can
+register backends) and makes the core's dependency surface explicit.
+
+**Branch:** `claude/prodserver-entrypoint-foundation`
+
+**Scope is non-breaking:**
+
+- `PRODUCTION_PROCESSES["<name>"]["BACKEND"] = "django_prodserver.backends.gunicorn.GunicornServer"`
+  keeps working.
+- `pip install django-prodserver[gunicorn]` keeps working.
+- All current tests stay green; no adapter modules move yet.
 
 ### P1. Entry-point–based backend discovery
 
@@ -132,11 +147,32 @@ branches fork from. None of this is breaking.
 - Provide a `tox`/CI matrix story for "core only" vs "core + one adapter" vs
   "everything" so a contributor can run the slice they care about.
 
-## Options To Explore (one branch each)
+### P4. Document the plugin contract
+
+- Add `docs/extending.md` (or equivalent) describing the entry-point group,
+  what `BaseServerBackend` requires, and the satellite-package naming convention
+  decided in P2.
+- Add a tiny example out-of-tree adapter under `examples/` that registers itself
+  via entry points and is exercised in CI as smoke proof that the contract works.
+
+### Phase 0 done criteria
+
+- Entry-point registry lands; both short names and dotted paths resolve.
+- All existing tests green; no public-API breakage.
+- Core import graph contains no third-party deps beyond `django`
+  (assert this with a test).
+- `docs/extending.md` published; example adapter installs and runs in CI.
+- Branch is merged to `main`. All option branches below fork from it.
+
+## Split Options To Explore (one branch each, after Phase 0)
 
 Each option below should be prototyped far enough to answer the **decision
-criteria** at the bottom. Suggested branch names are given; the requester will
+criteria** further down. Suggested branch names are given; the requester will
 create/drive these branches.
+
+Note: the *packaging strategy* (next section) is an orthogonal axis — every
+option here should be tried under at least one packaging strategy, and ideally
+its preferred one.
 
 ### Option A — Full multi-repo
 
@@ -206,26 +242,85 @@ their own repos later (Option A) if an upstream bites.
 needs care (semantic-release config currently assumes one package); "merged into
 respective upstream repos" still requires a later move.
 
-### Option C — Single package, plugin-ready, no split (the "do less" option)
+> Option C from the previous draft ("single package, plugin-ready, no split") is
+> not an option anymore — that work is **Phase 0** above and happens regardless.
 
-**Branch:** `claude/split-plugin-only-spike`
+## Packaging Strategy (orthogonal to Option A vs B)
 
-- Land only the Shared Prerequisite (entry points + boundary cleanup + test
-  federation), keep shipping one `django-prodserver` distribution with the
-  current extras.
-- The payoff: third parties (including the upstream projects, if they want) can
-  publish their *own* adapter packages against the documented entry-point
-  contract, without us splitting anything. The "core" is already importable on
-  its own; we just document the subset that would go to Django.
-- Deliverables on the branch: the P1–P3 work, a `docs/extending.md` describing
-  the backend plugin contract and entry-point group, and an example out-of-tree
-  adapter package in `examples/` to prove the contract works.
+The repo-layout decision (A vs B) is independent from the *install UX* decision.
+The same code split can be shipped to PyPI in two distinct shapes, and the
+trade-offs are different enough that each split option's branch should pick one
+explicitly. These strategies are what determines what a user types when they
+install.
 
-**Pros:** smallest change, no release/CI multiplication, unblocks the ecosystem
-goal immediately, fully reversible.
-**Cons:** doesn't by itself achieve "core merged into Django" or "adapters in
-upstream repos" — it just makes both *possible* later. The big adapters
-(werkzeug, daphne, granian) still ship in the main distribution.
+### Strategy 1 — Umbrella extras preserved (recommended default)
+
+The user-facing install command is **unchanged**:
+
+```sh
+pip install django-prodserver[gunicorn]
+```
+
+But under the hood:
+
+- `django-prodserver` becomes a thin **umbrella distribution**. Its
+  `[project.optional-dependencies]` map extras to the satellite adapter
+  packages, not to the upstream server libraries directly:
+  ```toml
+  [project.optional-dependencies]
+  gunicorn = ["django-prodserver-gunicorn"]
+  uvicorn  = ["django-prodserver-uvicorn"]
+  # ...
+  ```
+- `django-prodserver-gunicorn` is the satellite, and it depends on `gunicorn`
+  itself. So the dependency chain resolves to
+  `django-prodserver → django-prodserver-gunicorn → gunicorn`, plus
+  `django-prodserver` pulling in `django-prodserver-core` (the actual core).
+- Existing `PRODUCTION_PROCESSES` dotted paths still resolve, because each
+  satellite ships a thin shim module at the old import path
+  (`django_prodserver.backends.gunicorn`) re-exporting the moved class.
+
+**Pros:** zero-friction migration; existing docs, blog posts, copilot
+suggestions, deployment scripts keep working with no edits; users don't need to
+know the split happened. This is the "same install experience, but installing
+the adapter package instead of the raw server" shape.
+**Cons:** more indirection in the dependency graph (one extra package per
+adapter); umbrella publishing has to be coordinated with adapter publishing
+(can't ship `django-prodserver 4.0` until the satellites it points at exist).
+
+### Strategy 2 — Direct install per package
+
+The user installs each piece explicitly:
+
+```sh
+pip install django-prodserver-core django-prodserver-gunicorn
+```
+
+`django-prodserver` (as a distribution name) is either retired, frozen, or kept
+as a deprecated meta-shim that prints a warning.
+
+**Pros:** cleanest dependency graph; easy to understand which adapter is in use;
+mirrors how `pytest` + `pytest-django` (or `sqlalchemy` + `psycopg2`) is
+typically installed.
+**Cons:** breaks today's install instructions and `[extras]` syntax in every
+existing deployment script and Dockerfile; requires a real deprecation period
+and a migration note; bad first-run UX for users who copy old README snippets.
+
+### Which strategy applies to which option
+
+- **Option A (multi-repo):** can adopt **either** strategy. Strategy 1 needs the
+  umbrella `django-prodserver` to live somewhere — likely this repo, now demoted
+  to "umbrella + core" or split further to "umbrella" vs "core" repos.
+- **Option B (monorepo workspace):** Strategy 1 is the natural fit (umbrella is
+  just another package in the workspace). Strategy 2 is also possible by simply
+  not publishing the umbrella package.
+
+The recommended default for the first spike is **Strategy 1 + Option B**: same
+install UX, no breaking change, split happens behind the extras. Strategy 2
+becomes interesting later if/when adapters get upstreamed into their host
+projects (e.g. gunicorn's repo starts shipping its own `django-prodserver`
+adapter), because then the umbrella's gunicorn extra would point at *that*
+upstream-owned package.
 
 ## Affected / Reference Files
 
@@ -269,10 +364,11 @@ Tests:
 - `tests/backends/*` (federate per P3), `tests/test_server_command.py`,
   `tests/test_conf.py`, `tests/test_utils.py`.
 
-## Decision Criteria (what each branch must let us judge)
+## Decision Criteria (what each option branch must let us judge)
 
 1. **Install ergonomics:** how many `pip install ...` lines does a typical user
-   need, and is the error message good when an adapter dep is missing?
+   need, and is the error message good when an adapter dep is missing? Document
+   under both packaging strategies.
 2. **Maintainer overhead:** number of release pipelines, CI jobs, and changelogs;
    does `semantic-release` still work, or does it need replacing?
 3. **Django-merge readiness:** can the core be built/tested/shipped with only
@@ -284,29 +380,42 @@ Tests:
 5. **Back-compat:** does an existing project with `PRODUCTION_PROCESSES` pointing
    at `django_prodserver.backends.gunicorn.GunicornServer` and
    `pip install django-prodserver[gunicorn]` keep working with no changes?
+   (Strategy 1 should make this trivially yes; Strategy 2 should document the
+   migration path.)
 6. **Reversibility:** how hard is it to undo / re-merge if the experiment fails?
 
 ## Recommendation (to be confirmed after the spikes)
 
-Start by landing the **Shared Prerequisite** (which is Option C in full). Then
-prototype **Option B (monorepo workspace)** as the primary candidate — it
-delivers the per-adapter install/versioning win and the "core is liftable into
-Django" story with the least disruption, while keeping the door open to Option A
-on a per-adapter basis whenever an upstream project agrees to host the adapter.
-Treat **Option A** as the long-term end state for individual adapters, not a
-big-bang migration.
+1. **Land Phase 0 first**, on its own branch and merged to `main`, before any
+   split spike begins. This delivers #71 by itself and is independently shippable.
+2. After Phase 0, prototype **Option B (monorepo workspace) + Strategy 1
+   (umbrella extras)** as the primary candidate — it delivers per-adapter
+   install/versioning + minimal deps + a clean "lift the core into Django" story
+   *without* changing the user-facing install command.
+3. Run a smaller spike for **Option A (multi-repo)** focused on the
+   `git filter-repo` extraction recipe and what an upstream-PR-ready adapter
+   looks like (e.g. a `django-prodserver-django-tasks` aimed at the django-tasks
+   repo). Use this to validate that A is reachable from B on a per-adapter basis.
+4. Treat **Option A** as the long-term end state for individual adapters that
+   upstreams accept — not a big-bang migration.
+5. **Strategy 2 (direct install)** is deferred: revisit once enough adapters
+   live upstream that the umbrella stops adding value.
 
 ## Success Criteria
 
-- A base branch exists with entry-point discovery + boundary cleanup + a
-  federated test plan, with no breaking change to `PRODUCTION_PROCESSES` and all
-  existing tests green.
-- Three exploration branches exist (A, B, C), each with enough working code to
-  answer the decision criteria, plus a short `FINDINGS.md` on each branch.
-- A written comparison (this spec updated, or a follow-up doc) recommending one
-  option, with explicit answers to the six decision criteria.
-- The core package's dependency closure is demonstrably just `django` in
-  whichever option(s) implement a separate core.
+- **Phase 0** is merged to `main`: entry-point discovery + boundary cleanup +
+  test federation + plugin-contract docs, with no breaking change to
+  `PRODUCTION_PROCESSES` and all existing tests green.
+- **Option-B branch** exists with a working uv workspace; `django-prodserver-core`
+  builds with only `django` as a dep; at least two adapter packages
+  (`gunicorn` + one worker) build and install via Strategy 1's umbrella extras;
+  CI runs the federated test matrix from P3.
+- **Option-A branch** exists with a documented `git filter-repo` extraction
+  recipe and at least one extracted adapter working when installed from a
+  sibling directory.
+- Each branch has a short `FINDINGS.md` answering the six decision criteria.
+- A written comparison (this spec updated, or a follow-up doc) names a winner
+  and confirms the packaging strategy.
 - Docs describe the chosen install story and the backend plugin contract.
 
 ## Risks & Mitigations
@@ -315,8 +424,9 @@ big-bang migration.
   package; multi-package publishing needs new config or a different tool.
   *Mitigation:* spike this explicitly on the Option B branch before committing.
 - **Discoverability regression:** users currently find everything via one
-  package + extras. *Mitigation:* keep an umbrella `django-prodserver`
-  distribution that pulls adapters via extras (Options A2 and B).
+  package + extras. *Mitigation:* default to **Packaging Strategy 1** (umbrella
+  extras preserved) under whichever split option wins, so
+  `pip install django-prodserver[gunicorn]` keeps working.
 - **History loss on extraction:** *Mitigation:* use `git filter-repo` (document
   the recipe on the Option A branch) rather than fresh repos.
 - **Upstreams say no:** gunicorn/uvicorn/celery may not want a Django-specific
