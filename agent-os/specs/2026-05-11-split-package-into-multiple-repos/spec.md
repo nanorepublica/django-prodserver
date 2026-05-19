@@ -6,6 +6,20 @@ Exploratory spec. The goal of this spec is to **evaluate** structural options by
 prototyping each on its own branch, then pick one. It is intentionally written as
 parallel exploration tracks rather than a single linear implementation plan.
 
+## Related Issues
+
+- [#98](https://github.com/nanorepublica/django-prodserver/issues/98) —
+  "Splitting out the backends and the core API". This is the parent issue this
+  spec addresses: explore a future where the core API + commands can be merged
+  into Django, with each backend ideally merged into its individual upstream
+  project, and (as an immediate step) break the backends out into their own
+  package(s). Raised by Jake at DjangoCon Europe.
+- [#71](https://github.com/nanorepublica/django-prodserver/issues/71) —
+  "Entrypoint support for backends". Directly satisfied by the shared
+  prerequisite below; requested so external packages (e.g. Chancy) can register
+  backends without end-user setup. Useful on its own even if the package is
+  never split.
+
 ## Goal
 
 Restructure django-prodserver so that:
@@ -50,10 +64,9 @@ actually depends on the adapters being in the same distribution — `import_stri
 in `server.py:99` will happily import a backend class from any installed package.
 That is what makes the split feasible.
 
-This work is also aligned with roadmap items **#71 "Entrypoint support for
-backends"** and **#20 "plugin system for third-party backends"** — the plugin
-discovery mechanism described below is a hard prerequisite for any of the split
-options, and is useful on its own even if the repo is never split.
+See the **Related Issues** section above for the GitHub issues this spec
+addresses (#98 is the driver; #71 is satisfied as a side-effect of the shared
+prerequisite).
 
 ## Non-Goals / Out of Scope
 
