@@ -200,6 +200,7 @@ class TestWorkerCommand(TestCase):
         mock_backend_class = Mock()
         mock_backend_instance = Mock()
         mock_backend_instance.accepts_extra_args = True
+        mock_backend_instance.overridden_args.return_value = []
         mock_backend_instance.prep_server_args.return_value = []
         mock_backend_class.return_value = mock_backend_instance
         mock_import_string.return_value = mock_backend_class

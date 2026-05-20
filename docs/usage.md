@@ -33,12 +33,35 @@ python manage.py server web --skip-checks
 ### Forwarding arguments to the backend
 
 Arguments that the command does not recognise are forwarded to the underlying
-process (gunicorn, uvicorn, waitress, celery, ...) and appended after the
-`ARGS` configured in `PRODUCTION_PROCESSES`:
+process (gunicorn, uvicorn, waitress, celery, ...). This is an escape hatch for
+tweaking a process without editing settings — for example, raising a timeout or
+the worker count while debugging a production issue:
 
 ```bash
 python manage.py server web --timeout=120
 ```
+
+A command-line argument **takes precedence** over an argument with the same
+name configured in `PRODUCTION_PROCESSES`. The configured value is dropped and
+a notice is printed so the override is visible:
+
+```python
+PRODUCTION_PROCESSES = {
+    "web": {
+        "BACKEND": "django_prodserver.backends.servers.gunicorn.GunicornServer",
+        "ARGS": {"bind": "0.0.0.0:8000", "workers": "4"},
+    }
+}
+```
+
+```bash
+# Starts with workers=2 (the CLI value), not workers=4
+python manage.py server web --workers=2
+```
+
+Precedence is matched on the long option name (`--workers`). A short option
+passed on the command line (`-w 2`) cannot be matched against a configured
+long option and would be passed alongside it.
 
 Backends that build their server programmatically rather than from a
 command line — Granian and the `devserver`-style runserver backends — cannot

@@ -139,6 +139,15 @@ class BaseProcessCommand(BaseCommand):
                 f"extra command-line arguments: {' '.join(extra_args)}"
             )
 
+        if extra_args:
+            for overridden in backend.overridden_args(extra_args):
+                self.stdout.write(
+                    self.style.WARNING(
+                        f"Overriding configured argument '{overridden}' with "
+                        "command-line value"
+                    )
+                )
+
         self.stdout.write(
             self.style.NOTICE(f"Starting {self.process_label} named {process_name}")
         )

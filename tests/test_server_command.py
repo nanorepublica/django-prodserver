@@ -537,6 +537,7 @@ class TestServerCommand(TestCase):
         mock_backend_class = Mock()
         mock_backend_instance = Mock()
         mock_backend_instance.accepts_extra_args = True
+        mock_backend_instance.overridden_args.return_value = []
         mock_backend_instance.prep_server_args.return_value = []
         mock_backend_class.return_value = mock_backend_instance
         mock_import_string.return_value = mock_backend_class
@@ -550,6 +551,30 @@ class TestServerCommand(TestCase):
             ["--timeout=120", "--reload"]
         )
         mock_exit.assert_not_called()
+
+    @override_settings(
+        PRODUCTION_PROCESSES={
+            "web": {
+                "BACKEND": "django_prodserver.backends.servers.gunicorn.GunicornServer",
+                "ARGS": {"workers": "2", "timeout": "30"},
+            }
+        }
+    )
+    @patch("django_prodserver.management.base.import_string")
+    def test_start_process_notifies_when_cli_overrides_config(self, mock_import_string):
+        """A notice is printed when a CLI arg overrides a configured one."""
+        from django_prodserver.backends.servers.gunicorn import GunicornServer
+
+        mock_import_string.return_value = GunicornServer
+
+        with patch.object(GunicornServer, "start_server") as mock_start:
+            self.command.start_process("web", extra_args=["--workers=4"])
+
+        output = self.command.stdout.getvalue()
+        assert "Overriding configured argument '--workers=2'" in output
+        assert "--timeout" not in output  # not overridden, so no notice
+        # The configured --workers is dropped; the CLI value is kept.
+        mock_start.assert_called_once_with("--timeout=30", "--workers=4")
 
     @override_settings(
         PRODUCTION_PROCESSES={

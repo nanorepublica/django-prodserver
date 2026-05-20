@@ -2,6 +2,19 @@ from collections.abc import Collection, Mapping
 from typing import Any
 
 
+def _option_name(token: str) -> str | None:
+    """
+    Return the option name for a command-line token.
+
+    The name is the text before any ``=`` (e.g. ``--bind`` for
+    ``--bind=0.0.0.0:8000``). Tokens that are not options -- they do not start
+    with ``-``, such as a bare value in ``--timeout 30`` -- return ``None``.
+    """
+    if not token.startswith("-"):
+        return None
+    return token.split("=", 1)[0]
+
+
 class BaseProcessBackend:
     """
     Base class to configure an individual process backend.
@@ -40,10 +53,29 @@ class BaseProcessBackend:
         Here we customisation of the arguments passed to the server process.
 
         Typically this is where fixed arguments are inserted into the args.
-        ``extra_args`` holds any arguments forwarded from the command line and
-        is appended after the arguments configured in settings.
+        ``extra_args`` holds any arguments forwarded from the command line.
+        They are appended after the arguments configured in settings and take
+        precedence over any configured argument that shares the same option
+        name.
         """
-        return [*self.args, *extra_args]
+        return [*self._configured_args(extra_args), *extra_args]
+
+    def overridden_args(self, extra_args: Collection[str] = ()) -> list[str]:
+        """
+        Return the configured args that ``extra_args`` overrides.
+
+        A configured argument is overridden when ``extra_args`` contains an
+        option with the same name, so the command-line value wins.
+        """
+        cli_options = {
+            name for name in map(_option_name, extra_args) if name is not None
+        }
+        return [arg for arg in self.args if _option_name(arg) in cli_options]
+
+    def _configured_args(self, extra_args: Collection[str]) -> list[str]:
+        """Return configured args with anything overridden by ``extra_args`` dropped."""
+        overridden = set(self.overridden_args(extra_args))
+        return [arg for arg in self.args if arg not in overridden]
 
     def _format_server_args_from_dict(
         self, args: str | Mapping[str, str | Collection[str] | None]

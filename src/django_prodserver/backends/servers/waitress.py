@@ -26,4 +26,9 @@ class WaitressServer(BaseServerBackend):
         positional argument, so forwarded ``extra_args`` are inserted before
         it alongside the settings-configured options.
         """
-        return ["waitress", *self.args, *extra_args, wsgi_app_name()]
+        return [
+            "waitress",
+            *self._configured_args(extra_args),
+            *extra_args,
+            wsgi_app_name(),
+        ]

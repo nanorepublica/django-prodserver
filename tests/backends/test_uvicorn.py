@@ -48,6 +48,17 @@ class TestUvicornServer:
         assert args == ["tests.asgi:application"]
         mock_asgi_app_name.assert_called_once()
 
+    @patch(
+        "django_prodserver.backends.servers.uvicorn.asgi_app_name",
+        return_value="tests.asgi:application",
+    )
+    def test_prep_server_args_cli_overrides_configured(self, mock_asgi_app_name):
+        """A CLI arg replaces the matching configured arg, app name stays first."""
+        server = UvicornServer(ARGS={"host": "127.0.0.1", "port": "8000"})
+        args = server.prep_server_args(["--port=9000"])
+
+        assert args == ["tests.asgi:application", "--host=127.0.0.1", "--port=9000"]
+
     @patch("django_prodserver.backends.servers.uvicorn.uvicorn.main.main")
     def test_start_server(self, mock_uvicorn_main):
         """Test start_server method."""
