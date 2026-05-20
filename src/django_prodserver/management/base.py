@@ -39,7 +39,7 @@ class BaseProcessCommand(BaseCommand):
                 "Check the documentation to configure this setting correctly."
             ) from None
         try:
-            default = next(iter(choices))
+            default = next(iter(self._matching_process_names()))
         except StopIteration:
             raise CommandError(
                 f"No {self.process_label}s configured in the PRODUCTION_PROCESSES "
@@ -54,6 +54,51 @@ class BaseProcessCommand(BaseCommand):
             default=default,
         )
         parser.add_argument("--list", action="store_true")
+
+    def _matching_process_names(self) -> list[str]:
+        """
+        Return the configured process names runnable by this command.
+
+        Each configured backend is imported and classified as a server or
+        worker backend; names whose backend subclasses
+        :attr:`backend_base_class` are returned. A misconfigured or
+        unclassifiable backend raises :class:`CommandError` so the problem
+        surfaces instead of being silently hidden.
+        """
+        try:
+            processes = app_settings.PRODUCTION_PROCESSES.items()
+        except AttributeError:
+            raise CommandError(
+                "PRODUCTION_PROCESSES setting has been configured incorrectly.\n"
+                "Check the documentation to configure this setting correctly."
+            ) from None
+
+        matching = []
+        for process_name, process_config in processes:
+            try:
+                backend_path = process_config["BACKEND"]
+            except KeyError:
+                raise CommandError(
+                    f"Backend not configured for process named '{process_name}'"
+                ) from None
+            try:
+                backend_class = import_string(backend_path)
+            except ImportError as e:
+                raise CommandError(
+                    f"Backend '{backend_path}' configured for process named "
+                    f"'{process_name}' could not be imported: {e}"
+                ) from None
+            if not (
+                isinstance(backend_class, type)
+                and issubclass(backend_class, (BaseServerBackend, BaseWorkerBackend))
+            ):
+                raise CommandError(
+                    f"Backend '{backend_path}' configured for process named "
+                    f"'{process_name}' is not a server or worker backend."
+                )
+            if issubclass(backend_class, self.backend_base_class):
+                matching.append(process_name)
+        return matching
 
     def run_from_argv(self, argv: list[str]) -> None:
         """
@@ -149,7 +194,7 @@ class BaseProcessCommand(BaseCommand):
 
     def list_process_names(self) -> None:
         """Simple function to return a list of the configured processes."""
-        available = "\n ".join(app_settings.PRODUCTION_PROCESSES.keys())
+        available = "\n ".join(self._matching_process_names())
         self.stdout.write(
             self.style.SUCCESS(
                 f"Available {self.process_label} process names are:\n {available}"

@@ -128,7 +128,8 @@ python manage.py worker worker
 Both commands read from the same `PRODUCTION_PROCESSES` setting; `server` only accepts
 server backends and `worker` only accepts worker backends. If you point one at the wrong
 kind of backend it will tell you which command to use instead. Run either command with
-`--list` to see the configured process names.
+`--list` to see its configured process names: `server --list` shows only server
+backends and `worker --list` shows only worker backends.
 
 > **Deprecated:** `python manage.py prodserver` continues to work as an alias but is deprecated and will be removed in django-prodserver 4.0.0. Use `python manage.py server` instead.
 

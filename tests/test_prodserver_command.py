@@ -8,7 +8,7 @@ tests here verify that the deprecated alias still works AND emits a
 
 import warnings
 from io import StringIO
-from unittest.mock import Mock, patch
+from unittest.mock import patch
 
 from django.test import TestCase, override_settings
 
@@ -19,6 +19,7 @@ from django_prodserver.management.commands.prodserver import (
     Command as ProdServerCommand,
 )
 from django_prodserver.management.commands.server import Command as ServerCommand
+from tests.test_server_command import DUMMY_SERVER, _DummyServerBackend
 
 
 class TestProdserverDeprecation(TestCase):
@@ -36,13 +37,7 @@ class TestProdserverDeprecation(TestCase):
     def test_command_instance_creation(self):
         assert isinstance(self.command, ProdServerCommand)
 
-    @override_settings(
-        PRODUCTION_PROCESSES={
-            "web": {
-                "BACKEND": "django_prodserver.backends.servers.gunicorn.GunicornServer"
-            }
-        }
-    )
+    @override_settings(PRODUCTION_PROCESSES={"web": {"BACKEND": DUMMY_SERVER}})
     def test_run_from_argv_emits_deprecation_warning(self):
         """Running `prodserver --list` must raise a DeprecationWarning."""
         with warnings.catch_warnings(record=True) as caught:
@@ -54,13 +49,7 @@ class TestProdserverDeprecation(TestCase):
         assert "prodserver" in str(deprecations[0].message)
         assert "server" in str(deprecations[0].message)
 
-    @override_settings(
-        PRODUCTION_PROCESSES={
-            "web": {
-                "BACKEND": "django_prodserver.backends.servers.gunicorn.GunicornServer"
-            }
-        }
-    )
+    @override_settings(PRODUCTION_PROCESSES={"web": {"BACKEND": DUMMY_SERVER}})
     def test_run_from_argv_writes_warning_to_stderr(self):
         """The deprecation must also be visible to humans on stderr."""
         with warnings.catch_warnings():
@@ -70,27 +59,17 @@ class TestProdserverDeprecation(TestCase):
         assert "DeprecationWarning" in self.command.stderr.getvalue()
         assert "prodserver" in self.command.stderr.getvalue()
 
-    @override_settings(
-        PRODUCTION_PROCESSES={
-            "web": {
-                "BACKEND": "django_prodserver.backends.servers.gunicorn.GunicornServer"
-            }
-        }
-    )
-    @patch("django_prodserver.management.base.import_string")
-    def test_run_from_argv_still_starts_server(self, mock_import_string):
+    @override_settings(PRODUCTION_PROCESSES={"web": {"BACKEND": DUMMY_SERVER}})
+    def test_run_from_argv_still_starts_server(self):
         """Despite the warning, the command must still start the server."""
-        mock_backend_class = Mock()
-        mock_backend_instance = Mock()
-        mock_backend_instance.prep_server_args.return_value = []
-        mock_backend_class.return_value = mock_backend_instance
-        mock_import_string.return_value = mock_backend_class
-
-        with warnings.catch_warnings():
+        with (
+            warnings.catch_warnings(),
+            patch.object(_DummyServerBackend, "start_server") as mock_start,
+        ):
             warnings.simplefilter("always")
             self.command.run_from_argv(["manage.py", "prodserver", "web"])
 
-        mock_backend_instance.start_server.assert_called_once()
+        mock_start.assert_called_once()
 
     def test_deprecation_message_mentions_removal_version(self):
         """The deprecation message must point users to `server` and 4.0.0."""

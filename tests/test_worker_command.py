@@ -80,13 +80,59 @@ class TestWorkerCommand(TestCase):
         }
     )
     def test_list_process_names(self):
-        """Test list_process_names method."""
+        """`list_process_names` shows workers and omits servers."""
         self.command.list_process_names()
 
         output = self.command.stdout.getvalue()
-        assert "web" in output
         assert "worker" in output
+        assert "web" not in output
         assert "Available worker process names are:" in output
+
+    @override_settings(
+        PRODUCTION_PROCESSES={
+            "web": {"BACKEND": DUMMY_SERVER},
+            "worker": {"BACKEND": DJANGO_TASKS_WORKER},
+        }
+    )
+    def test_default_skips_non_worker_backends(self):
+        """The no-argument default is the first worker backend, not a server."""
+        parser = MagicMock()
+        self.command.add_arguments(parser)
+
+        _, kwargs = parser.add_argument.call_args_list[0]
+        assert kwargs["default"] == "worker"
+
+    @override_settings(PRODUCTION_PROCESSES={"web": {"BACKEND": DUMMY_SERVER}})
+    def test_add_arguments_no_worker_backends(self):
+        """add_arguments fails when only server backends are configured."""
+        with pytest.raises(CommandError) as exc_info:
+            self.command.add_arguments(MagicMock())
+
+        assert "No workers configured in the PRODUCTION_PROCESSES setting" in str(
+            exc_info.value
+        )
+
+    @override_settings(
+        PRODUCTION_PROCESSES={
+            "worker": {"BACKEND": "django_prodserver.missing.Backend"}
+        }
+    )
+    def test_list_raises_on_unimportable_backend(self):
+        """A backend that cannot be imported surfaces as a CommandError."""
+        with pytest.raises(CommandError) as exc_info:
+            self.command.list_process_names()
+
+        assert "could not be imported" in str(exc_info.value)
+
+    @override_settings(PRODUCTION_PROCESSES={"worker": {}})
+    def test_list_raises_on_missing_backend(self):
+        """A process configured without a BACKEND key surfaces as a CommandError."""
+        with pytest.raises(CommandError) as exc_info:
+            self.command.list_process_names()
+
+        assert "Backend not configured for process named 'worker'" in str(
+            exc_info.value
+        )
 
     @override_settings(PRODUCTION_PROCESSES=ONE_WORKER)
     @patch("django.core.management.call_command")
@@ -133,24 +179,27 @@ class TestWorkerCommand(TestCase):
         assert "Backend not configured for worker named worker" in str(exc_info.value)
 
     @override_settings(PRODUCTION_PROCESSES=ONE_WORKER)
-    @patch("django_prodserver.management.base.import_string")
     @patch("sys.exit")
-    def test_run_from_argv_command_error(self, mock_exit, mock_import_string):
+    def test_run_from_argv_command_error(self, mock_exit):
         """Test run_from_argv converts CommandError to an exit code."""
-        mock_import_string.side_effect = CommandError("boom")
+        with patch.object(self.command, "start_process") as mock_start:
+            mock_start.side_effect = CommandError("boom")
 
-        self.command.run_from_argv(["manage.py", "worker", "worker"])
+            self.command.run_from_argv(["manage.py", "worker", "worker"])
 
         mock_exit.assert_called_with(1)
 
     @override_settings(PRODUCTION_PROCESSES=ONE_WORKER)
-    @patch("django_prodserver.management.base.import_string")
-    def test_run_from_argv_list_option(self, mock_import_string):
-        """Test run_from_argv with --list option short-circuits."""
-        with patch.object(self.command, "list_process_names") as mock_list:
+    def test_run_from_argv_list_option(self):
+        """Test run_from_argv with --list option lists without starting."""
+        with (
+            patch.object(self.command, "list_process_names") as mock_list,
+            patch.object(self.command, "start_process") as mock_start,
+        ):
             self.command.run_from_argv(["manage.py", "worker", "--list"])
-            mock_list.assert_called_once()
-        mock_import_string.assert_not_called()
+
+        mock_list.assert_called_once()
+        mock_start.assert_not_called()
 
     @override_settings(PRODUCTION_PROCESSES=ONE_WORKER)
     @patch("django_prodserver.management.base.import_string")

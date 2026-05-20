@@ -3,14 +3,45 @@ from unittest.mock import MagicMock, Mock, patch
 
 import pytest
 from django.core.management import CommandError, call_command
-from django.core.management.base import SystemCheckError
+from django.core.management.base import OutputWrapper, SystemCheckError
 from django.test import TestCase, override_settings
 
+from django_prodserver.backends.base import (
+    BaseProcessBackend,
+    BaseServerBackend,
+    BaseWorkerBackend,
+)
 from django_prodserver.management.commands.devserver import Command as DevServerCommand
 from django_prodserver.management.commands.server import Command
 from django_prodserver.management.commands.server import (
     Command as ServerCommand,
 )
+
+
+class _DummyServerBackend(BaseServerBackend):
+    """An importable server backend used to exercise the server command."""
+
+    def start_server(self, *args: str) -> None:
+        """Start nothing; command tests patch this when they need to."""
+
+
+class _DummyWorkerBackend(BaseWorkerBackend):
+    """An importable worker backend used to exercise backend classification."""
+
+    def start_server(self, *args: str) -> None:  # pragma: no cover - never run
+        raise AssertionError("the server command must not start a worker backend")
+
+
+class _DummyBareBackend(BaseProcessBackend):
+    """A backend that is neither a server nor a worker backend."""
+
+    def start_server(self, *args: str) -> None:  # pragma: no cover - never run
+        raise AssertionError("a bare process backend is not runnable")
+
+
+DUMMY_SERVER = "tests.test_server_command._DummyServerBackend"
+DUMMY_WORKER = "tests.test_server_command._DummyWorkerBackend"
+DUMMY_BARE = "tests.test_server_command._DummyBareBackend"
 
 
 class TestServerCommand(TestCase):
@@ -53,19 +84,19 @@ class TestServerCommand(TestCase):
 
     @override_settings(
         PRODUCTION_PROCESSES={
-            "web-1": {"BACKEND": "test.backend.1"},
-            "web-2": {"BACKEND": "test.backend.2"},
-            "worker-1": {"BACKEND": "test.backend.3"},
+            "web-1": {"BACKEND": DUMMY_SERVER},
+            "web-2": {"BACKEND": DUMMY_SERVER},
+            "worker-1": {"BACKEND": DUMMY_WORKER},
         }
     )
     def test_multiple_server_configurations(self):
-        """Test handling of multiple server configurations."""
+        """`--list` shows server processes and omits worker processes."""
         self.command.run_from_argv(["manage.py", "server", "--list"])
 
         output = self.command.stdout.getvalue()
         assert "web-1" in output
         assert "web-2" in output
-        assert "worker-1" in output
+        assert "worker-1" not in output
 
     def test_command_error_handling(self):
         """Test various error conditions in commands."""
@@ -100,10 +131,8 @@ class TestServerCommand(TestCase):
 
     @override_settings(
         PRODUCTION_PROCESSES={
-            "web": {
-                "BACKEND": "django_prodserver.backends.servers.gunicorn.GunicornServer"
-            },
-            "worker": {"BACKEND": "django_prodserver.backends.celery.CeleryWorker"},
+            "web": {"BACKEND": DUMMY_SERVER},
+            "worker": {"BACKEND": DUMMY_WORKER},
         }
     )
     def test_add_arguments_with_choices(self):
@@ -126,34 +155,31 @@ class TestServerCommand(TestCase):
         assert args[0] == "--list"
         assert kwargs["action"] == "store_true"
 
-    @override_settings(PRODUCTION_PROCESSES={"test": {}})
-    def test_add_arguments_empty_choices(self):
-        """Test add_arguments with empty PRODUCTION_PROCESSES."""
+    @override_settings(PRODUCTION_PROCESSES={"test": {"BACKEND": DUMMY_SERVER}})
+    def test_add_arguments_single_process(self):
+        """Test add_arguments with a single configured process."""
         parser = MagicMock()
 
-        # Should not raise error even with empty choices
         self.command.add_arguments(parser)
 
         calls = parser.add_argument.call_args_list
         server_name_call = calls[0]
-        args, kwargs = server_name_call
+        _, kwargs = server_name_call
         assert list(kwargs["choices"]) == ["test"]
 
     @override_settings(
         PRODUCTION_PROCESSES={
-            "web": {
-                "BACKEND": "django_prodserver.backends.servers.gunicorn.GunicornServer"
-            },
-            "worker": {"BACKEND": "django_prodserver.backends.celery.CeleryWorker"},
+            "web": {"BACKEND": DUMMY_SERVER},
+            "worker": {"BACKEND": DUMMY_WORKER},
         }
     )
     def test_list_process_names(self):
-        """Test list_process_names method."""
+        """`list_process_names` shows servers and omits workers."""
         self.command.list_process_names()
 
         output = self.command.stdout.getvalue()
         assert "web" in output
-        assert "worker" in output
+        assert "worker" not in output
         assert "Available server process names are:" in output
 
     @override_settings(PRODUCTION_PROCESSES={})
@@ -246,6 +272,7 @@ class TestServerCommand(TestCase):
             ARGS={"bind": "0.0.0.0:8000"},
         )
 
+    @override_settings(PRODUCTION_PROCESSES={"web": {"BACKEND": DUMMY_SERVER}})
     @patch("sys.exit")
     def test_run_from_argv_list_option(self, mock_exit):
         """Test run_from_argv with --list option."""
@@ -255,51 +282,40 @@ class TestServerCommand(TestCase):
             # Should return early and not call sys.exit
             mock_exit.assert_not_called()
 
-    @override_settings(
-        PRODUCTION_PROCESSES={
-            "web": {
-                "BACKEND": "django_prodserver.backends.servers.gunicorn.GunicornServer"
-            }
-        }
-    )
-    @patch("django_prodserver.management.base.import_string")
+    @override_settings(PRODUCTION_PROCESSES={"web": {"BACKEND": DUMMY_SERVER}})
     @patch("sys.exit")
-    def test_run_from_argv_start_server(self, mock_exit, mock_import_string):
+    def test_run_from_argv_start_server(self, mock_exit):
         """Test run_from_argv starting a server."""
-        mock_backend_class = Mock()
-        mock_backend_instance = Mock()
-        mock_backend_instance.prep_server_args.return_value = []
-        mock_backend_class.return_value = mock_backend_instance
-        mock_import_string.return_value = mock_backend_class
+        with patch.object(_DummyServerBackend, "start_server") as mock_start:
+            self.command.run_from_argv(["manage.py", "server", "web"])
 
-        self.command.run_from_argv(["manage.py", "server", "web"])
-
-        mock_backend_instance.start_server.assert_called_once()
+        mock_start.assert_called_once()
         mock_exit.assert_not_called()
 
+    @override_settings(PRODUCTION_PROCESSES={"web": {"BACKEND": DUMMY_SERVER}})
     @patch("sys.exit")
     def test_run_from_argv_command_error(self, mock_exit):
         """Test run_from_argv with CommandError."""
         with patch.object(self.command, "start_process") as mock_start:
             mock_start.side_effect = CommandError("Test error")
 
-            self.command.run_from_argv(["manage.py", "server", "nonexistent"])
+            self.command.run_from_argv(["manage.py", "server", "web"])
 
             mock_exit.assert_called_with(1)
 
+    @override_settings(PRODUCTION_PROCESSES={"web": {"BACKEND": DUMMY_SERVER}})
     @patch("sys.exit")
     def test_run_from_argv_system_check_error(self, mock_exit):
         """Test run_from_argv with SystemCheckError."""
+        self.command.stderr = OutputWrapper(StringIO())
         with patch.object(self.command, "start_process") as mock_start:
-            mock_start.side_effect = lambda *x, **y: SystemCheckError(
-                "System check failed"
-            )
+            mock_start.side_effect = SystemCheckError("System check failed")
 
             self.command.run_from_argv(["manage.py", "server", "web"])
 
-            mock_exit.assert_called_with(2)
+            mock_exit.assert_called_with(1)
 
-    @override_settings(PRODUCTION_PROCESSES={"web": {"BACKEND": "test.backend"}})
+    @override_settings(PRODUCTION_PROCESSES={"web": {"BACKEND": DUMMY_SERVER}})
     @patch("sys.exit")
     def test_run_from_argv_traceback_option(self, mock_exit):
         """Test run_from_argv with --traceback option."""
@@ -319,6 +335,7 @@ class TestServerCommand(TestCase):
             # Should not call sys.exit when traceback is requested
             mock_exit.assert_not_called()
 
+    @override_settings(PRODUCTION_PROCESSES={"web": {"BACKEND": DUMMY_SERVER}})
     def test_called_from_command_line_attribute(self):
         """Test that _called_from_command_line is set correctly."""
         assert hasattr(self.command, "_called_from_command_line")
@@ -330,13 +347,9 @@ class TestServerCommand(TestCase):
 
     @override_settings(
         PRODUCTION_PROCESSES={
-            "web1": {
-                "BACKEND": "django_prodserver.backends.servers.gunicorn.GunicornServer"
-            },
-            "web2": {
-                "BACKEND": "django_prodserver.backends.servers.uvicorn.UvicornServer"
-            },
-            "worker": {"BACKEND": "django_prodserver.backends.celery.CeleryWorker"},
+            "web1": {"BACKEND": DUMMY_SERVER},
+            "web2": {"BACKEND": DUMMY_SERVER},
+            "worker": {"BACKEND": DUMMY_WORKER},
         }
     )
     def test_default_server_selection(self):
@@ -346,7 +359,7 @@ class TestServerCommand(TestCase):
 
         calls = parser.add_argument.call_args_list
         server_name_call = calls[0]
-        args, kwargs = server_name_call
+        _, kwargs = server_name_call
 
         # Should have a default value (first in choices)
         assert "default" in kwargs
@@ -375,6 +388,7 @@ class TestServerCommand(TestCase):
         output = self.command.stdout.getvalue()
         assert "Starting server named web" in output
 
+    @override_settings(PRODUCTION_PROCESSES={"web": {"BACKEND": DUMMY_SERVER}})
     def test_server_name_argument_properties(self):
         """Test server_name argument properties."""
         parser = MagicMock()
@@ -487,3 +501,53 @@ class TestServerCommand(TestCase):
         assert "Configure your servers before running this command" in str(
             exc_info.value
         )
+
+    @override_settings(
+        PRODUCTION_PROCESSES={
+            "worker": {"BACKEND": DUMMY_WORKER},
+            "web": {"BACKEND": DUMMY_SERVER},
+        }
+    )
+    def test_default_skips_non_server_backends(self):
+        """The no-argument default is the first server backend, not a worker."""
+        parser = MagicMock()
+        self.command.add_arguments(parser)
+
+        _, kwargs = parser.add_argument.call_args_list[0]
+        assert kwargs["default"] == "web"
+
+    @override_settings(PRODUCTION_PROCESSES={"worker": {"BACKEND": DUMMY_WORKER}})
+    def test_add_arguments_no_server_backends(self):
+        """add_arguments fails when only worker backends are configured."""
+        with pytest.raises(CommandError) as exc_info:
+            self.command.add_arguments(MagicMock())
+
+        assert "No servers configured in the PRODUCTION_PROCESSES setting" in str(
+            exc_info.value
+        )
+
+    @override_settings(
+        PRODUCTION_PROCESSES={"web": {"BACKEND": "django_prodserver.missing.Backend"}}
+    )
+    def test_list_raises_on_unimportable_backend(self):
+        """A backend that cannot be imported surfaces as a CommandError."""
+        with pytest.raises(CommandError) as exc_info:
+            self.command.list_process_names()
+
+        assert "could not be imported" in str(exc_info.value)
+
+    @override_settings(PRODUCTION_PROCESSES={"web": {}})
+    def test_list_raises_on_missing_backend(self):
+        """A process configured without a BACKEND key surfaces as a CommandError."""
+        with pytest.raises(CommandError) as exc_info:
+            self.command.list_process_names()
+
+        assert "Backend not configured for process named 'web'" in str(exc_info.value)
+
+    @override_settings(PRODUCTION_PROCESSES={"web": {"BACKEND": DUMMY_BARE}})
+    def test_list_raises_on_non_process_backend(self):
+        """A backend that is neither a server nor a worker is rejected."""
+        with pytest.raises(CommandError) as exc_info:
+            self.command.list_process_names()
+
+        assert "is not a server or worker backend" in str(exc_info.value)
