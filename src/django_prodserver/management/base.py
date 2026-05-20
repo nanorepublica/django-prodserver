@@ -1,6 +1,6 @@
 import sys
 from argparse import ArgumentParser
-from collections.abc import Mapping
+from collections.abc import Collection
 
 from django.core.management import BaseCommand, CommandError, handle_default_options
 from django.core.management.base import SystemCheckError
@@ -59,8 +59,10 @@ class BaseProcessCommand(BaseCommand):
         """
         Slight modification of the BaseCommand function.
 
-        Set up any environment changes requested (e.g., Python path
-        and Django settings), then run this command. If the
+        Set up any environment changes requested (e.g., Python path and
+        Django settings), run Django's system checks unless ``--skip-checks``
+        is given, then run this command. Arguments not recognised by this
+        command are forwarded to the underlying process backend. If the
         command raises a ``CommandError``, intercept it and print it sensibly
         to stderr. If the ``--traceback`` option is present or the raised
         ``Exception`` is not ``CommandError``, raise it.
@@ -68,7 +70,7 @@ class BaseProcessCommand(BaseCommand):
         self._called_from_command_line = True
         parser = self.create_parser(argv[0], argv[1])
 
-        options = parser.parse_args(argv[2:])
+        options, extra_args = parser.parse_known_args(argv[2:])
         cmd_options = vars(options)
         # Move positional args out of options to mimic legacy optparse
         args = cmd_options.pop("args", ())
@@ -79,7 +81,10 @@ class BaseProcessCommand(BaseCommand):
             return
 
         try:
-            self.start_process(*args, **cmd_options)
+            if not options.skip_checks:
+                self.stdout.write("Performing system checks...\n")
+                self.check(display_num_errors=True)
+            self.start_process(*args, extra_args=extra_args, **cmd_options)
         except CommandError as e:
             if options.traceback:
                 raise
@@ -92,7 +97,11 @@ class BaseProcessCommand(BaseCommand):
             sys.exit(e.returncode)
 
     def start_process(
-        self, process_name: str, *args: list[str], **kwargs: Mapping[str, str]
+        self,
+        process_name: str,
+        *args: str,
+        extra_args: Collection[str] = (),
+        **kwargs: object,
     ) -> None:
         """Start the correct process based on the provided name."""
         try:
@@ -121,12 +130,19 @@ class BaseProcessCommand(BaseCommand):
                 self._wrong_backend_message(process_name, backend_path, backend_class)
             )
 
+        backend = backend_class(**process_config)
+
+        if extra_args and not backend.accepts_extra_args:
+            raise CommandError(
+                f"The '{backend_path}' backend configured for "
+                f"{self.process_label} named '{process_name}' does not accept "
+                f"extra command-line arguments: {' '.join(extra_args)}"
+            )
+
         self.stdout.write(
             self.style.NOTICE(f"Starting {self.process_label} named {process_name}")
         )
-
-        backend = backend_class(**process_config)
-        backend.start_server(*backend.prep_server_args())
+        backend.start_server(*backend.prep_server_args(extra_args))
 
     def _wrong_backend_message(
         self, process_name: str, backend_path: str, backend_class: type

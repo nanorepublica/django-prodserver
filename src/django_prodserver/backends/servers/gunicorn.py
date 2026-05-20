@@ -26,6 +26,12 @@ class GunicornServer(BaseServerBackend):
     """
 
     def start_server(self, *args: str) -> None:
-        """Add args back into sys.argv and run the server."""
-        sys.argv.extend(args)
+        """
+        Reset sys.argv to a clean slate and run the server.
+
+        Gunicorn re-parses ``sys.argv``; the management command name and any
+        Django options (e.g. ``--skip-checks``) must be dropped first so they
+        are not mistaken for gunicorn arguments.
+        """
+        sys.argv[:] = [sys.argv[0], *args]
         DjangoApplication("%(prog)s [OPTIONS]").run()

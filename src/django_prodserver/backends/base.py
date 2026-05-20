@@ -18,6 +18,12 @@ class BaseProcessBackend:
     }
     """
 
+    #: Whether this backend can accept extra command-line arguments forwarded
+    #: from the ``server``/``worker`` command. Backends that construct their
+    #: server programmatically (rather than from an argv list) should set this
+    #: to ``False`` so unusable arguments fail loudly instead of being dropped.
+    accepts_extra_args: bool = True
+
     def __init__(self, **server_args: Any) -> None:
         self.args = self._format_server_args_from_dict(server_args.get("ARGS", {}))
 
@@ -29,13 +35,15 @@ class BaseProcessBackend:
         """
         raise NotImplementedError
 
-    def prep_server_args(self) -> list[str]:
+    def prep_server_args(self, extra_args: Collection[str] = ()) -> list[str]:
         """
         Here we customisation of the arguments passed to the server process.
 
-        Typically this is where fixed arguments are inserted into the args
+        Typically this is where fixed arguments are inserted into the args.
+        ``extra_args`` holds any arguments forwarded from the command line and
+        is appended after the arguments configured in settings.
         """
-        return self.args
+        return [*self.args, *extra_args]
 
     def _format_server_args_from_dict(
         self, args: str | Mapping[str, str | Collection[str] | None]

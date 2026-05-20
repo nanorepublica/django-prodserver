@@ -25,6 +25,11 @@ class TestGranianServerBase:
         assert isinstance(server, BaseServerBackend)
         assert isinstance(server, GranianServerBase)
 
+    def test_does_not_accept_extra_args(self):
+        """Granian is built programmatically and rejects forwarded CLI args."""
+        assert GranianServerBase.accepts_extra_args is False
+        assert GranianASGIServer().accepts_extra_args is False
+
     def test_parse_granian_kwargs_shared_logic(self):
         """Test that parsing logic is shared between ASGI and WSGI servers."""
         asgi_server = GranianASGIServer(

@@ -21,6 +21,29 @@ accepts server backends and `worker` only accepts worker backends; pointing one
 at the wrong kind of backend produces an error telling you which command to use.
 Pass `--list` to either command to print the configured process names.
 
+### System checks
+
+Before starting a process, `server` and `worker` run Django's system checks.
+Pass `--skip-checks` to bypass them:
+
+```bash
+python manage.py server web --skip-checks
+```
+
+### Forwarding arguments to the backend
+
+Arguments that the command does not recognise are forwarded to the underlying
+process (gunicorn, uvicorn, waitress, celery, ...) and appended after the
+`ARGS` configured in `PRODUCTION_PROCESSES`:
+
+```bash
+python manage.py server web --timeout=120
+```
+
+Backends that build their server programmatically rather than from a
+command line — Granian and the `devserver`-style runserver backends — cannot
+accept forwarded arguments and will raise an error if any are passed.
+
 ```{deprecated} 3.0.0
 The `prodserver` command has been renamed to `server`. The old name continues
 to work as an alias but will be removed in django-prodserver 4.0.0.

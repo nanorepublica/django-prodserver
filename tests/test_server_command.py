@@ -3,7 +3,7 @@ from unittest.mock import MagicMock, Mock, patch
 
 import pytest
 from django.core.management import CommandError, call_command
-from django.core.management.base import SystemCheckError
+from django.core.management.base import OutputWrapper, SystemCheckError
 from django.test import TestCase, override_settings
 
 from django_prodserver.management.commands.devserver import Command as DevServerCommand
@@ -440,13 +440,140 @@ class TestServerCommand(TestCase):
             mock_options = Mock()
             mock_options.traceback = False
             mock_options.list = True
-            mock_parser.parse_args.return_value = mock_options
+            mock_parser.parse_known_args.return_value = (mock_options, [])
             mock_create_parser.return_value = mock_parser
 
             with patch.object(self.command, "list_process_names"):
                 self.command.run_from_argv(["manage.py", "server", "--list"])
 
             mock_handle_default_options.assert_called_once_with(mock_options)
+
+    @override_settings(
+        PRODUCTION_PROCESSES={
+            "web": {
+                "BACKEND": "django_prodserver.backends.servers.gunicorn.GunicornServer"
+            }
+        }
+    )
+    @patch("django_prodserver.management.base.import_string")
+    @patch("sys.exit")
+    def test_run_from_argv_runs_system_checks(self, mock_exit, mock_import_string):
+        """run_from_argv runs Django system checks before starting."""
+        mock_backend_class = Mock()
+        mock_backend_instance = Mock()
+        mock_backend_instance.accepts_extra_args = True
+        mock_backend_instance.prep_server_args.return_value = []
+        mock_backend_class.return_value = mock_backend_instance
+        mock_import_string.return_value = mock_backend_class
+
+        with patch.object(self.command, "check") as mock_check:
+            self.command.run_from_argv(["manage.py", "server", "web"])
+
+        mock_check.assert_called_once()
+        mock_backend_instance.start_server.assert_called_once()
+
+    @override_settings(
+        PRODUCTION_PROCESSES={
+            "web": {
+                "BACKEND": "django_prodserver.backends.servers.gunicorn.GunicornServer"
+            }
+        }
+    )
+    @patch("django_prodserver.management.base.import_string")
+    @patch("sys.exit")
+    def test_run_from_argv_skip_checks(self, mock_exit, mock_import_string):
+        """The --skip-checks option bypasses Django system checks."""
+        mock_backend_class = Mock()
+        mock_backend_instance = Mock()
+        mock_backend_instance.accepts_extra_args = True
+        mock_backend_instance.prep_server_args.return_value = []
+        mock_backend_class.return_value = mock_backend_instance
+        mock_import_string.return_value = mock_backend_class
+
+        with patch.object(self.command, "check") as mock_check:
+            self.command.run_from_argv(["manage.py", "server", "--skip-checks", "web"])
+
+        mock_check.assert_not_called()
+        mock_backend_instance.start_server.assert_called_once()
+
+    @override_settings(
+        PRODUCTION_PROCESSES={
+            "web": {
+                "BACKEND": "django_prodserver.backends.servers.gunicorn.GunicornServer"
+            }
+        }
+    )
+    @patch("django_prodserver.management.base.import_string")
+    @patch("sys.exit")
+    def test_run_from_argv_aborts_on_failed_system_check(
+        self, mock_exit, mock_import_string
+    ):
+        """A failing system check stops the server from starting."""
+        mock_backend_class = Mock()
+        mock_backend_instance = Mock()
+        mock_backend_class.return_value = mock_backend_instance
+        mock_import_string.return_value = mock_backend_class
+        # SystemCheckError formatting needs a real OutputWrapper, not a StringIO.
+        self.command.stderr = OutputWrapper(StringIO())
+
+        with patch.object(self.command, "check", side_effect=SystemCheckError("boom")):
+            self.command.run_from_argv(["manage.py", "server", "web"])
+
+        mock_backend_instance.start_server.assert_not_called()
+        mock_exit.assert_called_with(1)
+        assert "boom" in self.command.stderr._out.getvalue()
+
+    @override_settings(
+        PRODUCTION_PROCESSES={
+            "web": {
+                "BACKEND": "django_prodserver.backends.servers.gunicorn.GunicornServer"
+            }
+        }
+    )
+    @patch("django_prodserver.management.base.import_string")
+    @patch("sys.exit")
+    def test_run_from_argv_forwards_extra_args(self, mock_exit, mock_import_string):
+        """Unrecognized CLI args are forwarded to the backend."""
+        mock_backend_class = Mock()
+        mock_backend_instance = Mock()
+        mock_backend_instance.accepts_extra_args = True
+        mock_backend_instance.prep_server_args.return_value = []
+        mock_backend_class.return_value = mock_backend_instance
+        mock_import_string.return_value = mock_backend_class
+
+        with patch.object(self.command, "check"):
+            self.command.run_from_argv(
+                ["manage.py", "server", "web", "--timeout=120", "--reload"]
+            )
+
+        mock_backend_instance.prep_server_args.assert_called_once_with(
+            ["--timeout=120", "--reload"]
+        )
+        mock_exit.assert_not_called()
+
+    @override_settings(
+        PRODUCTION_PROCESSES={
+            "web": {
+                "BACKEND": "django_prodserver.backends.servers.gunicorn.GunicornServer"
+            }
+        }
+    )
+    @patch("django_prodserver.management.base.import_string")
+    def test_start_process_rejects_extra_args_for_incompatible_backend(
+        self, mock_import_string
+    ):
+        """Backends that cannot consume forwarded args raise a CommandError."""
+        mock_backend_class = Mock()
+        mock_backend_instance = Mock()
+        mock_backend_instance.accepts_extra_args = False
+        mock_backend_class.return_value = mock_backend_instance
+        mock_import_string.return_value = mock_backend_class
+
+        with pytest.raises(CommandError) as exc_info:
+            self.command.start_process("web", extra_args=["--reload"])
+
+        assert "does not accept extra command-line arguments" in str(exc_info.value)
+        mock_backend_instance.start_server.assert_not_called()
 
     @override_settings(
         PRODUCTION_PROCESSES={

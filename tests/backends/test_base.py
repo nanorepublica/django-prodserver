@@ -40,6 +40,21 @@ def test_prep_server_args_empty():
     assert backend.prep_server_args() == []
 
 
+def test_prep_server_args_appends_extra_args():
+    """Forwarded extra args are appended after the configured args."""
+    backend = BaseServerBackend(ARGS={"foo": "bar"})
+    assert backend.prep_server_args(["--baz", "--qux=1"]) == [
+        "--foo=bar",
+        "--baz",
+        "--qux=1",
+    ]
+
+
+def test_accepts_extra_args_default():
+    """Backends accept forwarded command-line arguments by default."""
+    assert BaseServerBackend().accepts_extra_args is True
+
+
 def test_format_server_args_from_dict():
     """Test _format_server_args_from_dict method."""
     backend = BaseServerBackend()

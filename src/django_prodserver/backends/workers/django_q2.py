@@ -1,3 +1,4 @@
+from collections.abc import Collection
 from typing import Any
 
 from django.core import management
@@ -55,7 +56,7 @@ class DjangoQ2Worker(BaseWorkerBackend):
         """
         management.call_command("qcluster", *args)
 
-    def prep_server_args(self) -> list[str]:
+    def prep_server_args(self, extra_args: Collection[str] = ()) -> list[str]:
         """
         Prepare arguments for qcluster command.
 
@@ -69,4 +70,4 @@ class DjangoQ2Worker(BaseWorkerBackend):
             verbosity and cluster naming.
 
         """
-        return super().prep_server_args()
+        return super().prep_server_args(extra_args)
