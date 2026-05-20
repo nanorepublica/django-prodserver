@@ -19,7 +19,8 @@ python manage.py worker <process_name>
 Both commands read from the same `PRODUCTION_PROCESSES` setting. `server` only
 accepts server backends and `worker` only accepts worker backends; pointing one
 at the wrong kind of backend produces an error telling you which command to use.
-Pass `--list` to either command to print the configured process names.
+Pass `--list` to either command to print its configured process names; `server
+--list` shows only server backends and `worker --list` only worker backends.
 
 ```{deprecated} 3.0.0
 The `prodserver` command has been renamed to `server`. The old name continues
