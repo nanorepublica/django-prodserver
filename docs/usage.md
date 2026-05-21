@@ -41,9 +41,9 @@ the worker count while debugging a production issue:
 python manage.py server web --timeout=120
 ```
 
-A command-line argument **takes precedence** over an argument with the same
-name configured in `PRODUCTION_PROCESSES`. The configured value is dropped and
-a notice is printed so the override is visible:
+A command-line argument that matches an entry in the process's `ARGS` setting
+**overrides** it: the command-line value is merged into `ARGS` before the
+process starts, and a notice is printed so the override is visible.
 
 ```python
 PRODUCTION_PROCESSES = {
@@ -59,13 +59,16 @@ PRODUCTION_PROCESSES = {
 python manage.py server web --workers=2
 ```
 
-Precedence is matched on the long option name (`--workers`). A short option
+Overrides are matched on the long option name (`--workers`). A short option
 passed on the command line (`-w 2`) cannot be matched against a configured
-long option and would be passed alongside it.
+long option and is treated as a new argument.
 
-Backends that build their server programmatically rather than from a
-command line — Granian and the `devserver`-style runserver backends — cannot
-accept forwarded arguments and will raise an error if any are passed.
+Backends that build their server programmatically rather than from a command
+line — Granian and the `devserver`-style runserver backends — accept
+command-line arguments **only** when they override an existing `ARGS` entry.
+A new argument they have no `ARGS` entry for cannot be applied and raises an
+error; add it to `ARGS` first if you want to override it from the command
+line.
 
 ```{deprecated} 3.0.0
 The `prodserver` command has been renamed to `server`. The old name continues
