@@ -14,6 +14,10 @@ class GranianServerBase(BaseServerBackend):
     including argument parsing and server configuration.
     """
 
+    # Granian is constructed programmatically from settings, not from an argv
+    # list, so it cannot consume arbitrary forwarded command-line arguments.
+    accepts_extra_args = False
+
     def __init__(self, **server_args: Any) -> None:
         """Initialize the Granian server backend."""
         super().__init__(**server_args)

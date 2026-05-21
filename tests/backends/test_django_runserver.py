@@ -44,6 +44,11 @@ class TestInitDefaults:
         backend = DjangoRunserver()
         assert isinstance(backend, BaseServerBackend)
 
+    def test_does_not_accept_extra_args(self):
+        """Runserver-style backends reject forwarded command-line args."""
+        assert BaseRunserverBackend.accepts_extra_args is False
+        assert DjangoRunserver().accepts_extra_args is False
+
     def test_defaults_with_no_args(self):
         backend = DjangoRunserver()
         assert backend.use_ipv6 is False

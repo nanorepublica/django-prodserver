@@ -173,3 +173,42 @@ class TestWorkerCommand(TestCase):
             BACKEND=DJANGO_TASKS_WORKER, ARGS={"queues": "high"}
         )
         mock_backend_instance.start_server.assert_called_once()
+
+    @override_settings(PRODUCTION_PROCESSES=ONE_WORKER)
+    @patch("django_prodserver.management.base.import_string")
+    @patch("sys.exit")
+    def test_run_from_argv_runs_system_checks(self, mock_exit, mock_import_string):
+        """The worker command runs Django system checks before starting."""
+        mock_backend_class = Mock()
+        mock_backend_instance = Mock()
+        mock_backend_instance.accepts_extra_args = True
+        mock_backend_instance.prep_server_args.return_value = []
+        mock_backend_class.return_value = mock_backend_instance
+        mock_import_string.return_value = mock_backend_class
+
+        with patch.object(self.command, "check") as mock_check:
+            self.command.run_from_argv(["manage.py", "worker", "worker"])
+
+        mock_check.assert_called_once()
+        mock_backend_instance.start_server.assert_called_once()
+
+    @override_settings(PRODUCTION_PROCESSES=ONE_WORKER)
+    @patch("django_prodserver.management.base.import_string")
+    @patch("sys.exit")
+    def test_run_from_argv_forwards_extra_args(self, mock_exit, mock_import_string):
+        """Unrecognized CLI args are forwarded to the worker backend."""
+        mock_backend_class = Mock()
+        mock_backend_instance = Mock()
+        mock_backend_instance.prep_server_args.return_value = []
+        mock_backend_class.return_value = mock_backend_instance
+        mock_import_string.return_value = mock_backend_class
+
+        with patch.object(self.command, "check"):
+            self.command.run_from_argv(
+                ["manage.py", "worker", "worker", "--queues=high"]
+            )
+
+        mock_backend_instance.prep_server_args.assert_called_once_with(
+            ["--queues=high"]
+        )
+        mock_exit.assert_not_called()

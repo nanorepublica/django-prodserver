@@ -1,3 +1,5 @@
+from collections.abc import Collection
+
 import uvicorn.main
 
 from ...utils import asgi_app_name, wsgi_app_name
@@ -12,11 +14,9 @@ class UvicornServer(BaseServerBackend):
     to uvicorn.
     """
 
-    def prep_server_args(self) -> list[str]:
+    def prep_server_args(self, extra_args: Collection[str] = ()) -> list[str]:
         """Prepare the server args."""
-        args = [asgi_app_name()]
-        args.extend(self.args)
-        return args
+        return [asgi_app_name(), *self.args, *extra_args]
 
     def start_server(self, *args: str) -> None:
         """Start the server."""
@@ -31,11 +31,9 @@ class UvicornWSGIServer(BaseServerBackend):
     to uvicorn.
     """
 
-    def prep_server_args(self) -> list[str]:
+    def prep_server_args(self, extra_args: Collection[str] = ()) -> list[str]:
         """Prepare the server args."""
-        args = [wsgi_app_name(), "--interface=wsgi"]
-        args.extend(self.args)
-        return args
+        return [wsgi_app_name(), "--interface=wsgi", *self.args, *extra_args]
 
     def start_server(self, *args: str) -> None:
         """Start the server."""

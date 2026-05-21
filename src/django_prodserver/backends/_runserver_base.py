@@ -28,6 +28,10 @@ class BaseRunserverBackend(BaseServerBackend):
 
     server_kind: str = "development"
 
+    # Runserver-style backends are driven entirely by their ARGS configuration,
+    # not by an argv list, so forwarded command-line arguments cannot be used.
+    accepts_extra_args = False
+
     def __init__(self, **server_args: Any) -> None:
         """Parse ARGS keys shared by every runserver-style backend."""
         super().__init__(**server_args)

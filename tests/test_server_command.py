@@ -3,7 +3,7 @@ from unittest.mock import MagicMock, Mock, patch
 
 import pytest
 from django.core.management import CommandError, call_command
-from django.core.management.base import SystemCheckError
+from django.core.management.base import OutputWrapper, SystemCheckError
 from django.test import TestCase, override_settings
 
 from django_prodserver.management.commands.devserver import Command as DevServerCommand
@@ -440,13 +440,181 @@ class TestServerCommand(TestCase):
             mock_options = Mock()
             mock_options.traceback = False
             mock_options.list = True
-            mock_parser.parse_args.return_value = mock_options
+            mock_parser.parse_known_args.return_value = (mock_options, [])
             mock_create_parser.return_value = mock_parser
 
             with patch.object(self.command, "list_process_names"):
                 self.command.run_from_argv(["manage.py", "server", "--list"])
 
             mock_handle_default_options.assert_called_once_with(mock_options)
+
+    @override_settings(
+        PRODUCTION_PROCESSES={
+            "web": {
+                "BACKEND": "django_prodserver.backends.servers.gunicorn.GunicornServer"
+            }
+        }
+    )
+    @patch("django_prodserver.management.base.import_string")
+    @patch("sys.exit")
+    def test_run_from_argv_runs_system_checks(self, mock_exit, mock_import_string):
+        """run_from_argv runs Django system checks before starting."""
+        mock_backend_class = Mock()
+        mock_backend_instance = Mock()
+        mock_backend_instance.accepts_extra_args = True
+        mock_backend_instance.prep_server_args.return_value = []
+        mock_backend_class.return_value = mock_backend_instance
+        mock_import_string.return_value = mock_backend_class
+
+        with patch.object(self.command, "check") as mock_check:
+            self.command.run_from_argv(["manage.py", "server", "web"])
+
+        mock_check.assert_called_once()
+        mock_backend_instance.start_server.assert_called_once()
+
+    @override_settings(
+        PRODUCTION_PROCESSES={
+            "web": {
+                "BACKEND": "django_prodserver.backends.servers.gunicorn.GunicornServer"
+            }
+        }
+    )
+    @patch("django_prodserver.management.base.import_string")
+    @patch("sys.exit")
+    def test_run_from_argv_skip_checks(self, mock_exit, mock_import_string):
+        """The --skip-checks option bypasses Django system checks."""
+        mock_backend_class = Mock()
+        mock_backend_instance = Mock()
+        mock_backend_instance.accepts_extra_args = True
+        mock_backend_instance.prep_server_args.return_value = []
+        mock_backend_class.return_value = mock_backend_instance
+        mock_import_string.return_value = mock_backend_class
+
+        with patch.object(self.command, "check") as mock_check:
+            self.command.run_from_argv(["manage.py", "server", "--skip-checks", "web"])
+
+        mock_check.assert_not_called()
+        mock_backend_instance.start_server.assert_called_once()
+
+    @override_settings(
+        PRODUCTION_PROCESSES={
+            "web": {
+                "BACKEND": "django_prodserver.backends.servers.gunicorn.GunicornServer"
+            }
+        }
+    )
+    @patch("django_prodserver.management.base.import_string")
+    @patch("sys.exit")
+    def test_run_from_argv_aborts_on_failed_system_check(
+        self, mock_exit, mock_import_string
+    ):
+        """A failing system check stops the server from starting."""
+        mock_backend_class = Mock()
+        mock_backend_instance = Mock()
+        mock_backend_class.return_value = mock_backend_instance
+        mock_import_string.return_value = mock_backend_class
+        # SystemCheckError formatting needs a real OutputWrapper, not a StringIO.
+        self.command.stderr = OutputWrapper(StringIO())
+
+        with patch.object(self.command, "check", side_effect=SystemCheckError("boom")):
+            self.command.run_from_argv(["manage.py", "server", "web"])
+
+        mock_backend_instance.start_server.assert_not_called()
+        mock_exit.assert_called_with(1)
+        assert "boom" in self.command.stderr._out.getvalue()
+
+    @override_settings(
+        PRODUCTION_PROCESSES={
+            "web": {
+                "BACKEND": "django_prodserver.backends.servers.gunicorn.GunicornServer"
+            }
+        }
+    )
+    @patch("django_prodserver.management.base.import_string")
+    @patch("sys.exit")
+    def test_run_from_argv_forwards_extra_args(self, mock_exit, mock_import_string):
+        """Unrecognized CLI args are forwarded to the backend."""
+        mock_backend_class = Mock()
+        mock_backend_instance = Mock()
+        mock_backend_instance.prep_server_args.return_value = []
+        mock_backend_class.return_value = mock_backend_instance
+        mock_import_string.return_value = mock_backend_class
+
+        with patch.object(self.command, "check"):
+            self.command.run_from_argv(
+                ["manage.py", "server", "web", "--timeout=120", "--reload"]
+            )
+
+        mock_backend_instance.prep_server_args.assert_called_once_with(
+            ["--timeout=120", "--reload"]
+        )
+        mock_exit.assert_not_called()
+
+    @override_settings(
+        PRODUCTION_PROCESSES={
+            "web": {
+                "BACKEND": "django_prodserver.backends.servers.gunicorn.GunicornServer",
+                "ARGS": {"workers": "2", "timeout": "30"},
+            }
+        }
+    )
+    @patch("django_prodserver.management.base.import_string")
+    def test_start_process_notifies_when_cli_overrides_config(self, mock_import_string):
+        """A CLI arg overrides the configured ARGS entry and prints a notice."""
+        from django_prodserver.backends.servers.gunicorn import GunicornServer
+
+        mock_import_string.return_value = GunicornServer
+
+        with patch.object(GunicornServer, "start_server") as mock_start:
+            self.command.start_process("web", extra_args=["--workers=4"])
+
+        output = self.command.stdout.getvalue()
+        assert "Overriding configured argument '--workers'" in output
+        assert "--timeout" not in output  # not overridden, so no notice
+        # The configured workers value is replaced; timeout is left untouched.
+        mock_start.assert_called_once_with("--workers=4", "--timeout=30")
+
+    @override_settings(
+        PRODUCTION_PROCESSES={
+            "dev": {
+                "BACKEND": (
+                    "django_prodserver.backends.dev.django_runserver.DjangoRunserver"
+                ),
+                "ARGS": {"addrport": "0.0.0.0:9000"},
+            }
+        }
+    )
+    def test_start_process_override_reaches_programmatic_backend(self):
+        """A CLI override of a configured ARG is applied to a programmatic backend."""
+        from django_prodserver.backends.dev.django_runserver import DjangoRunserver
+
+        with patch.object(DjangoRunserver, "start_server", autospec=True) as mock_start:
+            self.command.start_process("dev", extra_args=["--addrport=0.0.0.0:8080"])
+
+        backend = mock_start.call_args.args[0]
+        assert (backend.addr, backend.port) == ("0.0.0.0", 8080)
+        assert "Overriding configured argument '--addrport'" in (
+            self.command.stdout.getvalue()
+        )
+
+    @override_settings(
+        PRODUCTION_PROCESSES={
+            "dev": {
+                "BACKEND": (
+                    "django_prodserver.backends.dev.django_runserver.DjangoRunserver"
+                ),
+                "ARGS": {"addrport": "0.0.0.0:9000"},
+            }
+        }
+    )
+    def test_start_process_programmatic_backend_rejects_new_arg(self):
+        """A programmatic backend rejects CLI args that do not override ARGS."""
+        with pytest.raises(CommandError) as exc_info:
+            self.command.start_process("dev", extra_args=["--noreload"])
+
+        message = str(exc_info.value)
+        assert "only accepts command-line arguments that override" in message
+        assert "--noreload" in message
 
     @override_settings(
         PRODUCTION_PROCESSES={

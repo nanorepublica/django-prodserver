@@ -49,10 +49,10 @@ class TestGunicornServer:
         server = GunicornServer(ARGS={"bind": "0.0.0.0:8000", "workers": "4"})
         assert server.args == ["--bind=0.0.0.0:8000", "--workers=4"]
 
-    @patch("sys.argv", ["manage.py", "prodserver"])
+    @patch("sys.argv", ["manage.py", "server", "--skip-checks", "web"])
     @patch("django_prodserver.backends.servers.gunicorn.DjangoApplication")
     def test_start_server(self, mock_django_app):
-        """Test start_server method."""
+        """Test start_server resets sys.argv to a clean slate."""
         mock_app_instance = Mock()
         mock_django_app.return_value = mock_app_instance
 
@@ -61,11 +61,13 @@ class TestGunicornServer:
 
         server.start_server(*args)
 
-        # Check that args were added to sys.argv
+        # The management command name and Django options must not leak into
+        # the argv that gunicorn re-parses.
         import sys
 
-        assert "--bind=0.0.0.0:8000" in sys.argv
-        assert "--workers=4" in sys.argv
+        assert sys.argv == ["manage.py", "--bind=0.0.0.0:8000", "--workers=4"]
+        assert "--skip-checks" not in sys.argv
+        assert "web" not in sys.argv
 
         # Check that DjangoApplication was created and run was called
         mock_django_app.assert_called_once_with("%(prog)s [OPTIONS]")
@@ -81,6 +83,9 @@ class TestGunicornServer:
         server = GunicornServer()
         server.start_server()
 
+        import sys
+
+        assert sys.argv == ["manage.py"]
         mock_django_app.assert_called_once_with("%(prog)s [OPTIONS]")
         mock_app_instance.run.assert_called_once()
 
@@ -123,6 +128,12 @@ class TestGunicornServer:
 
         mock_django_app.assert_called_once_with("%(prog)s [OPTIONS]")
         mock_app_instance.run.assert_called_once()
+
+    def test_prep_server_args_appends_extra_args(self):
+        """Forwarded extra args are appended after the configured args."""
+        server = GunicornServer(ARGS={"bind": "0.0.0.0:8000"})
+        args = server.prep_server_args(["--timeout=30"])
+        assert args == ["--bind=0.0.0.0:8000", "--timeout=30"]
 
     def test_server_args_formatting(self):
         """Test that server args are properly formatted from dict."""

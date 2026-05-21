@@ -21,6 +21,55 @@ accepts server backends and `worker` only accepts worker backends; pointing one
 at the wrong kind of backend produces an error telling you which command to use.
 Pass `--list` to either command to print the configured process names.
 
+### System checks
+
+Before starting a process, `server` and `worker` run Django's system checks.
+Pass `--skip-checks` to bypass them:
+
+```bash
+python manage.py server web --skip-checks
+```
+
+### Forwarding arguments to the backend
+
+Arguments that the command does not recognise are forwarded to the underlying
+process (gunicorn, uvicorn, waitress, celery, ...). This is an escape hatch for
+tweaking a process without editing settings — for example, raising a timeout or
+the worker count while debugging a production issue:
+
+```bash
+python manage.py server web --timeout=120
+```
+
+A command-line argument that matches an entry in the process's `ARGS` setting
+**overrides** it: the command-line value is merged into `ARGS` before the
+process starts, and a notice is printed so the override is visible.
+
+```python
+PRODUCTION_PROCESSES = {
+    "web": {
+        "BACKEND": "django_prodserver.backends.servers.gunicorn.GunicornServer",
+        "ARGS": {"bind": "0.0.0.0:8000", "workers": "4"},
+    }
+}
+```
+
+```bash
+# Starts with workers=2 (the CLI value), not workers=4
+python manage.py server web --workers=2
+```
+
+Overrides are matched on the long option name (`--workers`). A short option
+passed on the command line (`-w 2`) cannot be matched against a configured
+long option and is treated as a new argument.
+
+Backends that build their server programmatically rather than from a command
+line — Granian and the `devserver`-style runserver backends — accept
+command-line arguments **only** when they override an existing `ARGS` entry.
+A new argument they have no `ARGS` entry for cannot be applied and raises an
+error; add it to `ARGS` first if you want to override it from the command
+line.
+
 ```{deprecated} 3.0.0
 The `prodserver` command has been renamed to `server`. The old name continues
 to work as an alias but will be removed in django-prodserver 4.0.0.

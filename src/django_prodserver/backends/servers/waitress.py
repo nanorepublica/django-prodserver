@@ -1,3 +1,5 @@
+from collections.abc import Collection
+
 import waitress.runner
 
 from ...utils import wsgi_app_name
@@ -16,9 +18,12 @@ class WaitressServer(BaseServerBackend):
         """Start the server."""
         waitress.runner.run(argv=args)
 
-    def prep_server_args(self) -> list[str]:
-        """Prepare the server args."""
-        args = ["waitress"]
-        args.extend(self.args)
-        args.append(wsgi_app_name())
-        return args
+    def prep_server_args(self, extra_args: Collection[str] = ()) -> list[str]:
+        """
+        Prepare the server args.
+
+        ``waitress-serve`` expects the application module as the final
+        positional argument, so forwarded ``extra_args`` are inserted before
+        it alongside the settings-configured options.
+        """
+        return ["waitress", *self.args, *extra_args, wsgi_app_name()]
