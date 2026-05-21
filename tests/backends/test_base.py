@@ -50,30 +50,6 @@ def test_prep_server_args_appends_extra_args():
     ]
 
 
-def test_prep_server_args_cli_arg_overrides_configured():
-    """A CLI arg replaces the configured arg with the same option name."""
-    backend = BaseServerBackend(ARGS={"workers": "2", "timeout": "30"})
-    # --workers from the CLI wins; the configured --timeout is untouched.
-    assert backend.prep_server_args(["--workers=4"]) == [
-        "--timeout=30",
-        "--workers=4",
-    ]
-
-
-def test_prep_server_args_cli_arg_overrides_space_separated():
-    """Override detection also works for space-separated CLI args."""
-    backend = BaseServerBackend(ARGS={"timeout": "30"})
-    assert backend.prep_server_args(["--timeout", "120"]) == ["--timeout", "120"]
-
-
-def test_overridden_args_reports_replaced_configuration():
-    """overridden_args lists the configured args a CLI arg replaces."""
-    backend = BaseServerBackend(ARGS={"workers": "2", "timeout": "30"})
-    assert backend.overridden_args(["--workers=4"]) == ["--workers=2"]
-    assert backend.overridden_args(["--reload"]) == []
-    assert backend.overridden_args() == []
-
-
 def test_accepts_extra_args_default():
     """Backends accept forwarded command-line arguments by default."""
     assert BaseServerBackend().accepts_extra_args is True

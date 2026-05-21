@@ -1,6 +1,6 @@
 import sys
 from argparse import ArgumentParser
-from collections.abc import Collection
+from collections.abc import Collection, Mapping
 
 from django.core.management import BaseCommand, CommandError, handle_default_options
 from django.core.management.base import SystemCheckError
@@ -12,6 +12,43 @@ from ..backends.base import (
     BaseWorkerBackend,
 )
 from ..conf import app_settings
+
+
+def _option_name(token: str) -> str | None:
+    """Return a token's option name (text before ``=``), or None if not an option."""
+    if not token.startswith("-"):
+        return None
+    return token.split("=", 1)[0]
+
+
+def split_extra_args(
+    extra_args: Collection[str], configured: Mapping[str, object]
+) -> tuple[dict[str, str | None], list[str]]:
+    """
+    Split forwarded command-line args into ARGS overrides and new arguments.
+
+    An *override* is a ``--name`` / ``--name=value`` token whose ``name``
+    matches a key configured in ``ARGS``; its value replaces the configured
+    one. For a configured option that expects a value, a following
+    space-separated token is consumed as that value. Every other token is
+    returned untouched as a *new* argument.
+    """
+    overrides: dict[str, str | None] = {}
+    new_args: list[str] = []
+    tokens = iter(extra_args)
+    for token in tokens:
+        name = _option_name(token)
+        key = name[2:] if name is not None and name.startswith("--") else None
+        if key is None or key not in configured:
+            new_args.append(token)
+            continue
+        if "=" in token:
+            overrides[key] = token.split("=", 1)[1]
+        elif configured[key] is None:
+            overrides[key] = None
+        else:
+            overrides[key] = next(tokens, None)
+    return overrides, new_args
 
 
 class BaseProcessCommand(BaseCommand):
@@ -130,28 +167,38 @@ class BaseProcessCommand(BaseCommand):
                 self._wrong_backend_message(process_name, backend_path, backend_class)
             )
 
-        backend = backend_class(**process_config)
+        configured_args = process_config.get("ARGS", {})
+        if not isinstance(configured_args, Mapping):
+            configured_args = {}
+        overrides, new_args = split_extra_args(extra_args, configured_args)
 
-        if extra_args and not backend.accepts_extra_args:
+        if new_args and not backend_class.accepts_extra_args:
             raise CommandError(
                 f"The '{backend_path}' backend configured for "
-                f"{self.process_label} named '{process_name}' does not accept "
-                f"extra command-line arguments: {' '.join(extra_args)}"
+                f"{self.process_label} named '{process_name}' only accepts "
+                "command-line arguments that override an entry in its ARGS "
+                f"setting; these do not: {' '.join(new_args)}"
             )
 
-        if extra_args:
-            for overridden in backend.overridden_args(extra_args):
+        if overrides:
+            process_config = {
+                **process_config,
+                "ARGS": {**configured_args, **overrides},
+            }
+            for key in overrides:
                 self.stdout.write(
                     self.style.WARNING(
-                        f"Overriding configured argument '{overridden}' with "
+                        f"Overriding configured argument '--{key}' with "
                         "command-line value"
                     )
                 )
 
+        backend = backend_class(**process_config)
+
         self.stdout.write(
             self.style.NOTICE(f"Starting {self.process_label} named {process_name}")
         )
-        backend.start_server(*backend.prep_server_args(extra_args))
+        backend.start_server(*backend.prep_server_args(new_args))
 
     def _wrong_backend_message(
         self, process_name: str, backend_path: str, backend_class: type

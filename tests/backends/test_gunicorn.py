@@ -135,12 +135,6 @@ class TestGunicornServer:
         args = server.prep_server_args(["--timeout=30"])
         assert args == ["--bind=0.0.0.0:8000", "--timeout=30"]
 
-    def test_prep_server_args_cli_overrides_configured(self):
-        """A CLI --bind replaces the configured --bind rather than adding to it."""
-        server = GunicornServer(ARGS={"bind": "0.0.0.0:8000", "workers": "2"})
-        args = server.prep_server_args(["--bind=0.0.0.0:9000"])
-        assert args == ["--workers=2", "--bind=0.0.0.0:9000"]
-
     def test_server_args_formatting(self):
         """Test that server args are properly formatted from dict."""
         server = GunicornServer(

@@ -52,9 +52,9 @@ class TestUvicornServer:
         "django_prodserver.backends.servers.uvicorn.asgi_app_name",
         return_value="tests.asgi:application",
     )
-    def test_prep_server_args_cli_overrides_configured(self, mock_asgi_app_name):
-        """A CLI arg replaces the matching configured arg, app name stays first."""
-        server = UvicornServer(ARGS={"host": "127.0.0.1", "port": "8000"})
+    def test_prep_server_args_appends_extra_args(self, mock_asgi_app_name):
+        """Extra args are appended after the configured args, app name first."""
+        server = UvicornServer(ARGS={"host": "127.0.0.1"})
         args = server.prep_server_args(["--port=9000"])
 
         assert args == ["tests.asgi:application", "--host=127.0.0.1", "--port=9000"]

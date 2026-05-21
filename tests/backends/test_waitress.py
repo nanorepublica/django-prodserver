@@ -53,9 +53,9 @@ class TestWaitressServer:
         "django_prodserver.backends.servers.waitress.wsgi_app_name",
         return_value="tests.wsgi:application",
     )
-    def test_prep_server_args_cli_overrides_configured(self, mock_wsgi_app_name):
-        """A CLI arg replaces the matching configured arg, app name stays last."""
-        server = WaitressServer(ARGS={"host": "127.0.0.1", "port": "8000"})
+    def test_prep_server_args_appends_extra_args(self, mock_wsgi_app_name):
+        """Extra args are appended before the app name, after configured args."""
+        server = WaitressServer(ARGS={"host": "127.0.0.1"})
         args = server.prep_server_args(["--port=9000"])
 
         assert args == [

@@ -536,8 +536,6 @@ class TestServerCommand(TestCase):
         """Unrecognized CLI args are forwarded to the backend."""
         mock_backend_class = Mock()
         mock_backend_instance = Mock()
-        mock_backend_instance.accepts_extra_args = True
-        mock_backend_instance.overridden_args.return_value = []
         mock_backend_instance.prep_server_args.return_value = []
         mock_backend_class.return_value = mock_backend_instance
         mock_import_string.return_value = mock_backend_class
@@ -562,7 +560,7 @@ class TestServerCommand(TestCase):
     )
     @patch("django_prodserver.management.base.import_string")
     def test_start_process_notifies_when_cli_overrides_config(self, mock_import_string):
-        """A notice is printed when a CLI arg overrides a configured one."""
+        """A CLI arg overrides the configured ARGS entry and prints a notice."""
         from django_prodserver.backends.servers.gunicorn import GunicornServer
 
         mock_import_string.return_value = GunicornServer
@@ -571,34 +569,52 @@ class TestServerCommand(TestCase):
             self.command.start_process("web", extra_args=["--workers=4"])
 
         output = self.command.stdout.getvalue()
-        assert "Overriding configured argument '--workers=2'" in output
+        assert "Overriding configured argument '--workers'" in output
         assert "--timeout" not in output  # not overridden, so no notice
-        # The configured --workers is dropped; the CLI value is kept.
-        mock_start.assert_called_once_with("--timeout=30", "--workers=4")
+        # The configured workers value is replaced; timeout is left untouched.
+        mock_start.assert_called_once_with("--workers=4", "--timeout=30")
 
     @override_settings(
         PRODUCTION_PROCESSES={
-            "web": {
-                "BACKEND": "django_prodserver.backends.servers.gunicorn.GunicornServer"
+            "dev": {
+                "BACKEND": (
+                    "django_prodserver.backends.dev.django_runserver.DjangoRunserver"
+                ),
+                "ARGS": {"addrport": "0.0.0.0:9000"},
             }
         }
     )
-    @patch("django_prodserver.management.base.import_string")
-    def test_start_process_rejects_extra_args_for_incompatible_backend(
-        self, mock_import_string
-    ):
-        """Backends that cannot consume forwarded args raise a CommandError."""
-        mock_backend_class = Mock()
-        mock_backend_instance = Mock()
-        mock_backend_instance.accepts_extra_args = False
-        mock_backend_class.return_value = mock_backend_instance
-        mock_import_string.return_value = mock_backend_class
+    def test_start_process_override_reaches_programmatic_backend(self):
+        """A CLI override of a configured ARG is applied to a programmatic backend."""
+        from django_prodserver.backends.dev.django_runserver import DjangoRunserver
 
+        with patch.object(DjangoRunserver, "start_server", autospec=True) as mock_start:
+            self.command.start_process("dev", extra_args=["--addrport=0.0.0.0:8080"])
+
+        backend = mock_start.call_args.args[0]
+        assert (backend.addr, backend.port) == ("0.0.0.0", 8080)
+        assert "Overriding configured argument '--addrport'" in (
+            self.command.stdout.getvalue()
+        )
+
+    @override_settings(
+        PRODUCTION_PROCESSES={
+            "dev": {
+                "BACKEND": (
+                    "django_prodserver.backends.dev.django_runserver.DjangoRunserver"
+                ),
+                "ARGS": {"addrport": "0.0.0.0:9000"},
+            }
+        }
+    )
+    def test_start_process_programmatic_backend_rejects_new_arg(self):
+        """A programmatic backend rejects CLI args that do not override ARGS."""
         with pytest.raises(CommandError) as exc_info:
-            self.command.start_process("web", extra_args=["--reload"])
+            self.command.start_process("dev", extra_args=["--noreload"])
 
-        assert "does not accept extra command-line arguments" in str(exc_info.value)
-        mock_backend_instance.start_server.assert_not_called()
+        message = str(exc_info.value)
+        assert "only accepts command-line arguments that override" in message
+        assert "--noreload" in message
 
     @override_settings(
         PRODUCTION_PROCESSES={
