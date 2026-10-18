@@ -1,8 +1,8 @@
 (backend-django-tasks)=
 
-# Django Tasks
+# Django Tasks DB
 
-Django's built-in lightweight task queue (Django 6+). Uses the ORM for storage.
+The database backend supplied by `django-tasks-db`. Django's built-in task API does not itself provide a database worker.
 
 **Use when:** Simple background tasks, no external dependencies
 **Don't use when:** Distributed processing, complex workflows (use {ref}`backend-celery-worker`)
@@ -10,18 +10,18 @@ Django's built-in lightweight task queue (Django 6+). Uses the ORM for storage.
 ## Requirements
 
 Django 6+
-django-tasks
+django-tasks-db
 
 ## Installation
 
 ```bash
-pip install django-prodserver[django-tasks]
+pip install django-prodserver django-tasks-db
 ```
 
 ```python
 INSTALLED_APPS = [
     # ...
-    "django-tasks",
+    "django_tasks_db",
 ]
 ```
 
@@ -29,15 +29,26 @@ INSTALLED_APPS = [
 python manage.py migrate
 ```
 
+Configure task storage alongside the installed app:
+
+```python
+TASKS = {
+    "default": {
+        "BACKEND": "django_tasks_db.DatabaseBackend",
+        "QUEUES": ["default"],
+    }
+}
+```
+
 ## Configuration
 
 ```python
 PRODUCTION_PROCESSES = {
     "worker": {
-        "BACKEND": "django_prodserver.backends.workers.django_tasks.DjangoTasksWorker",
+        "BACKEND": "django_prodserver.backends.workers.django_tasks_db.DjangoTasksDBWorker",
         "ARGS": {
-            "processes": "4",
-            "threads": "1",
+            "queue-name": "default",
+            "interval": "1",
         }
     }
 }
@@ -45,12 +56,16 @@ PRODUCTION_PROCESSES = {
 
 ## ARGS
 
-| Argument    | Default   | Description         |
-| ----------- | --------- | ------------------- |
-| `processes` | `1`       | Worker processes    |
-| `threads`   | `1`       | Threads per process |
-| `queue`     | `default` | Queue to process    |
-| `verbosity` | `1`       | Log verbosity (0-3) |
+| Argument     | Default   | Description                       |
+| ------------ | --------- | --------------------------------- |
+| `queue-name` | `default` | Comma-separated queues to process |
+| `interval`   | `1`       | Seconds between checks when idle  |
+| `backend`    | `default` | Configured task backend alias     |
+| `verbosity`  | `1`       | Log verbosity (0–3)               |
+
+Run `python manage.py db_worker --help` for the options supported by your
+installed django-tasks-db version. Run multiple worker processes through your
+process supervisor rather than passing `processes` or `threads` to this command.
 
 ## Example
 
@@ -63,8 +78,8 @@ PRODUCTION_PROCESSES = {
         "ARGS": {"bind": "0.0.0.0:8000", "workers": "4"},
     },
     "worker": {
-        "BACKEND": "django_prodserver.backends.workers.django_tasks.DjangoTasksWorker",
-        "ARGS": {"processes": "2", "threads": "2"},
+        "BACKEND": "django_prodserver.backends.workers.django_tasks_db.DjangoTasksDBWorker",
+        "ARGS": {"queue-name": "default", "interval": "1"},
     },
 }
 ```
@@ -73,7 +88,7 @@ PRODUCTION_PROCESSES = {
 
 ```python
 # myapp/tasks.py
-from django.contrib.tasks import task
+from django.tasks import task
 
 @task()
 def send_email(email_address, message):
@@ -86,11 +101,9 @@ send_email.enqueue('user@example.com', 'Hello!')
 
 ## Scaling
 
-| Volume             | Config                 |
-| ------------------ | ---------------------- |
-| Low (< 1K/day)     | 1 process, 2 threads   |
-| Medium (1-10K/day) | 2 processes, 2 threads |
-| High (> 10K/day)   | Consider Celery        |
+Run multiple instances of the configured worker using your process supervisor.
+Select queues with `queue-name` to separate workloads. Assess database contention
+and task duration before increasing concurrency.
 
 ## Troubleshooting
 
@@ -101,3 +114,16 @@ send_email.enqueue('user@example.com', 'Hello!')
 ## Links
 
 - [Django Tasks Docs](https://docs.djangoproject.com/en/stable/topics/tasks/)
+
+## Compatibility
+
+For Django 5.2, install `django-tasks-db[compat]` and import `task` from
+`django_tasks` instead of `django.tasks`. Consult the installed backend version's
+requirements when using older Django versions.
+
+The original `django-tasks` extra is retained for projects using the legacy
+bundled database backend.
+
+The existing `django_prodserver.backends.workers.django_tasks.DjangoTasksWorker`
+import remains available as an alias. Both paths run `db_worker`; neither is a
+generic runner for every Django Tasks backend.

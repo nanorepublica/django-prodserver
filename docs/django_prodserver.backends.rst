@@ -33,10 +33,10 @@ django\_prodserver.backends.workers.django\_q2 module
    :show-inheritance:
    :undoc-members:
 
-django\_prodserver.backends.workers.django\_tasks module
+django\_prodserver.backends.workers.django\_tasks\_db module
 --------------------------------------------------------
 
-.. automodule:: django_prodserver.backends.workers.django_tasks
+.. automodule:: django_prodserver.backends.workers.django_tasks_db
    :members:
    :show-inheritance:
    :undoc-members:

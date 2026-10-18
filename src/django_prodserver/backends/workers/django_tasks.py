@@ -1,11 +1,7 @@
-from django.core import management
+"""Compatibility import for the database-backed Django Tasks worker."""
 
-from ..base import BaseWorkerBackend
+from .django_tasks_db import DjangoTasksDBWorker
 
+DjangoTasksWorker = DjangoTasksDBWorker
 
-class DjangoTasksWorker(BaseWorkerBackend):
-    """Backend to start a django task db worker."""
-
-    def start_server(self, *args: str) -> None:
-        """Call django-tasks management command."""
-        management.call_command("db_worker", *args)
+__all__ = ["DjangoTasksWorker"]

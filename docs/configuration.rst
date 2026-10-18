@@ -53,7 +53,7 @@ Python import path to the backend class:
 +--------------------------------------------------+-------------+
 | ``django_prodserver.backends.servers.flower.CeleryFlower``                | Monitoring  |
 +--------------------------------------------------+-------------+
-| ``django_prodserver.backends.workers.django_tasks.DjangoTasksWorker`` | Worker  |
+| ``django_prodserver.backends.workers.django_tasks_db.DjangoTasksDBWorker`` | Worker  |
 +--------------------------------------------------+-------------+
 | ``django_prodserver.backends.workers.django_q2.DjangoQ2Worker``   | Worker      |
 +--------------------------------------------------+-------------+

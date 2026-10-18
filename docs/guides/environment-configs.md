@@ -388,11 +388,11 @@ PRODUCTION_PROCESSES = {
             "threads": "2",
         }
     },
-    # Lightweight task queue for development
+    # Database task worker (configure django_tasks_db and TASKS as in the backend guide)
     "worker": {
-        "BACKEND": "django_prodserver.backends.workers.django_tasks.DjangoTasksWorker",
+        "BACKEND": "django_prodserver.backends.workers.django_tasks_db.DjangoTasksDBWorker",
         "ARGS": {
-            "processes": "1",
+            "queue-name": "default",
         }
     }
 }

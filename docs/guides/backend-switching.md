@@ -234,20 +234,22 @@ PRODUCTION_PROCESSES = {
 }
 ```
 
-**After (Django Tasks - Django 5.1+):**
+**After (Django Tasks DB - Django 6+):**
 
 ```python
 # settings.py
 INSTALLED_APPS = [
     # ...
-    'django.contrib.tasks',
+    'django_tasks_db',
 ]
+
+TASKS = {"default": {"BACKEND": "django_tasks_db.DatabaseBackend"}}
 
 PRODUCTION_PROCESSES = {
     "worker": {
-        "BACKEND": "django_prodserver.backends.workers.django_tasks.DjangoTasksWorker",
+        "BACKEND": "django_prodserver.backends.workers.django_tasks_db.DjangoTasksDBWorker",
         "ARGS": {
-            "processes": "4",
+            "queue-name": "default",
         }
     }
 }
@@ -255,13 +257,13 @@ PRODUCTION_PROCESSES = {
 
 **Migration Steps:**
 
-1. **Ensure Django 5.1+:**
+1. **Install the database backend:**
 
    ```bash
-   pip install "django>=5.1"
+   pip install "django>=6" django-tasks-db
    ```
 
-2. **Add to INSTALLED_APPS**
+2. **Configure the installed app and task backend**, as shown above.
 
 3. **Run migrations:**
 
@@ -280,7 +282,7 @@ PRODUCTION_PROCESSES = {
        # ...
 
    # After (Django Tasks)
-   from django.contrib.tasks import task
+   from django.tasks import task
 
    @task()
    def send_email(email):
@@ -312,9 +314,9 @@ PRODUCTION_PROCESSES = {
 ```python
 PRODUCTION_PROCESSES = {
     "worker": {
-        "BACKEND": "django_prodserver.backends.workers.django_tasks.DjangoTasksWorker",
+        "BACKEND": "django_prodserver.backends.workers.django_tasks_db.DjangoTasksDBWorker",
         "ARGS": {
-            "processes": "2",
+            "queue-name": "default",
         }
     }
 }
@@ -409,7 +411,7 @@ PRODUCTION_PROCESSES = {
    pip install django-q2
    ```
 
-2. **Add to INSTALLED_APPS**
+2. **Configure the installed app and task backend**, as shown above.
 
 3. **Run migrations**
 
