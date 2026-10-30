@@ -39,3 +39,13 @@ tox extras=envs:
 
 # activate:
 #     source .venv/bin/activate
+
+# A library with no server or database: dev, stop and seed are here for the project contract.
+dev:
+    @echo "django-prodserver has no dev server; use just tests or just tox"
+
+stop:
+    @echo "nothing to stop"
+
+seed:
+    @echo "no database to seed"
